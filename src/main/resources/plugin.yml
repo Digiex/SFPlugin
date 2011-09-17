@@ -1,0 +1,29 @@
+name: SimpleFeatures
+main: net.digiex.simplefeatures.SFPlugin
+version: 0.0.1
+description: Basic commands and features
+author: jessenic
+website: http://digiex.net/
+commands:
+    home:
+        usage: /home [worldname]
+        aliases: [h]
+    sethome:
+        usage: /sethome [worldname]
+        aliases: [sh]
+    spawn:
+        usage: /spawn [worldname]
+        aliases: [s]
+    setspawn:
+        usage: /setspawn [worldname]
+    tp:
+        usage: /tp [player]
+    tphere:
+        usage: /tphere [player]
+    tpa:
+        usage: /tpa [player]
+    tpahere:
+        usage: /tpahere [player]
+    world:
+        usage: /world WorldName
+        aliases: [w]
