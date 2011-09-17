@@ -15,15 +15,12 @@ import net.digiex.simplefeatures.commands.CMDtpahere;
 import net.digiex.simplefeatures.commands.CMDworld;
 import net.digiex.simplefeatures.listeners.BListener;
 import net.digiex.simplefeatures.listeners.PListener;
-import net.digiex.simplefeatures.listeners.WListener;
 
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.MaterialData;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
@@ -47,7 +44,6 @@ public class SFPlugin extends JavaPlugin{
 			return true;
 		}
 		return false;
-		//TODO: Check if this works
 	}
 	public static void log(Level level, String msg){
 		log.log(level, "["+pluginName+"] "+msg);
@@ -72,27 +68,6 @@ public class SFPlugin extends JavaPlugin{
 		} catch (IllegalArgumentException e) {
 			return null;
 		}
-	}
-	public String itemStackToString(ItemStack[] itemStacks)
-	{
-		String invString = "";
-		for (ItemStack itemStack : itemStacks) {
-			if (itemStack != null) {
-				invString = invString + ";" + itemStack.getTypeId() + ":" + itemStack.getAmount() + ":" + itemStack.getDurability();
-
-				if (itemStack.getData() == null) {
-					invString = invString + ":null";
-				} else {
-					invString = invString + ":" + itemStack.getData().getData();
-				}
-
-			}
-			else
-			{
-				invString = invString + ";" + "null";
-			}
-		}
-		return invString;
 	}
 	@Override
 	public void onDisable() {
@@ -147,14 +122,12 @@ public class SFPlugin extends JavaPlugin{
 		// Simple Output to the Console to show how many Worlds were loaded.
 		log(Level.INFO,count + " world(s) loaded.");
 		PListener playerListener = new PListener(this);
-		WListener worldListener = new WListener(this);
+		//WListener worldListener = new WListener(this);
 		BListener blockListener = new BListener(this);
 		//Listeners
 		pm.registerEvent(Event.Type.PLAYER_TELEPORT, playerListener, Event.Priority.Highest, this);
-		pm.registerEvent(Event.Type.WORLD_SAVE, worldListener, Priority.Monitor, this);
-		pm.registerEvent(Event.Type.WORLD_SAVE, worldListener, Priority.Monitor, this);
-		pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Priority.Monitor, this);
-		pm.registerEvent(Event.Type.PLAYER_TELEPORT, playerListener, Priority.Highest, this);
+		//pm.registerEvent(Event.Type.WORLD_SAVE, worldListener, Priority.Monitor, this); TODO: Save stuff when world saves.
+		//pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Priority.Monitor, this);
 		pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener, Priority.Highest, this);
 		pm.registerEvent(Event.Type.PLAYER_RESPAWN, playerListener, Priority.Monitor, this);
 		pm.registerEvent(Event.Type.PLAYER_PORTAL, playerListener, Priority.Highest, this);
@@ -168,26 +141,6 @@ public class SFPlugin extends JavaPlugin{
 		getCommand("tpa").setExecutor(new CMDtpa(this));
 		getCommand("tpahere").setExecutor(new CMDtpahere(this));
 		getCommand("world").setExecutor(new CMDworld(this));
-	}
-
-	public ItemStack[] stringToItemStack(String invString)
-	{
-		String[] firstSplit = invString.split("\\;");
-		ItemStack[] itemStack = new ItemStack[firstSplit.length - 1];
-
-		for (int i = 0; i < firstSplit.length - 1; i++) {
-			if (!firstSplit[(i + 1)].equals("null")) {
-				String[] secondSplit = firstSplit[(i + 1)].split("\\:");
-				itemStack[i] = new ItemStack(Integer.valueOf(secondSplit[0]).intValue(), Integer.valueOf(secondSplit[1]).intValue(), Short.valueOf(secondSplit[2]).shortValue());
-
-				if (!secondSplit[3].equals("null")) {
-					itemStack[i].setData(new MaterialData(Integer.valueOf(secondSplit[0]).intValue(), Byte.valueOf(secondSplit[3]).byteValue()));
-				}
-			}
-
-		}
-
-		return itemStack;
 	}
 
 

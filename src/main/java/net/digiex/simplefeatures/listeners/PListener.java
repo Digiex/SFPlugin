@@ -15,7 +15,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerPortalEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.scheduler.BukkitScheduler;
@@ -44,7 +43,6 @@ public class PListener extends PlayerListener{
 
 		if (event.getClickedBlock().getType() == Material.BED_BLOCK)
 		{
-
 			SFPlayer sfplayer = new SFPlayer(event.getPlayer());
 			sfplayer.setHomeLocation();
 			event.getPlayer().sendMessage(ChatColor.YELLOW+"Your home for this world is now set to this bed!");
@@ -58,16 +56,7 @@ public class PListener extends PlayerListener{
 	@Override
 	public void onPlayerPortal(PlayerPortalEvent e) {
 		if (!(e.isCancelled()) && e.getTo() != null) {
-
 			Teleported(e.getFrom().getWorld(),e.getTo().getWorld(),e.getPlayer());
-
-		}
-	}
-	@Override
-	public void onPlayerQuit(PlayerQuitEvent event) {
-		Player player = event.getPlayer();
-		if(player.getGameMode() == GameMode.CREATIVE){
-			player.getInventory().clear();
 		}
 	}
 
@@ -90,18 +79,12 @@ public class PListener extends PlayerListener{
 			}
 		}else if(gamemode == 0){
 			if(player.getGameMode() != GameMode.SURVIVAL) {
-				if(player.getGameMode() == GameMode.CREATIVE){
-					player.getInventory().clear();
-				}
 				player.setGameMode(org.bukkit.GameMode.SURVIVAL);
 
 				SFPlugin.log(Level.INFO, "Gamemode set to survival for "+player.getName());
 			}
 		}else{
 			if(player.getGameMode() != plugin.getServer().getDefaultGameMode()) {
-				if(player.getGameMode() == GameMode.CREATIVE){
-					player.getInventory().clear();
-				}
 				player.setGameMode(plugin.getServer().getDefaultGameMode());
 				SFPlugin.log(Level.INFO, "Gamemode set to default ("+plugin.getServer().getDefaultGameMode().toString()+") for "+player.getName());
 			}
