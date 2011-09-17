@@ -6,17 +6,20 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.digiex.simplefeatures.commands.CMDhome;
+import net.digiex.simplefeatures.commands.CMDsethome;
+import net.digiex.simplefeatures.commands.CMDsetspawn;
+import net.digiex.simplefeatures.commands.CMDspawn;
+import net.digiex.simplefeatures.commands.CMDtpa;
+import net.digiex.simplefeatures.commands.CMDtpahere;
+import net.digiex.simplefeatures.commands.CMDworld;
 import net.digiex.simplefeatures.listeners.BListener;
 import net.digiex.simplefeatures.listeners.PListener;
 import net.digiex.simplefeatures.listeners.WListener;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.inventory.ItemStack;
@@ -29,42 +32,9 @@ import org.bukkit.util.config.Configuration;
 import de.diddiz.LogBlockQuestioner.LogBlockQuestioner;
 
 public class SFPlugin extends JavaPlugin{
-	class tpaPlayer implements Runnable{
-		private final Player fromPlayer;
-		private final Player toPlayer;
-		private String question;
-		private final boolean tpahere;
-		tpaPlayer(Player fromPlayer,Player toPlayer, boolean tpahere) {
-			this.fromPlayer = fromPlayer;
-			this.toPlayer = toPlayer;
-			this.tpahere = tpahere;
-			question = fromPlayer.getDisplayName()+" wants ";
-			if(tpahere){
-				question=question+"to teleport you to him/her.";
-			}else{
 
-				question=question+"to teleport to you.";
-			}
-
-			question=question+" Do you want to accept?";
-		}
-
-		@Override
-		public void run() {
-			if (SFPlugin.questioner.ask(fromPlayer, question, "yes", "no") == "yes") {
-				if(this.tpahere){
-					fromPlayer.teleport(toPlayer);
-				}else{
-					toPlayer.teleport(fromPlayer);
-				}
-				toPlayer.sendMessage("Teleport request accepted.");
-			} else {
-				toPlayer.sendMessage("Teleport request rejected.");
-			}
-		}
-	}
 	public static Configuration playerconfig;
-	private static LogBlockQuestioner questioner;
+	static LogBlockQuestioner questioner;
 	public Configuration config;
 	static final Logger log = Logger.getLogger("Minecraft");
 	public static String pluginName = "SimpleFeatures";
@@ -123,69 +93,6 @@ public class SFPlugin extends JavaPlugin{
 			}
 		}
 		return invString;
-	}
-	@Override
-	public boolean onCommand(CommandSender sender, Command command, String label, String[] args){
-		String cmd = command.getName();
-		/* In-game only commands */
-		if(sender instanceof Player){
-			SFPlayer sfplayer = new SFPlayer((Player) sender);
-			if(cmd.equalsIgnoreCase("home")){
-				sfplayer.teleportToHome();
-				sender.sendMessage(ChatColor.GRAY+"Home sweet home!");
-				return true;
-			}
-			else if(cmd.equalsIgnoreCase("sethome")){
-				sfplayer.setHomeLocation();
-				sender.sendMessage(ChatColor.GRAY+"Home set for this world!");
-				return true;
-			}
-			else if(cmd.equalsIgnoreCase("spawn")){
-				sfplayer.teleportToSpawn();
-				sender.sendMessage(ChatColor.GRAY+"Spawn!");
-				return true;
-			}
-			else if(cmd.equalsIgnoreCase("setspawn")){
-				sfplayer.setSpawn();
-				sender.sendMessage(ChatColor.GRAY+"Spawn set!");
-				return true;
-			}
-			/* Player teleportation */
-			else if(cmd.equalsIgnoreCase("tpa")){
-				if(args.length > 0){
-					Player to = getServer().getPlayer(args[0]);
-					if(to != null){
-						getServer().getScheduler().scheduleAsyncDelayedTask(this, new tpaPlayer((Player)sender, to, false));
-						sender.sendMessage(ChatColor.GRAY+"Requesting!");
-						return true;
-					}
-				}
-			}
-			else if(cmd.equalsIgnoreCase("tpahere")){
-				if(args.length > 0){
-					Player to = getServer().getPlayer(args[0]);
-					if(to != null){
-						getServer().getScheduler().scheduleAsyncDelayedTask(this, new tpaPlayer((Player)sender, to, true));
-						sender.sendMessage(ChatColor.GRAY+"Requesting!");
-						return true;
-					}
-				}
-			}
-			else if(cmd.equalsIgnoreCase("world")){
-				if(args.length > 0){
-					World world = getServer().getWorld(args[0]);
-					if(world != null){
-						((Player) sender).teleport(world.getSpawnLocation());
-						sender.sendMessage(ChatColor.GRAY+"Teleporting to "+world.getName());
-						return true;
-					}
-				}
-			}
-		}else{
-			sender.sendMessage("This command is only for players.");
-			return true;
-		}
-		return false;
 	}
 	@Override
 	public void onDisable() {
@@ -254,7 +161,13 @@ public class SFPlugin extends JavaPlugin{
 		pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.BLOCK_PLACE, blockListener, Priority.Highest, this);
 		pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener, Priority.Highest, this);
-
+		getCommand("home").setExecutor(new CMDhome(this));
+		getCommand("sethome").setExecutor(new CMDsethome(this));
+		getCommand("setspawn").setExecutor(new CMDsetspawn(this));
+		getCommand("spawn").setExecutor(new CMDspawn(this));
+		getCommand("tpa").setExecutor(new CMDtpa(this));
+		getCommand("tpahere").setExecutor(new CMDtpahere(this));
+		getCommand("world").setExecutor(new CMDworld(this));
 	}
 
 	public ItemStack[] stringToItemStack(String invString)
