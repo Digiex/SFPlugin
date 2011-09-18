@@ -52,6 +52,11 @@ public class PListener extends PlayerListener{
 	@Override
 	public void onPlayerJoin(PlayerJoinEvent e){
 		setGameMode(e.getPlayer(),e.getPlayer().getWorld());
+                if(e.getPlayer().isOp()){
+                    e.getPlayer().setDisplayName(ChatColor.AQUA+e.getPlayer().getName()+ChatColor.WHITE);
+                }else{
+                    e.getPlayer().setDisplayName(ChatColor.GREEN+e.getPlayer().getName()+ChatColor.WHITE);
+                }
 	}
 	@Override
 	public void onPlayerPortal(PlayerPortalEvent e) {
