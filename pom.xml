@@ -9,6 +9,10 @@
 	<repositories>
 		<repository>
 			<id>bukkit-repo</id>
+			<url>http://artifacts.lukegb.com/repo</url>
+		</repository>
+		<repository>
+			<id>DigiexMaven</id>
 			<url>http://artifactory.xzkingzxburnzx.tk/repo</url>
 		</repository>
 	</repositories>
@@ -19,8 +23,6 @@
 			<groupId>org.bukkit</groupId>
 			<artifactId>bukkit</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
-			<type>jar</type>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>LogBlockQuestioner</groupId>
