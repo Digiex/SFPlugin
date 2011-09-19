@@ -23,6 +23,11 @@ public class CMDtpa implements CommandExecutor {
             Player player = (Player) sender;
             if (args.length > 0) {
                 if (plugin.teleporters.containsKey(player.getName())) {
+                    if (player.hasPermission("fix me with a permission node please")) {
+                       TeleportConfirmTask task = plugin.teleporters.get(player.getName());
+                       int id = task.getId();
+                       plugin.getServer().getScheduler().cancelTask(id);
+                    }
                     player.sendMessage(ChatColor.GRAY + "You cannot teleport again this quickly, learn to walk");
                     return true;
                 }

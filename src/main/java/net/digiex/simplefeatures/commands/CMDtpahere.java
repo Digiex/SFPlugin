@@ -24,6 +24,11 @@ public class CMDtpahere implements CommandExecutor {
             if (args.length > 0) {
                 Player to = plugin.getServer().getPlayer(args[0]);
                 if (plugin.teleporters.containsKey(to.getName())) {
+                    if (to.hasPermission("Permission node here to please")) {
+                        TeleportConfirmTask task = plugin.teleporters.get(to.getName());
+                        int id = task.getId();
+                        plugin.getServer().getScheduler().cancelTask(id);
+                    }
                     player.sendMessage(ChatColor.GRAY + to.getName() + " cannot teleport this quickly, he/she must learn to walk");
                     return true;
                 }
