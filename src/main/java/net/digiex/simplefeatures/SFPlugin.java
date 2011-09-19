@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.HashMap;
 
 import net.digiex.simplefeatures.commands.CMDhome;
 import net.digiex.simplefeatures.commands.CMDsethome;
@@ -15,6 +16,7 @@ import net.digiex.simplefeatures.commands.CMDtpahere;
 import net.digiex.simplefeatures.commands.CMDworld;
 import net.digiex.simplefeatures.listeners.BListener;
 import net.digiex.simplefeatures.listeners.PListener;
+import net.digiex.simplefeatures.listeners.EListener;
 
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -27,7 +29,6 @@ import org.bukkit.util.Vector;
 import org.bukkit.util.config.Configuration;
 
 import de.diddiz.LogBlockQuestioner.LogBlockQuestioner;
-import net.digiex.simplefeatures.listeners.EListener;
 
 public class SFPlugin extends JavaPlugin{
 
@@ -36,6 +37,10 @@ public class SFPlugin extends JavaPlugin{
 	public Configuration config;
 	static final Logger log = Logger.getLogger("Minecraft");
 	public static String pluginName = "SimpleFeatures";
+        
+        public HashMap<String, TeleportConfirmTask> teleporters = new HashMap<String, TeleportConfirmTask>();
+        public HashMap<String, Boolean> gods = new HashMap<String, Boolean>();
+        
 	public static boolean isInSpawnProtect(Location loc){
 		final Vector player = loc.toVector();
 		final Vector spawn = loc.getWorld().getSpawnLocation().toVector();
@@ -125,7 +130,7 @@ public class SFPlugin extends JavaPlugin{
 		PListener playerListener = new PListener(this);
 		//WListener worldListener = new WListener(this);
 		BListener blockListener = new BListener(this);
-		EListener entityListener = new EListener(this);
+                EListener entityListener = new EListener(this);
 		//Listeners
 		pm.registerEvent(Event.Type.PLAYER_TELEPORT, playerListener, Event.Priority.Highest, this);
 		//pm.registerEvent(Event.Type.WORLD_SAVE, worldListener, Priority.Monitor, this); TODO: Save stuff when world saves.
@@ -136,6 +141,7 @@ public class SFPlugin extends JavaPlugin{
 		pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.BLOCK_PLACE, blockListener, Priority.Highest, this);
 		pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener, Priority.Highest, this);
+                pm.registerEvent(Event.Type.ENTITY_DAMAGE, entityListener, Priority.Highest, this);
 		pm.registerEvent(Event.Type.ENTITY_EXPLODE, entityListener, Priority.Highest, this);
 		getCommand("home").setExecutor(new CMDhome(this));
 		getCommand("sethome").setExecutor(new CMDsethome(this));
