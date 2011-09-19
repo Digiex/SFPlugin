@@ -28,9 +28,10 @@ public class CMDtpahere implements CommandExecutor {
                         TeleportConfirmTask task = plugin.teleporters.get(to.getName());
                         int id = task.getId();
                         plugin.getServer().getScheduler().cancelTask(id);
+                    } else {
+                        player.sendMessage(ChatColor.GRAY + to.getName() + " cannot teleport this quickly, he/she must learn to walk");
+                        return true;
                     }
-                    player.sendMessage(ChatColor.GRAY + to.getName() + " cannot teleport this quickly, he/she must learn to walk");
-                    return true;
                 }
                 if (to != null) {
                     TeleportConfirmTask task = new TeleportConfirmTask(player, to, true, plugin);

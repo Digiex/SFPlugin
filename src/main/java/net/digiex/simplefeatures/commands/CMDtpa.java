@@ -27,9 +27,10 @@ public class CMDtpa implements CommandExecutor {
                        TeleportConfirmTask task = plugin.teleporters.get(player.getName());
                        int id = task.getId();
                        plugin.getServer().getScheduler().cancelTask(id);
+                    } else {
+                        player.sendMessage(ChatColor.GRAY + "You cannot teleport again this quickly, learn to walk");
+                        return true;
                     }
-                    player.sendMessage(ChatColor.GRAY + "You cannot teleport again this quickly, learn to walk");
-                    return true;
                 }
                 Player to = plugin.getServer().getPlayer(args[0]);
                 if (to != null) {
