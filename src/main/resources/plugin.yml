@@ -7,27 +7,75 @@ website: http://digiex.net/
 database: true
 commands:
     home:
-        usage: /home [worldname]
+        usage: |
+               /<command> [world]
+               Example: /<command> Survival
         aliases: [h]
+        description: Teleports player to their home
     listhomes:
-        usage: /listhomes [player]
+        usage: |
+               /<command> [player]
+               Example: /<command> Snookieboy
         aliases: [lh]
+        description: Lists player's homes
     sethome:
-        usage: /sethome [worldname]
+        usage: |
+               /<command> [world]
+               Example: /<command> Survival
         aliases: [sh]
+        description: Sets player's home
     spawn:
-        usage: /spawn [worldname]
+        usage: |
+               /<command> [world]
+               Example: /<command> Survival
         aliases: [s]
+        description: Teleports player to spawn location
     setspawn:
-        usage: /setspawn [worldname]
+        usage: |
+               /<command> [world]
+               Example: /<command> Survival
+        description: Sets the spawn location
     tp:
-        usage: /tp [player]
+        usage: |
+               /<command> [player]
+               Example: /<command> Snookieboy
+        description: Teleports you to player
     tphere:
-        usage: /tphere [player]
+        usage: |
+               /<command> [player]
+               Example: /<command> Snookieboy
+        description: Teleports player to you
     tpa:
-        usage: /tpa [player]
+        usage: |
+               /<command> [player]
+               Example: /<command> Snookieboy
+        description: Teleports you to player with confirmation
     tpahere:
-        usage: /tpahere [player]
+        usage: |
+               /<command> [player]
+               Example: /<command> Snookieboy
+        description: Teleports player to you with confirmation
     world:
-        usage: /world WorldName
+        usage: |
+               /<command> [world]
+               Example: /<command> Survival
         aliases: [w]
+        description: Teleports you to another world
+    who:
+        aliases: [whois, whos, player, players, listplayers, list, playerlist, pl]
+        description: Looks up a player, returning various details about them. If no player is specified, it lists all available players.
+        usage: |
+               /<command> [player]
+               Example: /<command> Snookieboy
+        msg:
+        aliases: [priv, tell, m, pm]
+        description: Sends a player a message
+        usage: |
+               /<command> <player> <message>
+               Example: /<command> Snookieboy I smell sharks!
+        reply:
+        aliases: [r]
+        description: Replies to the last received message
+        usage: |
+               /<command> <message>
+               Example: /<command> Oh no!
