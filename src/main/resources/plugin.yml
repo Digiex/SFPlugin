@@ -8,6 +8,9 @@ commands:
     home:
         usage: /home [worldname]
         aliases: [h]
+    listhomes:
+        usage: /listhomes [player]
+        aliases: [lh]
     sethome:
         usage: /sethome [worldname]
         aliases: [sh]

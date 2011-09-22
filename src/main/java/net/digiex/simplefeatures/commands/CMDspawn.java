@@ -1,6 +1,5 @@
 package net.digiex.simplefeatures.commands;
 
-import net.digiex.simplefeatures.SFPlayer;
 import net.digiex.simplefeatures.SFPlugin;
 
 import org.bukkit.ChatColor;
@@ -17,8 +16,7 @@ public class CMDspawn implements CommandExecutor{
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if(sender instanceof Player){
-			SFPlayer sfplayer = new SFPlayer((Player) sender);
-			sfplayer.teleportToSpawn();
+			((Player) sender).teleport(((Player) sender).getWorld().getSpawnLocation());
 			sender.sendMessage(ChatColor.GRAY+"Spawn!");
 			return true;
 		}

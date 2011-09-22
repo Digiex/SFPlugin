@@ -2,10 +2,13 @@ package net.digiex.simplefeatures;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.HashMap;
+
+import javax.persistence.PersistenceException;
 
 import net.digiex.simplefeatures.commands.CMDhome;
 import net.digiex.simplefeatures.commands.CMDsethome;
@@ -21,6 +24,8 @@ import net.digiex.simplefeatures.listeners.EListener;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.plugin.PluginManager;
@@ -146,11 +151,46 @@ public class SFPlugin extends JavaPlugin{
 		getCommand("home").setExecutor(new CMDhome(this));
 		getCommand("sethome").setExecutor(new CMDsethome(this));
 		getCommand("setspawn").setExecutor(new CMDsetspawn(this));
+		getCommand("listhomes").setExecutor(new CMDsetspawn(this));
 		getCommand("spawn").setExecutor(new CMDspawn(this));
 		getCommand("tpa").setExecutor(new CMDtpa(this));
 		getCommand("tpahere").setExecutor(new CMDtpahere(this));
 		getCommand("world").setExecutor(new CMDworld(this));
+		setupDatabase();
 	}
+    @Override
+    public List<Class<?>> getDatabaseClasses() {
+        List<Class<?>> list = new ArrayList<Class<?>>();
+        list.add(Home.class);
+        return list;
+    }
+    private void setupDatabase() {
+        try {
+            getDatabase().find(Home.class).findRowCount();
+        } catch (PersistenceException ex) {
+            System.out.println("Installing database for " + getDescription().getName() + " due to first time usage");
+            installDDL();
+        }
+    }
+    public static Player getPlayer(CommandSender sender, String name) {
+        if (name != null) {
+            List<Player> players = sender.getServer().matchPlayer(name);
+
+            if (players.isEmpty()) {
+                sender.sendMessage("I don't know who '" + name + "' is!");
+                return null;
+            } else {
+                return players.get(0);
+            }
+        } else {
+            if (!(sender instanceof Player)) {
+                return null;
+            } else {
+                return (Player)sender;
+            }
+        }
+    }
+
 
 
 }

@@ -2,7 +2,7 @@ package net.digiex.simplefeatures.listeners;
 
 import java.util.logging.Level;
 
-import net.digiex.simplefeatures.SFPlayer;
+import net.digiex.simplefeatures.Home;
 import net.digiex.simplefeatures.SFPlugin;
 
 import org.bukkit.ChatColor;
@@ -38,9 +38,17 @@ public class PListener extends PlayerListener {
         }
 
         if (event.getClickedBlock().getType() == Material.BED_BLOCK) {
-            SFPlayer sfplayer = new SFPlayer(event.getPlayer());
-            sfplayer.setHomeLocation();
-            event.getPlayer().sendMessage(ChatColor.YELLOW + "Your home for this world is now set to this bed!");
+        	Player player = event.getPlayer();
+    		Home home = plugin.getDatabase().find(Home.class).where()
+    				.ieq("worldName", player.getLocation().getWorld().getName()).ieq("playerName", player.getName())
+    				.findUnique();
+    		if (home == null) {
+    			home = new Home();
+    			home.setPlayer(player);
+    		}
+    		home.setLocation(player.getLocation());
+    		plugin.getDatabase().save(home);
+            player.sendMessage(ChatColor.YELLOW + "Your home for this world is now set to this bed!");
         }
     }
 
@@ -63,7 +71,14 @@ public class PListener extends PlayerListener {
 
     @Override
     public void onPlayerRespawn(PlayerRespawnEvent event) {
-        event.setRespawnLocation((new SFPlayer(event.getPlayer())).getHomeLocation());
+    	
+    	Home home = plugin.getDatabase().find(Home.class).where()
+				.ieq("worldName", event.getPlayer().getLocation().getWorld().getName()).ieq("playerName", event.getPlayer().getName())
+				.findUnique();
+		if (home != null) {
+			event.setRespawnLocation(home.getLocation());
+		}
+        
     }
 
     @Override
