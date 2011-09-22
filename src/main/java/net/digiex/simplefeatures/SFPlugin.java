@@ -12,11 +12,14 @@ import javax.persistence.PersistenceException;
 
 import net.digiex.simplefeatures.commands.CMDhome;
 import net.digiex.simplefeatures.commands.CMDlisthomes;
+import net.digiex.simplefeatures.commands.CMDmsg;
+import net.digiex.simplefeatures.commands.CMDreply;
 import net.digiex.simplefeatures.commands.CMDsethome;
 import net.digiex.simplefeatures.commands.CMDsetspawn;
 import net.digiex.simplefeatures.commands.CMDspawn;
 import net.digiex.simplefeatures.commands.CMDtpa;
 import net.digiex.simplefeatures.commands.CMDtpahere;
+import net.digiex.simplefeatures.commands.CMDwho;
 import net.digiex.simplefeatures.commands.CMDworld;
 import net.digiex.simplefeatures.listeners.BListener;
 import net.digiex.simplefeatures.listeners.PListener;
@@ -36,38 +39,44 @@ import org.bukkit.util.config.Configuration;
 
 import de.diddiz.LogBlockQuestioner.LogBlockQuestioner;
 
-public class SFPlugin extends JavaPlugin{
+public class SFPlugin extends JavaPlugin {
 
 	public static Configuration playerconfig;
 	static LogBlockQuestioner questioner;
 	public Configuration config;
 	static final Logger log = Logger.getLogger("Minecraft");
 	public static String pluginName = "SimpleFeatures";
-        
-        public HashMap<String, TeleportConfirmTask> teleporters = new HashMap<String, TeleportConfirmTask>();
-        public HashMap<String, Boolean> gods = new HashMap<String, Boolean>();
-        
-	public static boolean isInSpawnProtect(Location loc){
+
+	public HashMap<String, TeleportConfirmTask> teleporters = new HashMap<String, TeleportConfirmTask>();
+	public HashMap<String, Boolean> gods = new HashMap<String, Boolean>();
+
+	public static boolean isInSpawnProtect(Location loc) {
 		final Vector player = loc.toVector();
 		final Vector spawn = loc.getWorld().getSpawnLocation().toVector();
 		final double safe = 50;
-		if (spawn.distance(player) < safe)
-		{
+		if (spawn.distance(player) < safe) {
 			return true;
 		}
 		return false;
 	}
-	public static void log(Level level, String msg){
-		log.log(level, "["+pluginName+"] "+msg);
+
+	public static void log(Level level, String msg) {
+		log.log(level, "[" + pluginName + "] " + msg);
 	}
-	boolean permissionsEnabled = true;    // 0 = unloaded, 1 = loaded successfully, 2 = loaded with errors    int shares = 0;
+
+	boolean permissionsEnabled = true; // 0 = unloaded, 1 = loaded successfully,
+										// 2 = loaded with errors int shares =
+										// 0;
+
 	public Environment getEnvFromString(String env) {
-		// Don't reference the enum directly as there aren't that many, and we can be more forgiving to users this way
+		// Don't reference the enum directly as there aren't that many, and we
+		// can be more forgiving to users this way
 		if (env.equalsIgnoreCase("HELL") || env.equalsIgnoreCase("NETHER")) {
 			env = "NETHER";
 		}
 
-		if (env.equalsIgnoreCase("SKYLANDS") || env.equalsIgnoreCase("SKYLAND") || env.equalsIgnoreCase("STARWARS")) {
+		if (env.equalsIgnoreCase("SKYLANDS") || env.equalsIgnoreCase("SKYLAND")
+				|| env.equalsIgnoreCase("STARWARS")) {
 			env = "SKYLANDS";
 		}
 
@@ -81,21 +90,24 @@ public class SFPlugin extends JavaPlugin{
 			return null;
 		}
 	}
+
 	@Override
 	public void onDisable() {
 		// TODO Auto-generated method stub
 
 	}
+
 	@Override
 	public void onEnable() {
-		questioner = (LogBlockQuestioner)this.getServer().getPluginManager().getPlugin("LogBlockQuestioner");
+		questioner = (LogBlockQuestioner) this.getServer().getPluginManager()
+				.getPlugin("LogBlockQuestioner");
 		PluginManager pm = getServer().getPluginManager();
 		// TODO Auto-generated method stub
-		if(!this.getDataFolder().exists()){
+		if (!this.getDataFolder().exists()) {
 			this.getDataFolder().mkdir();
 		}
-		File pcfgfile = new File(this.getDataFolder(),"players.yml");
-		if(!pcfgfile.exists()){
+		File pcfgfile = new File(this.getDataFolder(), "players.yml");
+		if (!pcfgfile.exists()) {
 			try {
 				pcfgfile.createNewFile();
 			} catch (IOException e) {
@@ -109,46 +121,67 @@ public class SFPlugin extends JavaPlugin{
 		config.load();
 		config.setHeader("#Feature configuration");
 		config.save();
-		//Worlds
+		// Worlds
 
 		// Basic Counter to count how many Worlds we are loading.
 		int count = 0;
 		// Grab all the Worlds from the Config.
 		List<String> worldKeys = config.getKeys("worlds");
 
-
 		// Check that the list is not null.
 		if (worldKeys != null) {
 			for (String worldKey : worldKeys) {
 				// Grab the initial values from the config file.
-				String environment = config.getString("worlds." + worldKey + ".environment", "NORMAL"); // Grab the Environment as a String.
-				World newworld = getServer().createWorld(worldKey, getEnvFromString(environment));
+				String environment = config.getString("worlds." + worldKey
+						+ ".environment", "NORMAL"); // Grab the Environment as
+														// a String.
+				World newworld = getServer().createWorld(worldKey,
+						getEnvFromString(environment));
 				// Increment the world count
-				newworld.setPVP(config.getBoolean("worlds." + worldKey + ".pvp", false));
-				newworld.setSpawnFlags(config.getBoolean("worlds." + worldKey + ".monsters", false), config.getBoolean("worlds." + worldKey + ".animals", false));
-				log(Level.INFO,"World "+newworld.getName()+" loaded, environment "+newworld.getEnvironment().toString()+", pvp: "+newworld.getPVP()+", Animals:"+newworld.getAllowAnimals()+", Monsters: "+newworld.getAllowMonsters());
+				newworld.setPVP(config.getBoolean(
+						"worlds." + worldKey + ".pvp", false));
+				newworld.setSpawnFlags(config.getBoolean("worlds." + worldKey
+						+ ".monsters", false), config.getBoolean("worlds."
+						+ worldKey + ".animals", false));
+				log(Level.INFO,
+						"World " + newworld.getName() + " loaded, environment "
+								+ newworld.getEnvironment().toString()
+								+ ", pvp: " + newworld.getPVP() + ", Animals:"
+								+ newworld.getAllowAnimals() + ", Monsters: "
+								+ newworld.getAllowMonsters());
 				count++;
 			}
 		}
 
 		// Simple Output to the Console to show how many Worlds were loaded.
-		log(Level.INFO,count + " world(s) loaded.");
+		log(Level.INFO, count + " world(s) loaded.");
 		PListener playerListener = new PListener(this);
-		//WListener worldListener = new WListener(this);
+		// WListener worldListener = new WListener(this);
 		BListener blockListener = new BListener(this);
-                EListener entityListener = new EListener(this);
-		//Listeners
-		pm.registerEvent(Event.Type.PLAYER_TELEPORT, playerListener, Event.Priority.Highest, this);
-		//pm.registerEvent(Event.Type.WORLD_SAVE, worldListener, Priority.Monitor, this); TODO: Save stuff when world saves.
-		//pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Priority.Monitor, this);
-		pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener, Priority.Highest, this);
-		pm.registerEvent(Event.Type.PLAYER_RESPAWN, playerListener, Priority.Monitor, this);
-		pm.registerEvent(Event.Type.PLAYER_PORTAL, playerListener, Priority.Highest, this);
-		pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Priority.Normal, this);
-		pm.registerEvent(Event.Type.BLOCK_PLACE, blockListener, Priority.Highest, this);
-		pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener, Priority.Highest, this);
-                pm.registerEvent(Event.Type.ENTITY_DAMAGE, entityListener, Priority.Highest, this);
-		pm.registerEvent(Event.Type.ENTITY_EXPLODE, entityListener, Priority.Highest, this);
+		EListener entityListener = new EListener(this);
+		// Listeners
+		pm.registerEvent(Event.Type.PLAYER_TELEPORT, playerListener,
+				Event.Priority.Highest, this);
+		// pm.registerEvent(Event.Type.WORLD_SAVE, worldListener,
+		// Priority.Monitor, this); TODO: Save stuff when world saves.
+		// pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener,
+		// Priority.Monitor, this);
+		pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener,
+				Priority.Highest, this);
+		pm.registerEvent(Event.Type.PLAYER_RESPAWN, playerListener,
+				Priority.Monitor, this);
+		pm.registerEvent(Event.Type.PLAYER_PORTAL, playerListener,
+				Priority.Highest, this);
+		pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener,
+				Priority.Normal, this);
+		pm.registerEvent(Event.Type.BLOCK_PLACE, blockListener,
+				Priority.Highest, this);
+		pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener,
+				Priority.Highest, this);
+		pm.registerEvent(Event.Type.ENTITY_DAMAGE, entityListener,
+				Priority.Highest, this);
+		pm.registerEvent(Event.Type.ENTITY_EXPLODE, entityListener,
+				Priority.Highest, this);
 		getCommand("home").setExecutor(new CMDhome(this));
 		getCommand("sethome").setExecutor(new CMDsethome(this));
 		getCommand("setspawn").setExecutor(new CMDsetspawn(this));
@@ -157,43 +190,60 @@ public class SFPlugin extends JavaPlugin{
 		getCommand("tpa").setExecutor(new CMDtpa(this));
 		getCommand("tpahere").setExecutor(new CMDtpahere(this));
 		getCommand("world").setExecutor(new CMDworld(this));
+		getCommand("who").setExecutor(new CMDwho(this));
+		getCommand("msg").setExecutor(new CMDmsg(this));
+		getCommand("reply").setExecutor(new CMDreply(this));
 		setupDatabase();
 	}
-    @Override
-    public List<Class<?>> getDatabaseClasses() {
-        List<Class<?>> list = new ArrayList<Class<?>>();
-        list.add(Home.class);
-        return list;
-    }
-    private void setupDatabase() {
-        try {
-            getDatabase().find(Home.class).findRowCount();
-        }
-        catch (PersistenceException ex) {
-            System.out.println("Installing database for " + getDescription().getName() + " due to first time usage");
-            installDDL();
-        }
-    }
-    public static Player getPlayer(CommandSender sender, String name) {
-        if (name != null) {
-            List<Player> players = sender.getServer().matchPlayer(name);
 
-            if (players.isEmpty()) {
-                sender.sendMessage("I don't know who '" + name + "' is!");
-                return null;
-            } else {
-                return players.get(0);
-            }
-        } else {
-            if (!(sender instanceof Player)) {
-                return null;
-            } else {
-                return (Player)sender;
-            }
-        }
-    }
+	@Override
+	public List<Class<?>> getDatabaseClasses() {
+		List<Class<?>> list = new ArrayList<Class<?>>();
+		list.add(Home.class);
+		return list;
+	}
 
+	public static String recompileMessage(String[] args, int start, int end) {
+		if (start > args.length) {
+			throw new IndexOutOfBoundsException();
+		}
 
+		String result = args[start];
+
+		for (int i = start + 1; i <= end; i++) {
+			result += " " + args[i];
+		}
+
+		return result;
+	}
+
+	private void setupDatabase() {
+		try {
+			getDatabase().find(Home.class).findRowCount();
+		} catch (PersistenceException ex) {
+			System.out.println("Installing database for "
+					+ getDescription().getName() + " due to first time usage");
+			installDDL();
+		}
+	}
+
+	public static Player getPlayer(CommandSender sender, String name) {
+		if (name != null) {
+			List<Player> players = sender.getServer().matchPlayer(name);
+
+			if (players.isEmpty()) {
+				sender.sendMessage("I don't know who '" + name + "' is!");
+				return null;
+			} else {
+				return players.get(0);
+			}
+		} else {
+			if (!(sender instanceof Player)) {
+				return null;
+			} else {
+				return (Player) sender;
+			}
+		}
+	}
 
 }
-

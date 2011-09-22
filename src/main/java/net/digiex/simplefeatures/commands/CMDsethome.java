@@ -19,7 +19,7 @@ public class CMDsethome implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command command,
 			String label, String[] args) {
 		String name = null;
-		if(args.length > 0){
+		if (args.length > 0) {
 			name = args[0];
 		}
 		Player player = SFPlugin.getPlayer(sender, name);
