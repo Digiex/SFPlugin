@@ -2,7 +2,7 @@ package net.digiex.simplefeatures.commands;
 
 import java.util.List;
 
-import net.digiex.simplefeatures.Home;
+import net.digiex.simplefeatures.SFHome;
 import net.digiex.simplefeatures.SFPlugin;
 
 import org.bukkit.command.Command;
@@ -27,7 +27,7 @@ public class CMDlisthomes implements CommandExecutor {
 		if (player == null) {
 			return true;
 		}
-		List<Home> homes = plugin.getDatabase().find(Home.class).where()
+		List<SFHome> homes = plugin.getDatabase().find(SFHome.class).where()
 				.ieq("playerName", player.getName()).findList();
 		if (homes.isEmpty()) {
 			if (sender == player) {
@@ -37,7 +37,7 @@ public class CMDlisthomes implements CommandExecutor {
 			}
 		} else {
 			String result = "";
-			for (Home home : homes) {
+			for (SFHome home : homes) {
 				if (result.length() > 0) {
 					result += ", ";
 				}

@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
 
 @Entity()
 @Table(name = "sf_home")
-public class Home {
+public class SFHome {
 	@Id
 	private int id;
 

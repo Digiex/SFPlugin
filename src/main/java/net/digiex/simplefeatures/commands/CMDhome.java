@@ -1,6 +1,6 @@
 package net.digiex.simplefeatures.commands;
 
-import net.digiex.simplefeatures.Home;
+import net.digiex.simplefeatures.SFHome;
 import net.digiex.simplefeatures.SFPlugin;
 
 import org.bukkit.ChatColor;
@@ -33,7 +33,7 @@ public class CMDhome implements CommandExecutor {
 			sender.sendMessage(ChatColor.RED + "I don't know how to move you!");
 			return true;
 		}
-		Home home = plugin.getDatabase().find(Home.class).where()
+		SFHome home = plugin.getDatabase().find(SFHome.class).where()
 				.ieq("worldName", player.getLocation().getWorld().getName()).ieq("playerName", player.getName())
 				.findUnique();
 		if (home == null) {

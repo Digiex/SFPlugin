@@ -25,6 +25,7 @@ import net.digiex.simplefeatures.listeners.BListener;
 import net.digiex.simplefeatures.listeners.PListener;
 import net.digiex.simplefeatures.listeners.EListener;
 
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
@@ -32,6 +33,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.MaterialData;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
@@ -170,6 +173,8 @@ public class SFPlugin extends JavaPlugin {
 				Priority.Highest, this);
 		pm.registerEvent(Event.Type.PLAYER_RESPAWN, playerListener,
 				Priority.Monitor, this);
+		pm.registerEvent(Event.Type.PLAYER_GAME_MODE_CHANGE, playerListener,
+				Priority.Monitor, this);
 		pm.registerEvent(Event.Type.PLAYER_PORTAL, playerListener,
 				Priority.Highest, this);
 		pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener,
@@ -199,7 +204,8 @@ public class SFPlugin extends JavaPlugin {
 	@Override
 	public List<Class<?>> getDatabaseClasses() {
 		List<Class<?>> list = new ArrayList<Class<?>>();
-		list.add(Home.class);
+		list.add(SFHome.class);
+		list.add(SFInventory.class);
 		return list;
 	}
 
@@ -219,7 +225,8 @@ public class SFPlugin extends JavaPlugin {
 
 	private void setupDatabase() {
 		try {
-			getDatabase().find(Home.class).findRowCount();
+			getDatabase().find(SFHome.class).findRowCount();
+			getDatabase().find(SFInventory.class).findRowCount();
 		} catch (PersistenceException ex) {
 			System.out.println("Installing database for "
 					+ getDescription().getName() + " due to first time usage");
@@ -246,4 +253,78 @@ public class SFPlugin extends JavaPlugin {
 		}
 	}
 
+	public static String itemStackToString(ItemStack[] itemStacks) {
+		String invString = "";
+		for (ItemStack itemStack : itemStacks) {
+			if (itemStack != null) {
+				invString = invString + ";" + itemStack.getTypeId() + ":"
+						+ itemStack.getAmount() + ":"
+						+ itemStack.getDurability();
+
+				if (itemStack.getData() == null)
+					invString = invString + ":null";
+				else {
+					invString = invString + ":" + itemStack.getData().getData();
+				}
+
+			} else {
+				invString = invString + ";" + "null";
+			}
+		}
+		return invString;
+	}
+
+	public static ItemStack[] stringToItemStack(String invString) {
+		if(invString == null){
+			return null;
+		}
+		String[] firstSplit = invString.split("\\;");
+		ItemStack[] itemStack = new ItemStack[firstSplit.length - 1];
+
+		for (int i = 0; i < firstSplit.length - 1; i++) {
+			if (!firstSplit[(i + 1)].equals("null")) {
+				String[] secondSplit = firstSplit[(i + 1)].split("\\:");
+				itemStack[i] = new ItemStack(Integer.valueOf(secondSplit[0])
+						.intValue(),
+						Integer.valueOf(secondSplit[1]).intValue(), Short
+								.valueOf(secondSplit[2]).shortValue());
+
+				if (!secondSplit[3].equals("null")) {
+					itemStack[i].setData(new MaterialData(Integer.valueOf(
+							secondSplit[0]).intValue(), Byte.valueOf(
+							secondSplit[3]).byteValue()));
+				}
+			}
+
+		}
+
+		return itemStack;
+	}
+
+	public void saveSFInventory(SFInventory inv) {
+		getDatabase().save(inv);
+	}
+
+	public boolean deleteSFInventory(GameMode gameMode, String playerName) {
+		SFInventory inv = getSFInventory(gameMode, playerName);
+		if (inv != null) {
+			getDatabase().delete(inv);
+			return true;
+		}
+		return false;
+	}
+
+	public SFInventory getSFInventory(GameMode gameMode, String playerName) {
+		int gm = gameMode.getValue();
+		SFInventory inv = (SFInventory) getDatabase().find(SFInventory.class)
+				.where().eq("gameMode", gm).ieq("playerName", playerName)
+				.findUnique();
+		return inv;
+	}
+
+	public void updateSFInventory(SFInventory inv) {
+		deleteSFInventory(inv.getGamemode(),
+				inv.getPlayerName());
+		saveSFInventory(inv);
+	}
 }
