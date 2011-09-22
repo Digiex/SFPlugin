@@ -67,13 +67,13 @@ commands:
         usage: |
                /<command> [player]
                Example: /<command> Snookieboy
-        msg:
+    msg:
         aliases: [priv, tell, m, pm]
         description: Sends a player a message
         usage: |
                /<command> <player> <message>
                Example: /<command> Snookieboy I smell sharks!
-        reply:
+    reply:
         aliases: [r]
         description: Replies to the last received message
         usage: |
