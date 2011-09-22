@@ -18,7 +18,11 @@ public class CMDhome implements CommandExecutor {
 
 	public boolean onCommand(CommandSender sender, Command command,
 			String label, String[] args) {
-		Player player = SFPlugin.getPlayer(sender, args[0]);
+		String name = null;
+		if(args.length > 0){
+			name = args[0];
+		}
+		Player player = SFPlugin.getPlayer(sender, name);
 		if (player == null) {
 			return true;
 		} else if ((player != sender) && (!sender.isOp())) {

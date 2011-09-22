@@ -11,6 +11,7 @@ import java.util.HashMap;
 import javax.persistence.PersistenceException;
 
 import net.digiex.simplefeatures.commands.CMDhome;
+import net.digiex.simplefeatures.commands.CMDlisthomes;
 import net.digiex.simplefeatures.commands.CMDsethome;
 import net.digiex.simplefeatures.commands.CMDsetspawn;
 import net.digiex.simplefeatures.commands.CMDspawn;
@@ -151,7 +152,7 @@ public class SFPlugin extends JavaPlugin{
 		getCommand("home").setExecutor(new CMDhome(this));
 		getCommand("sethome").setExecutor(new CMDsethome(this));
 		getCommand("setspawn").setExecutor(new CMDsetspawn(this));
-		getCommand("listhomes").setExecutor(new CMDsetspawn(this));
+		getCommand("listhomes").setExecutor(new CMDlisthomes(this));
 		getCommand("spawn").setExecutor(new CMDspawn(this));
 		getCommand("tpa").setExecutor(new CMDtpa(this));
 		getCommand("tpahere").setExecutor(new CMDtpahere(this));
@@ -167,7 +168,8 @@ public class SFPlugin extends JavaPlugin{
     private void setupDatabase() {
         try {
             getDatabase().find(Home.class).findRowCount();
-        } catch (PersistenceException ex) {
+        }
+        catch (PersistenceException ex) {
             System.out.println("Installing database for " + getDescription().getName() + " due to first time usage");
             installDDL();
         }

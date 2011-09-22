@@ -4,6 +4,7 @@ version: 0.0.1
 description: Basic commands and features
 author: jessenic
 website: http://digiex.net/
+database: true
 commands:
     home:
         usage: /home [worldname]
