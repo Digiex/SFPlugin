@@ -91,20 +91,26 @@ public class PListener extends PlayerListener {
 		inv.setFood(e.getPlayer().getFoodLevel());
 		plugin.updateSFInventory(inv);
 
-		inv = plugin
-				.getSFInventory(e.getNewGameMode(), e.getPlayer().getName());
 		e.getPlayer().getInventory().clear();
-		ItemStack[] contents = SFPlugin.stringToItemStack(inv.getInventory());
-		if (contents != null) {
-			e.getPlayer().getInventory().setContents(contents);
+		try {
+			inv = plugin.getSFInventory(e.getNewGameMode(), e.getPlayer()
+					.getName());
+			ItemStack[] contents = SFPlugin.stringToItemStack(inv
+					.getInventory());
+			if (contents != null) {
+				e.getPlayer().getInventory().setContents(contents);
+			}
+			ItemStack[] armor = SFPlugin.stringToItemStack(inv.getArmor());
+			if (armor != null) {
+				e.getPlayer().getInventory().setArmorContents(armor);
+			}
+			e.getPlayer().setHealth(inv.getHealth());
+			e.getPlayer().setFoodLevel(inv.getFood());
+		} catch (NullPointerException ex) {
+			SFPlugin.log(Level.INFO, "Some inventory contents were null for "
+					+ e.getPlayer().getName() + ". Stacktrace for debugging:");
+			ex.printStackTrace();
 		}
-		ItemStack[] armor = SFPlugin.stringToItemStack(inv.getArmor());
-		if (armor != null) {
-			e.getPlayer().getInventory().setArmorContents(armor);
-		}
-		e.getPlayer().setHealth(inv.getHealth());
-		e.getPlayer().setFoodLevel(inv.getFood());
-
 	}
 
 	@Override
