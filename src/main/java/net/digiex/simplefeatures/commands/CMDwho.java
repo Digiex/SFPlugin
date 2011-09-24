@@ -56,6 +56,10 @@ public class CMDwho  implements CommandExecutor {
         	Map<String, String> result = new HashMap<String, String>();
             result.put("Display Name", player.getDisplayName());
             result.put("World", player.getWorld().getName());
+            result.put("IP",player.getAddress().getAddress().getHostAddress());
+            result.put("Health", player.getHealth()+"/20");
+            result.put("Food", player.getFoodLevel()+"/20");
+            result.put("Location", "x"+player.getLocation().getBlockX()+", y"+player.getLocation().getBlockY()+", z"+player.getLocation().getBlockZ());
 
             if (!ChatColor.stripColor(player.getDisplayName()).equalsIgnoreCase(player.getName())) {
                 result.put("Username", player.getName());
