@@ -20,9 +20,18 @@ public class CMDworld implements CommandExecutor{
 			if(args.length > 0){
 				World world = plugin.getServer().getWorld(args[0]);
 				if(world != null){
+					if(world.getName().contains("_nether")){
+						if(!((Player) sender).isOp()){
+							sender.sendMessage(ChatColor.RED+"Only ops can warp to the nether!");
+							return false;
+						}else{
+							sender.sendMessage("Wait! You need to use nether portals!!! Oh you're an OP... Sorry, my mistake.");
+						}
+					}
 					((Player) sender).teleport(world.getSpawnLocation());
 					sender.sendMessage(ChatColor.GRAY+"Teleporting to "+world.getName());
 					return true;
+					
 				}
 			}
 		}
