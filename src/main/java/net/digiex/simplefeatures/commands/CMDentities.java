@@ -11,6 +11,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Minecart;
+import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 
@@ -36,12 +37,28 @@ public class CMDentities implements CommandExecutor {
 				w = plugin.getServer().getWorld(args[0]);
 			}
 			if (w != null) {
+				if (args.length > 1) {
+					if (args[1].equalsIgnoreCase("clear")) {
+						sender.sendMessage("Clearing " + w.getEntities().size()
+								+ " in " + w.getName()
+								+ " (excluding Players and Paintings)");
+						for (Entity e : w.getEntities()) {
+							if (!(e instanceof Player)
+									&& !(e instanceof Painting)) {
+								e.remove();
+							}
+						}
+						return true;
+					}
+				}
 				sender.sendMessage("Entities for " + w.getName());
 				int expOrbs = 0;
 				int creatures = 0;
 				int items = 0;
 				int projectiles = 0;
 				int minecarts = 0;
+				int paintings = 0;
+				int players = 0;
 				for (Entity e : w.getEntities()) {
 					if (e instanceof ExperienceOrb) {
 						expOrbs++;
@@ -57,6 +74,12 @@ public class CMDentities implements CommandExecutor {
 					}
 					if (e instanceof Minecart) {
 						minecarts++;
+					}
+					if (e instanceof Painting) {
+						paintings++;
+					}
+					if (e instanceof Player) {
+						players++;
 					}
 				}
 				sender.sendMessage("All entities: " + w.getEntities().size());
@@ -74,6 +97,12 @@ public class CMDentities implements CommandExecutor {
 				}
 				if (minecarts > 0) {
 					sender.sendMessage("Minecarts: " + minecarts);
+				}
+				if (paintings > 0) {
+					sender.sendMessage("Paintings: " + paintings);
+				}
+				if (players > 0) {
+					sender.sendMessage("Players: " + players);
 				}
 				return true;
 			}
