@@ -11,7 +11,9 @@ import java.util.HashMap;
 import javax.persistence.PersistenceException;
 
 import net.digiex.simplefeatures.commands.CMDhome;
+import net.digiex.simplefeatures.commands.CMDlastmsgs;
 import net.digiex.simplefeatures.commands.CMDlisthomes;
+import net.digiex.simplefeatures.commands.CMDme;
 import net.digiex.simplefeatures.commands.CMDmsg;
 import net.digiex.simplefeatures.commands.CMDreply;
 import net.digiex.simplefeatures.commands.CMDsethome;
@@ -202,6 +204,8 @@ public class SFPlugin extends JavaPlugin {
 		getCommand("who").setExecutor(new CMDwho(this));
 		getCommand("msg").setExecutor(new CMDmsg(this));
 		getCommand("reply").setExecutor(new CMDreply(this));
+		getCommand("me").setExecutor(new CMDme(this));
+		getCommand("lastmsgs").setExecutor(new CMDlastmsgs(this));
 		setupDatabase();
 	}
 
@@ -210,6 +214,7 @@ public class SFPlugin extends JavaPlugin {
 		List<Class<?>> list = new ArrayList<Class<?>>();
 		list.add(SFHome.class);
 		list.add(SFInventory.class);
+		list.add(SFMail.class);
 		return list;
 	}
 
@@ -231,6 +236,7 @@ public class SFPlugin extends JavaPlugin {
 		try {
 			getDatabase().find(SFHome.class).findRowCount();
 			getDatabase().find(SFInventory.class).findRowCount();
+			getDatabase().find(SFMail.class).findRowCount();
 		} catch (PersistenceException ex) {
 			System.out.println("Installing database for "
 					+ getDescription().getName() + " due to first time usage");
@@ -279,7 +285,7 @@ public class SFPlugin extends JavaPlugin {
 	}
 
 	public static ItemStack[] stringToItemStack(String invString) {
-		if(invString == null){
+		if (invString == null) {
 			return null;
 		}
 		String[] firstSplit = invString.split("\\;");
@@ -327,8 +333,7 @@ public class SFPlugin extends JavaPlugin {
 	}
 
 	public void updateSFInventory(SFInventory inv) {
-		deleteSFInventory(inv.getGamemode(),
-				inv.getPlayerName());
+		deleteSFInventory(inv.getGamemode(), inv.getPlayerName());
 		saveSFInventory(inv);
 	}
 }

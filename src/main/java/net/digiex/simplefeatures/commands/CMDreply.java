@@ -1,6 +1,7 @@
 package net.digiex.simplefeatures.commands;
 
 
+import net.digiex.simplefeatures.SFMail;
 import net.digiex.simplefeatures.SFPlugin;
 
 import org.bukkit.ChatColor;
@@ -40,10 +41,7 @@ public class CMDreply implements CommandExecutor {
 		} else {
 			String message = SFPlugin
 					.recompileMessage(args, 0, args.length - 1);
-			String name = "Anonymous";
-
-			// TODO: This should use an event, but we need some internal changes
-			// to support that fully.
+			String name = "console";
 
 			if (target instanceof Player) {
 				name = ((Player) target).getDisplayName();
@@ -52,6 +50,9 @@ public class CMDreply implements CommandExecutor {
 			target.sendMessage(String.format("[%s]->[you]: %s",
 					player.getDisplayName(), message));
 			sender.sendMessage(String.format("[you]->[%s]: %s", name, message));
+			SFMail save = new SFMail();
+			save.newMail(sender.getName(), target.getName(), message);
+			plugin.getDatabase().save(save);
 		}
 
 		return true;

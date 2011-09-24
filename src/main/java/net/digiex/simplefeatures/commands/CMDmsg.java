@@ -3,6 +3,7 @@ package net.digiex.simplefeatures.commands;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.digiex.simplefeatures.SFMail;
 import net.digiex.simplefeatures.SFPlugin;
 
 import org.bukkit.ChatColor;
@@ -42,7 +43,7 @@ public class CMDmsg implements CommandExecutor {
 		if (target != null) {
 			String message = SFPlugin
 					.recompileMessage(args, 1, args.length - 1);
-			String name = "Anonymous";
+			String name = "console";
 
 			if (sender instanceof Player) {
 				name = ((Player) sender).getDisplayName();
@@ -53,6 +54,9 @@ public class CMDmsg implements CommandExecutor {
 					target.getDisplayName(), message));
 
 			lastMessages.put(target, sender);
+			SFMail save = new SFMail();
+			save.newMail(sender.getName(), target.getName(), message);
+			plugin.getDatabase().save(save);
 		}
 
 		return true;
