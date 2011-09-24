@@ -39,12 +39,15 @@ public class CMDentities implements CommandExecutor {
 			if (w != null) {
 				if (args.length > 1) {
 					if (args[1].equalsIgnoreCase("clear")) {
-						sender.sendMessage("Clearing " + w.getEntities().size()
-								+ " in " + w.getName()
-								+ " (excluding Players and Paintings)");
+						sender.sendMessage("Clearing "
+								+ w.getEntities().size()
+								+ " in "
+								+ w.getName()
+								+ " (excluding Players and Paintings and Minecarts)");
 						for (Entity e : w.getEntities()) {
 							if (!(e instanceof Player)
-									&& !(e instanceof Painting)) {
+									&& !(e instanceof Painting)
+									&& !(e instanceof Minecart)) {
 								e.remove();
 							}
 						}
