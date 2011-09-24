@@ -1,5 +1,10 @@
 package net.digiex.simplefeatures.commands;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import net.digiex.simplefeatures.SFPlugin;
 
@@ -75,28 +80,57 @@ public class CMDwho implements CommandExecutor {
 	}
 
 	private void PerformPlayerList(CommandSender sender, String[] args) {
-		String result = "";
-		Player[] players = plugin.getServer().getOnlinePlayers();
-		int count = 0;
+		StringBuilder online = new StringBuilder();
+		online.append(ChatColor.BLUE).append("There are ")
+				.append(ChatColor.RED)
+				.append(plugin.getServer().getOnlinePlayers().length);
+		online.append(ChatColor.BLUE).append(" out of a maximum ")
+				.append(ChatColor.RED)
+				.append(plugin.getServer().getMaxPlayers());
+		online.append(ChatColor.BLUE).append(" players online.");
+		sender.sendMessage(online.toString());
 
-		for (Player player : players) {
-			String name = player.getDisplayName();
+		Map<String, List<Player>> sort = new HashMap<String, List<Player>>();
+		for (Player p : plugin.getServer().getOnlinePlayers()) {
 
-			if (name.length() > 0) {
-				if (result.length() > 0)
-					result += ", ";
-				result += name;
-				count++;
+			String world = p.getWorld().getName();
+			if(world.contains("_nether")){
+				world = "Nether";
 			}
+			List<Player> list = sort.get(world);
+			if (list == null) {
+				list = new ArrayList<Player>();
+				sort.put(world, list);
+			}
+			list.add(p);
+		}
+		String[] worlds = sort.keySet().toArray(new String[0]);
+		Arrays.sort(worlds, String.CASE_INSENSITIVE_ORDER);
+		for (String world : worlds) {
+			StringBuilder groupString = new StringBuilder();
+			groupString.append(world).append(": ");
+			List<Player> players = sort.get(world);
+			//Collections.sort(players); TODO: Make this work
+			boolean first = true;
+			for (Player player : players) {
+				if (!first) {
+					groupString.append(", ");
+				} else {
+					first = false;
+				}
+				if (player.isSleeping()) {
+					groupString.append(ChatColor.GRAY+"[SLEEPING");
+					if (player.isSleepingIgnored()) {
+						groupString.append(" (ignored)");
+					}
+					groupString.append("]"+ChatColor.WHITE);
+				}
+				groupString.append(player.getDisplayName());
+				groupString.append(ChatColor.WHITE);
+			}
+			sender.sendMessage(groupString.toString());
 		}
 
-		if (count == 0) {
-			sender.sendMessage("There's currently nobody playing on this server!");
-		} else if (count == 1) {
-			sender.sendMessage("There's only one player online: " + result);
-		} else {
-			sender.sendMessage("Online players: " + result);
-		}
 	}
 
 }
