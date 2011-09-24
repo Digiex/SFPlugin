@@ -75,6 +75,7 @@ public class CMDentities implements CommandExecutor {
 				if (minecarts > 0) {
 					sender.sendMessage("Minecarts: " + minecarts);
 				}
+				return true;
 			}
 		}
 		return false;
