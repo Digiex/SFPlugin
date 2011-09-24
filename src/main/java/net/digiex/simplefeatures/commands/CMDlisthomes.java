@@ -29,7 +29,7 @@ public class CMDlisthomes implements CommandExecutor {
 		}
 		List<SFHome> homes = plugin.getDatabase().find(SFHome.class).where()
 				.ieq("playerName", player.getName()).findList();
-		if (homes.isEmpty()) {
+		if (homes.isEmpty() && player.getBedSpawnLocation() == null) {
 			if (sender == player) {
 				sender.sendMessage("You have no homes!");
 			} else {

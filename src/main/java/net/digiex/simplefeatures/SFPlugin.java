@@ -10,6 +10,7 @@ import java.util.HashMap;
 
 import javax.persistence.PersistenceException;
 
+import net.digiex.simplefeatures.commands.CMDentities;
 import net.digiex.simplefeatures.commands.CMDhome;
 import net.digiex.simplefeatures.commands.CMDlastmsgs;
 import net.digiex.simplefeatures.commands.CMDlisthomes;
@@ -206,6 +207,7 @@ public class SFPlugin extends JavaPlugin {
 		getCommand("reply").setExecutor(new CMDreply(this));
 		getCommand("me").setExecutor(new CMDme(this));
 		getCommand("lastmsgs").setExecutor(new CMDlastmsgs(this));
+		getCommand("entities").setExecutor(new CMDentities(this));
 		setupDatabase();
 	}
 

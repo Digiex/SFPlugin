@@ -79,3 +79,18 @@ commands:
         usage: |
                /<command> <message>
                Example: /<command> Oh no!
+    me:
+        description: Express yourself!
+        usage: |
+               /<command> <message>
+               Example: /<command> is a shark!
+    lastmsgs:
+        description: Shows last 5 messages sent to you.
+        usage: |
+               /<command> [from player]
+               Example: /<command> Snookieboy
+    entities:
+        description: Debugging
+        usage: |
+               /<command> [world]
+               Example: /<command> Survival
