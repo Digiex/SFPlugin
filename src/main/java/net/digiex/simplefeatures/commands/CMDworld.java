@@ -23,10 +23,14 @@ public class CMDworld implements CommandExecutor {
 			if (args.length > 0) {
 				World world = null;
 				for (World w : plugin.getServer().getWorlds()) {
-					if (w.getName().equalsIgnoreCase(args[0])) {
+					String wname = w.getName();
+					if (w.getName().contains("_nether")) {
+						wname = "Nether";
+					}
+					if (wname.equalsIgnoreCase(args[0])) {
 						world = w;
-					} else if (w.getName().toLowerCase()
-							.contains(args[0].toLowerCase())) {
+					} else if (wname.toLowerCase().indexOf(
+							args[0].toLowerCase()) != -1) {
 						world = w;
 					}
 
@@ -47,16 +51,20 @@ public class CMDworld implements CommandExecutor {
 					return true;
 
 				}
+				ListWorlds(sender, args[0]);
+				return true;
 			}
-			ListWorlds(sender, args[0]);
+			ListWorlds(sender, "");
 			return true;
 		}
 		return false;
 	}
 
 	private void ListWorlds(CommandSender sender, String tried) {
-		sender.sendMessage(ChatColor.RED + "World \"" + tried
-				+ "\" was not found. Check Spelling.");
+		if (tried.length() > 0) {
+			sender.sendMessage(ChatColor.RED + "World \"" + tried
+					+ "\" was not found. Check Spelling.");
+		}
 		sender.sendMessage(ChatColor.GREEN + "Available worlds:");
 		for (World w : plugin.getServer().getWorlds()) {
 			if (w.getName().contains("_nether")) {
@@ -67,7 +75,7 @@ public class CMDworld implements CommandExecutor {
 					allownether = true;
 				}
 				if (allownether) {
-					sender.sendMessage(ChatColor.GRAY + w.getName());
+					sender.sendMessage(ChatColor.GRAY + "Nether");
 				}
 			} else {
 				sender.sendMessage(ChatColor.YELLOW + w.getName());
