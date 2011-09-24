@@ -28,6 +28,8 @@ public class CMDtphere implements CommandExecutor {
 				}
 				if(from != null && to != null){
 					from.teleport(to);
+					sender.sendMessage("Teleported ;)");
+					return true;
 				}
 			}
 		}

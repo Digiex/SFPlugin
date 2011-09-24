@@ -31,6 +31,8 @@ public class CMDtp implements CommandExecutor {
 				}
 				if(from != null && to != null){
 					from.teleport(to);
+					sender.sendMessage("Teleported ;)");
+					return true;
 				}
 			}
 		}
