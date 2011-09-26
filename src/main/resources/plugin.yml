@@ -94,3 +94,8 @@ commands:
         usage: |
                /<command> [world]
                Example: /<command> Survival
+    abort:
+        description: Aborts a teleport
+        usage: |
+               /<command>
+               Example: /<command>

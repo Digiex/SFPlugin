@@ -1,13 +1,15 @@
 package net.digiex.simplefeatures.commands;
 
 import net.digiex.simplefeatures.SFPlugin;
-import net.digiex.simplefeatures.TeleportConfirmTask;
+import net.digiex.simplefeatures.TeleportTask;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionDefault;
 
 public class CMDtpahere implements CommandExecutor {
 
@@ -24,8 +26,8 @@ public class CMDtpahere implements CommandExecutor {
             if (args.length > 0) {
                 Player to = plugin.getServer().getPlayer(args[0]);
                 if (plugin.teleporters.containsKey(to.getName())) {
-                    if (to.hasPermission("Permission node here to please")) {
-                        TeleportConfirmTask task = plugin.teleporters.get(to.getName());
+                    if (to.hasPermission(new Permission("sf.tpoverride", PermissionDefault.OP))) {
+                        TeleportTask task = plugin.teleporters.get(to.getName());
                         int id = task.getId();
                         plugin.getServer().getScheduler().cancelTask(id);
                     } else {
@@ -34,7 +36,7 @@ public class CMDtpahere implements CommandExecutor {
                     }
                 }
                 if (to != null) {
-                    TeleportConfirmTask task = new TeleportConfirmTask(player, to, true, plugin);
+                    TeleportTask task = new TeleportTask(plugin, player, to, null, null, false, true, false, false);
                     int id = plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, task);
                     task.setId(id);
                     plugin.teleporters.put(to.getName(), task);

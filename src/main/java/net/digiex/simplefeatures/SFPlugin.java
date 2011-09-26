@@ -26,6 +26,7 @@ import net.digiex.simplefeatures.commands.CMDtpahere;
 import net.digiex.simplefeatures.commands.CMDtphere;
 import net.digiex.simplefeatures.commands.CMDwho;
 import net.digiex.simplefeatures.commands.CMDworld;
+import net.digiex.simplefeatures.commands.CMDabort;
 import net.digiex.simplefeatures.listeners.BListener;
 import net.digiex.simplefeatures.listeners.PListener;
 import net.digiex.simplefeatures.listeners.EListener;
@@ -55,7 +56,7 @@ public class SFPlugin extends JavaPlugin {
 	static final Logger log = Logger.getLogger("Minecraft");
 	public static String pluginName = "SimpleFeatures";
 
-	public HashMap<String, TeleportConfirmTask> teleporters = new HashMap<String, TeleportConfirmTask>();
+	public HashMap<String, TeleportTask> teleporters = new HashMap<String, TeleportTask>();
 	public HashMap<String, Boolean> gods = new HashMap<String, Boolean>();
 
 	public static boolean isInSpawnProtect(Location loc) {
@@ -208,6 +209,7 @@ public class SFPlugin extends JavaPlugin {
 		getCommand("me").setExecutor(new CMDme(this));
 		getCommand("lastmsgs").setExecutor(new CMDlastmsgs(this));
 		getCommand("entities").setExecutor(new CMDentities(this));
+                getCommand("abort").setExecutor(new CMDabort(this));
 		setupDatabase();
 	}
 
