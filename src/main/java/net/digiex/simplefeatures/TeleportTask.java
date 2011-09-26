@@ -37,6 +37,7 @@ public class TeleportTask implements Runnable {
                 toPlayer.sendMessage("Teleport request accepted");
                 startCountDown(fromPlayer, toPlayer);
                 try {
+                    coolingdown = true;
                     Thread.sleep(300000);
                 } catch (InterruptedException e) {
                     // sharks
@@ -52,6 +53,7 @@ public class TeleportTask implements Runnable {
                 toPlayer.sendMessage("Teleport request accepted");
                 startCountDown(toPlayer, fromPlayer);
                 try {
+                    coolingdown = true;
                     Thread.sleep(300000);
                 } catch (InterruptedException e) {
                     // sharks
@@ -66,6 +68,7 @@ public class TeleportTask implements Runnable {
                 fromPlayer.sendMessage("Teleport accepted");
                 startHomeCountDown(fromPlayer, location);
                 try {
+                    coolingdown = true;
                     Thread.sleep(300000);
                 } catch (InterruptedException e) {
                     // sharks
@@ -79,6 +82,7 @@ public class TeleportTask implements Runnable {
                 fromPlayer.sendMessage("Teleport accepted");
                 startWorldCountDown(fromPlayer, world);
                 try {
+                    coolingdown = true;
                     Thread.sleep(300000);
                 } catch (InterruptedException e) {
                     // sharks
