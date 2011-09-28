@@ -24,7 +24,7 @@ public class CMDtpahere implements CommandExecutor {
         if (sender instanceof Player) {
             Player player = (Player) sender;
             if (args.length > 0) {
-                Player to = plugin.getServer().getPlayer(args[0]);
+                Player to = plugin.getPlayer(sender, args[0]);
                 if (plugin.teleporters.containsKey(to.getName())) {
                     if (to.hasPermission(new Permission("sf.tpoverride", PermissionDefault.OP))) {
                         TeleportTask task = plugin.teleporters.get(to.getName());
