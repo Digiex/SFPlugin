@@ -5,6 +5,7 @@ import net.digiex.simplefeatures.SFPlugin;
 import net.digiex.simplefeatures.TeleportTask;
 
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -20,6 +21,7 @@ public class CMDhome implements CommandExecutor {
         this.plugin = parent;
     }
 
+    @Override
     public boolean onCommand(CommandSender sender, Command command,
             String label, String[] args) {
         String name = null;
@@ -48,16 +50,29 @@ public class CMDhome implements CommandExecutor {
                 return true;
             }
         }
-        
+
         SFHome home = plugin.getDatabase().find(SFHome.class).where().ieq("worldName", player.getLocation().getWorld().getName()).ieq("playerName", player.getName()).findUnique();
         if (home == null) {
             sender.sendMessage(ChatColor.RED + "I don't know where that is!");
-        } else {
-            TeleportTask task = new TeleportTask(plugin, player, null, null, home.getLocation(), false, false, true, false);
-            int id = plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, task);
-            task.setId(id);
-            plugin.teleporters.put(player.getName(), task);
+            return true;
         }
+
+        if (player.getGameMode().equals(GameMode.CREATIVE)) {
+            player.teleport(home.getLocation());
+            player.sendMessage("Home sweet home!");
+            return true;
+        }
+        
+        if (player.hasPermission(new Permission("sf.tpoverride", PermissionDefault.OP))) {
+            player.teleport(home.getLocation());
+            player.sendMessage("Home sweet home!");
+            return true;
+        }
+        
+        TeleportTask task = new TeleportTask(plugin, player, null, null, home.getLocation(), false, false, true, false, false);
+        int id = plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, task);
+        task.setId(id);
+        plugin.teleporters.put(player.getName(), task);
         return true;
     }
 }

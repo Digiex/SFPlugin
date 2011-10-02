@@ -4,6 +4,7 @@ import net.digiex.simplefeatures.SFPlugin;
 import net.digiex.simplefeatures.TeleportTask;
 
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -35,8 +36,13 @@ public class CMDtpa implements CommandExecutor {
                     }
                 }
                 Player to = plugin.getServer().getPlayer(args[0]);
+                if (player.getGameMode().equals(GameMode.CREATIVE) && to.getGameMode().equals(GameMode.CREATIVE)) {
+                    player.teleport(to);
+                    player.sendMessage("Poof!");
+                    return true;
+                }
                 if (to != null) {
-                    TeleportTask task = new TeleportTask(plugin, player, to, null, null, true, false, false, false);
+                    TeleportTask task = new TeleportTask(plugin, player, to, null, null, true, false, false, false, false);
                     int id = plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, task);
                     task.setId(id);
                     plugin.teleporters.put(player.getName(), task);

@@ -13,9 +13,9 @@ public class TeleportTask implements Runnable {
     private World world;
     private Location location;
     private Player fromPlayer, toPlayer;
-    private boolean tpa, tpahere, tph, tpw, coolingdown = false;
+    private boolean tpa, tpahere, tph, tpw, tps, coolingdown;
 
-    public TeleportTask(SFPlugin plugin, Player fromPlayer, Player toPlayer, World world, Location location, boolean tpa, boolean tpahere, boolean tph, boolean tpw) {
+    public TeleportTask(SFPlugin plugin, Player fromPlayer, Player toPlayer, World world, Location location, boolean tpa, boolean tpahere, boolean tph, boolean tpw, boolean tps) {
         this.plugin = plugin;
         this.fromPlayer = fromPlayer;
         this.toPlayer = toPlayer;
@@ -26,6 +26,7 @@ public class TeleportTask implements Runnable {
         this.tpahere = tpahere;
         this.tph = tph;
         this.tpw = tpw;
+        this.tps = tps;
     }
 
     @Override
@@ -88,6 +89,19 @@ public class TeleportTask implements Runnable {
                     // sharks
                 }
                 plugin.teleporters.remove(fromPlayer.getName());
+            } else {
+                fromPlayer.sendMessage("Teleport rejected");
+            }
+        } else if (tps) {
+            if (SFPlugin.questioner.ask(fromPlayer, question, "yes", "no").equals("yes")) {
+                fromPlayer.sendMessage("Teleport accepted");
+                startSpawnCountDown(fromPlayer);
+                try {
+                    coolingdown = true;
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    // features
+                }
             } else {
                 fromPlayer.sendMessage("Teleport rejected");
             }
@@ -171,6 +185,32 @@ public class TeleportTask implements Runnable {
             // shouts im a shark ;)
         }
     }
+    
+    private void startSpawnCountDown(Player p) {
+        try {
+            p.sendMessage("You will be teleported to spawn in 30 seconds...");
+            Thread.sleep(10000);
+            p.sendMessage("20...");
+            Thread.sleep(10000);
+            p.sendMessage("10...");
+            Thread.sleep(5000);
+            p.sendMessage("5...");
+            Thread.sleep(1000);
+            p.sendMessage("4...");
+            Thread.sleep(1000);
+            p.sendMessage("3...");
+            Thread.sleep(1000);
+            p.sendMessage("2...");
+            Thread.sleep(1000);
+            p.sendMessage("1...");
+            Thread.sleep(1000);
+            p.sendMessage("Poof!");
+            p.teleport(p.getWorld().getSpawnLocation());
+        } catch (InterruptedException e) {
+            plugin.teleporters.remove(p.getName());
+            // shouts im a shark ;)
+        }
+    }
 
     private String setQuestion() {
         if (tpa) {
@@ -181,6 +221,8 @@ public class TeleportTask implements Runnable {
             return "Are you sure you want to teleport home?";
         } else if (tpw) {
             return "Are you sure you want to teleport to " + world.getName() + "?";
+        } else if (tps) {
+            return "Are you sure you want to teleport to spawn?";
         }
         return "Uhh oh, something has went wrong, please shout at the feature commander.";
     }

@@ -4,6 +4,7 @@ import net.digiex.simplefeatures.SFPlugin;
 import net.digiex.simplefeatures.TeleportTask;
 
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -60,7 +61,20 @@ public class CMDworld implements CommandExecutor {
                             sender.sendMessage("Wait! You need to use nether portals!!! Oh you're an OP... Sorry, my mistake.");
                         }
                     }
-                    TeleportTask task = new TeleportTask(plugin, player, null, world, null, false, false, false, true);
+                    
+                    if (player.getGameMode().equals(GameMode.CREATIVE)) {
+                        player.teleport(world.getSpawnLocation());
+                        player.sendMessage("Welcome to " + world.getName().replace("_", " ") + "!");
+                        return true;
+                    }
+                    
+                    if (player.hasPermission(new Permission("sf.tpoverride", PermissionDefault.OP))) {
+                        player.teleport(world.getSpawnLocation());
+                        player.sendMessage("Welcome to " + world.getName().replace("_", " ") + "!");
+                        return true;
+                    }
+                    
+                    TeleportTask task = new TeleportTask(plugin, player, null, world, null, false, false, false, true, false);
                     int id = plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, task);
                     task.setId(id);
                     plugin.teleporters.put(player.getName(), task);
