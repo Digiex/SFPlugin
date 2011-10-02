@@ -55,7 +55,7 @@ public class CMDworld implements CommandExecutor {
                     if (world.getName().contains("_nether")) {
                         if (!((Player) sender).isOp()) {
                             sender.sendMessage(ChatColor.RED
-                                    + "Only ops can warp to the nether!");
+                                    + "Use a Nether Portal in Survival to enter Nether");
                             return true;
                         } else {
                             sender.sendMessage("Wait! You need to use nether portals!!! Oh you're an OP... Sorry, my mistake.");
