@@ -34,7 +34,10 @@ public class CMDtp implements CommandExecutor {
 					sender.sendMessage("Teleported ;)");
 					return true;
 				}
-			}
+			} else {
+                            p.sendMessage("Please use /TPA to Teleport to players");
+                            return true;
+                        }
 		}
 		return false;
 	}

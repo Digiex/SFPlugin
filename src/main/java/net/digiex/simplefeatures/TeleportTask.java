@@ -39,7 +39,7 @@ public class TeleportTask implements Runnable {
                 startCountDown(fromPlayer, toPlayer);
                 try {
                     coolingdown = true;
-                    Thread.sleep(300000);
+                    Thread.sleep(60000);
                 } catch (InterruptedException e) {
                     // sharks
                 }
@@ -55,7 +55,7 @@ public class TeleportTask implements Runnable {
                 startCountDown(toPlayer, fromPlayer);
                 try {
                     coolingdown = true;
-                    Thread.sleep(300000);
+                    Thread.sleep(60000);
                 } catch (InterruptedException e) {
                     // sharks
                 }
@@ -70,7 +70,7 @@ public class TeleportTask implements Runnable {
                 startHomeCountDown(fromPlayer, location);
                 try {
                     coolingdown = true;
-                    Thread.sleep(300000);
+                    Thread.sleep(60000);
                 } catch (InterruptedException e) {
                     // sharks
                 }
@@ -84,7 +84,7 @@ public class TeleportTask implements Runnable {
                 startWorldCountDown(fromPlayer, world);
                 try {
                     coolingdown = true;
-                    Thread.sleep(300000);
+                    Thread.sleep(60000);
                 } catch (InterruptedException e) {
                     // sharks
                 }
@@ -98,7 +98,7 @@ public class TeleportTask implements Runnable {
                 startSpawnCountDown(fromPlayer);
                 try {
                     coolingdown = true;
-                    Thread.sleep(3000);
+                    Thread.sleep(60000);
                 } catch (InterruptedException e) {
                     // features
                 }

@@ -31,7 +31,10 @@ public class CMDtphere implements CommandExecutor {
 					sender.sendMessage("Teleported ;)");
 					return true;
 				}
-			}
+			} else {
+                            p.sendMessage("Please use /TPAHERE to Teleport players to you");
+                            return true;
+                        }
 		}
 		return false;
 	}
