@@ -42,6 +42,7 @@ public class TeleportTask implements Runnable {
             } else {
                 fromPlayer.sendMessage("Teleport request rejected");
                 toPlayer.sendMessage("Teleport request rejected");
+                plugin.teleporters.remove(fromPlayer.getName());
             }
         } else if (tpahere) {
             if (SFPlugin.questioner.ask(toPlayer, question, "yes", "no").equals("yes")) {
@@ -53,6 +54,7 @@ public class TeleportTask implements Runnable {
             } else {
                 fromPlayer.sendMessage("Teleport request rejected");
                 toPlayer.sendMessage("Teleport request rejected");
+                plugin.teleporters.remove(fromPlayer.getName());
             }
         } else if (tph) {
             if (SFPlugin.questioner.ask(fromPlayer, question, "yes", "no").equals("yes")) {
@@ -71,6 +73,7 @@ public class TeleportTask implements Runnable {
                 plugin.teleporters.remove(fromPlayer.getName());
             } else {
                 fromPlayer.sendMessage("Teleport rejected");
+                plugin.teleporters.remove(fromPlayer.getName());
             }
         } else if (tps) {
             if (SFPlugin.questioner.ask(fromPlayer, question, "yes", "no").equals("yes")) {
@@ -80,6 +83,7 @@ public class TeleportTask implements Runnable {
                 plugin.teleporters.remove(fromPlayer.getName());
             } else {
                 fromPlayer.sendMessage("Teleport rejected");
+                plugin.teleporters.remove(fromPlayer.getName());
             }
         }
     }

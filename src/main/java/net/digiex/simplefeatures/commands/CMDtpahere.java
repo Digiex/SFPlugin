@@ -26,26 +26,31 @@ public class CMDtpahere implements CommandExecutor {
             Player player = (Player) sender;
             if (args.length > 0) {
                 Player to = SFPlugin.getPlayer(sender, args[0]);
-                if (plugin.teleporters.containsKey(to.getName())) {
-                    if (to.hasPermission(new Permission("sf.tpoverride", PermissionDefault.OP))) {
-                        TeleportTask task = plugin.teleporters.get(to.getName());
-                        int id = task.getId();
-                        plugin.getServer().getScheduler().cancelTask(id);
-                    } else {
-                        player.sendMessage(ChatColor.GRAY + to.getName() + " is already teleporting, try again later.");
+                if (to != null) {
+                    if (plugin.teleporters.containsKey(to.getName())) {
+                        if (to.hasPermission(new Permission("sf.tpoverride", PermissionDefault.OP))) {
+                            TeleportTask task = plugin.teleporters.get(to.getName());
+                            int id = task.getId();
+                            plugin.getServer().getScheduler().cancelTask(id);
+                        } else {
+                            player.sendMessage(ChatColor.GRAY + to.getName() + " is already teleporting, try again later.");
+                            return true;
+                        }
+                    }
+                    if (player.getName().equals(to.getName())) {
+                        player.sendMessage(ChatColor.GRAY + "You cannot teleport to yourself, silly.");
                         return true;
                     }
-                }
-                if (to.getName().equals(player.getName())) {
-                    player.sendMessage("You cannot teleport to yourself, silly.");
-                    return true;
-                }
-                if (to.getGameMode().equals(GameMode.CREATIVE) && player.getGameMode().equals(GameMode.CREATIVE)) {
-                    to.teleport(player);
-                    to.sendMessage("Poof!");
-                    return true;
-                }
-                if (to != null) {
+                    if (to.getGameMode().equals(GameMode.CREATIVE)) {
+                        to.teleport(player);
+                        to.sendMessage(ChatColor.GRAY + "Poof!");
+                        return true;
+                    }
+                    if (player.hasPermission(new Permission("sf.tpoverride", PermissionDefault.OP))) {
+                        to.teleport(player);
+                        to.sendMessage(ChatColor.GRAY + "Poof!");
+                        return true;
+                    }
                     TeleportTask task = new TeleportTask(plugin, player, to, null, null, false, true, false, false, false);
                     int id = plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, task);
                     task.setId(id);

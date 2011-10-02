@@ -59,13 +59,13 @@ public class CMDhome implements CommandExecutor {
 
         if (player.getGameMode().equals(GameMode.CREATIVE)) {
             player.teleport(home.getLocation());
-            player.sendMessage("Home sweet home!");
+            player.sendMessage(ChatColor.GRAY + "Home sweet home!");
             return true;
         }
         
         if (player.hasPermission(new Permission("sf.tpoverride", PermissionDefault.OP))) {
             player.teleport(home.getLocation());
-            player.sendMessage("Home sweet home!");
+            player.sendMessage(ChatColor.GRAY + "Home sweet home!");
             return true;
         }
         

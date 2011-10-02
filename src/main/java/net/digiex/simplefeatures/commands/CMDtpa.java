@@ -27,25 +27,30 @@ public class CMDtpa implements CommandExecutor {
             if (args.length > 0) {
                 if (plugin.teleporters.containsKey(player.getName())) {
                     if (player.hasPermission(new Permission("sf.tpoverride", PermissionDefault.OP))) {
-                       TeleportTask task = plugin.teleporters.get(player.getName());
-                       int id = task.getId();
-                       plugin.getServer().getScheduler().cancelTask(id);
+                        TeleportTask task = plugin.teleporters.get(player.getName());
+                        int id = task.getId();
+                        plugin.getServer().getScheduler().cancelTask(id);
                     } else {
                         player.sendMessage(ChatColor.GRAY + "Teleport already in progress, use /abort to Cancel");
                         return true;
                     }
                 }
                 Player to = plugin.getServer().getPlayer(args[0]);
-                if (to.getName().equals(player.getName())) {
-                    player.sendMessage(ChatColor.GRAY + "You cannot teleport to yourself, silly.");
-                    return true;
-                }
-                if (player.getGameMode().equals(GameMode.CREATIVE) && to.getGameMode().equals(GameMode.CREATIVE)) {
-                    player.teleport(to);
-                    player.sendMessage(ChatColor.GRAY + "Poof!");
-                    return true;
-                }
                 if (to != null) {
+                    if (to.getName().equals(player.getName())) {
+                        player.sendMessage(ChatColor.GRAY + "You cannot teleport to yourself, silly.");
+                        return true;
+                    }
+                    if (player.getGameMode().equals(GameMode.CREATIVE)) {
+                        player.teleport(to);
+                        player.sendMessage(ChatColor.GRAY + "Poof!");
+                        return true;
+                    }
+                    if (player.hasPermission(new Permission("sf.tpoverride", PermissionDefault.OP))) {
+                        player.teleport(to);
+                        player.sendMessage(ChatColor.GRAY + "Poof!");
+                        return true;
+                    }
                     TeleportTask task = new TeleportTask(plugin, player, to, null, null, true, false, false, false, false);
                     int id = plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, task);
                     task.setId(id);
