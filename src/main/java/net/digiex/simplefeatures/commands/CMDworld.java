@@ -32,7 +32,7 @@ public class CMDworld implements CommandExecutor {
                     int id = task.getId();
                     plugin.getServer().getScheduler().cancelTask(id);
                 } else {
-                    player.sendMessage(ChatColor.GRAY + "You cannot teleport again this quickly, learn to walk");
+                    player.sendMessage(ChatColor.GRAY + "Teleport already in progress, use /abort to cancel.");
                     return true;
                 }
             }
@@ -64,13 +64,13 @@ public class CMDworld implements CommandExecutor {
                     
                     if (player.getGameMode().equals(GameMode.CREATIVE)) {
                         player.teleport(world.getSpawnLocation());
-                        player.sendMessage("Welcome to " + world.getName().replace("_", " ") + "!");
+                        player.sendMessage(ChatColor.GRAY + "Welcome to " + world.getName().replace("_", " ") + "!");
                         return true;
                     }
                     
                     if (player.hasPermission(new Permission("sf.tpoverride", PermissionDefault.OP))) {
                         player.teleport(world.getSpawnLocation());
-                        player.sendMessage("Welcome to " + world.getName().replace("_", " ") + "!");
+                        player.sendMessage(ChatColor.GRAY + "Welcome to " + world.getName().replace("_", " ") + "!");
                         return true;
                     }
                     

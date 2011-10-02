@@ -11,6 +11,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.ChatColor;
 
 public class CMDabort implements CommandExecutor {
     
@@ -27,12 +28,12 @@ public class CMDabort implements CommandExecutor {
             if (parent.teleporters.containsKey(player.getName())) {
                 TeleportTask task = parent.teleporters.get(player.getName());
                 int id = task.getId();
-                if (task.isCooling()) {
-                    player.sendMessage("Nice try, but your cooling down from the last teleport. ;P");
-                    return false;
+                if (task.isCounting()) {
+                    parent.getServer().getScheduler().cancelTask(id);
+                    player.sendMessage(ChatColor.GRAY + "Teleport aborted!");
+                } else {
+                    player.sendMessage(ChatColor.GRAY + "Nothing to abort.");
                 }
-                parent.getServer().getScheduler().cancelTask(id);
-                player.sendMessage("Teleport aborted! Error: Feature Power Failure");
                 return true;
             }
         }

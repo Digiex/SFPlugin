@@ -31,14 +31,18 @@ public class CMDtpa implements CommandExecutor {
                        int id = task.getId();
                        plugin.getServer().getScheduler().cancelTask(id);
                     } else {
-                        player.sendMessage(ChatColor.GRAY + "You cannot teleport again this quickly, learn to walk");
+                        player.sendMessage(ChatColor.GRAY + "Teleport already in progress, use /abort to Cancel");
                         return true;
                     }
                 }
                 Player to = plugin.getServer().getPlayer(args[0]);
+                if (to.getName().equals(player.getName())) {
+                    player.sendMessage(ChatColor.GRAY + "You cannot teleport to yourself, silly.");
+                    return true;
+                }
                 if (player.getGameMode().equals(GameMode.CREATIVE) && to.getGameMode().equals(GameMode.CREATIVE)) {
                     player.teleport(to);
-                    player.sendMessage("Poof!");
+                    player.sendMessage(ChatColor.GRAY + "Poof!");
                     return true;
                 }
                 if (to != null) {

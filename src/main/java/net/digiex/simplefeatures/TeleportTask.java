@@ -13,7 +13,7 @@ public class TeleportTask implements Runnable {
     private World world;
     private Location location;
     private Player fromPlayer, toPlayer;
-    private boolean tpa, tpahere, tph, tpw, tps, coolingdown;
+    private boolean tpa, tpahere, tph, tpw, tps, counting;
 
     public TeleportTask(SFPlugin plugin, Player fromPlayer, Player toPlayer, World world, Location location, boolean tpa, boolean tpahere, boolean tph, boolean tpw, boolean tps) {
         this.plugin = plugin;
@@ -36,13 +36,8 @@ public class TeleportTask implements Runnable {
             if (SFPlugin.questioner.ask(toPlayer, question, "yes", "no").equals("yes")) {
                 fromPlayer.sendMessage("Teleport request accepted");
                 toPlayer.sendMessage("Teleport request accepted");
+                this.counting = true;
                 startCountDown(fromPlayer, toPlayer);
-                try {
-                    coolingdown = true;
-                    Thread.sleep(60000);
-                } catch (InterruptedException e) {
-                    // sharks
-                }
                 plugin.teleporters.remove(fromPlayer.getName());
             } else {
                 fromPlayer.sendMessage("Teleport request rejected");
@@ -52,13 +47,8 @@ public class TeleportTask implements Runnable {
             if (SFPlugin.questioner.ask(toPlayer, question, "yes", "no").equals("yes")) {
                 fromPlayer.sendMessage("Teleport request accepted");
                 toPlayer.sendMessage("Teleport request accepted");
+                this.counting = true;
                 startCountDown(toPlayer, fromPlayer);
-                try {
-                    coolingdown = true;
-                    Thread.sleep(60000);
-                } catch (InterruptedException e) {
-                    // sharks
-                }
                 plugin.teleporters.remove(toPlayer.getName());
             } else {
                 fromPlayer.sendMessage("Teleport request rejected");
@@ -67,13 +57,8 @@ public class TeleportTask implements Runnable {
         } else if (tph) {
             if (SFPlugin.questioner.ask(fromPlayer, question, "yes", "no").equals("yes")) {
                 fromPlayer.sendMessage("Teleport accepted");
+                this.counting = true;
                 startHomeCountDown(fromPlayer, location);
-                try {
-                    coolingdown = true;
-                    Thread.sleep(60000);
-                } catch (InterruptedException e) {
-                    // sharks
-                }
                 plugin.teleporters.remove(fromPlayer.getName());
             } else {
                 fromPlayer.sendMessage("Teleport rejected");
@@ -81,13 +66,8 @@ public class TeleportTask implements Runnable {
         } else if (tpw) {
             if (SFPlugin.questioner.ask(fromPlayer, question, "yes", "no").equals("yes")) {
                 fromPlayer.sendMessage("Teleport accepted");
+                this.counting = true;
                 startWorldCountDown(fromPlayer, world);
-                try {
-                    coolingdown = true;
-                    Thread.sleep(60000);
-                } catch (InterruptedException e) {
-                    // sharks
-                }
                 plugin.teleporters.remove(fromPlayer.getName());
             } else {
                 fromPlayer.sendMessage("Teleport rejected");
@@ -95,13 +75,9 @@ public class TeleportTask implements Runnable {
         } else if (tps) {
             if (SFPlugin.questioner.ask(fromPlayer, question, "yes", "no").equals("yes")) {
                 fromPlayer.sendMessage("Teleport accepted");
+                this.counting = true;
                 startSpawnCountDown(fromPlayer);
-                try {
-                    coolingdown = true;
-                    Thread.sleep(60000);
-                } catch (InterruptedException e) {
-                    // features
-                }
+                plugin.teleporters.remove(fromPlayer.getName());
             } else {
                 fromPlayer.sendMessage("Teleport rejected");
             }
@@ -235,8 +211,8 @@ public class TeleportTask implements Runnable {
         return this.toPlayer;
     }
 
-    public boolean isCooling() {
-        return this.coolingdown;
+    public boolean isCounting() {
+        return this.counting;
     }
 
     public void setId(Integer id) {

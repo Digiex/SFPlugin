@@ -32,9 +32,13 @@ public class CMDtpahere implements CommandExecutor {
                         int id = task.getId();
                         plugin.getServer().getScheduler().cancelTask(id);
                     } else {
-                        player.sendMessage(ChatColor.GRAY + to.getName() + " cannot teleport this quickly, he/she must learn to walk");
+                        player.sendMessage(ChatColor.GRAY + to.getName() + " is already teleporting, try again later.");
                         return true;
                     }
+                }
+                if (to.getName().equals(player.getName())) {
+                    player.sendMessage("You cannot teleport to yourself, silly.");
+                    return true;
                 }
                 if (to.getGameMode().equals(GameMode.CREATIVE) && player.getGameMode().equals(GameMode.CREATIVE)) {
                     to.teleport(player);

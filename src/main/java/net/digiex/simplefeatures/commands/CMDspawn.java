@@ -31,7 +31,7 @@ public class CMDspawn implements CommandExecutor {
                     int id = task.getId();
                     plugin.getServer().getScheduler().cancelTask(id);
                 } else {
-                    player.sendMessage(ChatColor.GRAY + "You cannot teleport again this quickly, learn to walk");
+                    player.sendMessage(ChatColor.GRAY + "Teleport already in progress, use /abort to Cancel");
                     return true;
                 }
             }
