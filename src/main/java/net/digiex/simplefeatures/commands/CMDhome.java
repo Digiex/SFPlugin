@@ -2,7 +2,8 @@ package net.digiex.simplefeatures.commands;
 
 import net.digiex.simplefeatures.SFHome;
 import net.digiex.simplefeatures.SFPlugin;
-import net.digiex.simplefeatures.TeleportTask;
+import net.digiex.simplefeatures.SFTeleport;
+import net.digiex.simplefeatures.SFTeleport.TeleportTypes;
 
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -39,40 +40,23 @@ public class CMDhome implements CommandExecutor {
             sender.sendMessage(ChatColor.RED + "I don't know how to move you!");
             return true;
         }
-
-        if (plugin.teleporters.containsKey(player.getName())) {
-            if (player.hasPermission(new Permission("sf.tpoverride", PermissionDefault.OP))) {
-                TeleportTask task = plugin.teleporters.get(player.getName());
-                int id = task.getId();
-                plugin.getServer().getScheduler().cancelTask(id);
-            } else {
-                player.sendMessage(ChatColor.GRAY + "Teleport already in progress, use /abort to Cancel");
-                return true;
-            }
+        if (plugin.teleporters.containsKey(player)) {
+            player.sendMessage(ChatColor.GRAY + "Teleport already in progress, use /abort to Cancel");
+            return true;
         }
-
         SFHome home = plugin.getDatabase().find(SFHome.class).where().ieq("worldName", player.getLocation().getWorld().getName()).ieq("playerName", player.getName()).findUnique();
         if (home == null) {
             sender.sendMessage(ChatColor.RED + "I don't know where that is!");
             return true;
         }
-
-        if (player.getGameMode().equals(GameMode.CREATIVE)) {
-            player.teleport(home.getLocation());
-            player.sendMessage(ChatColor.GRAY + "Home sweet home!");
-            return true;
+        SFTeleport teleport = new SFTeleport(plugin, TeleportTypes.home);
+        if (player.getGameMode().equals(GameMode.CREATIVE) || player.hasPermission(new Permission("sf.tpoverride", PermissionDefault.OP))) {
+            teleport.setTimer(false);
         }
-        
-        if (player.hasPermission(new Permission("sf.tpoverride", PermissionDefault.OP))) {
-            player.teleport(home.getLocation());
-            player.sendMessage(ChatColor.GRAY + "Home sweet home!");
-            return true;
-        }
-        
-        TeleportTask task = new TeleportTask(plugin, player, null, null, home.getLocation(), false, false, true, false, false);
-        int id = plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, task);
-        task.setId(id);
-        plugin.teleporters.put(player.getName(), task);
+        teleport.setHome(home.getLocation());
+        teleport.setFrom(player);
+        teleport.startTeleport();
+        plugin.teleporters.put(player, teleport);
         return true;
     }
 }

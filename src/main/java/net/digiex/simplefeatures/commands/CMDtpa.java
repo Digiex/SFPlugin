@@ -1,7 +1,8 @@
 package net.digiex.simplefeatures.commands;
 
 import net.digiex.simplefeatures.SFPlugin;
-import net.digiex.simplefeatures.TeleportTask;
+import net.digiex.simplefeatures.SFTeleport;
+import net.digiex.simplefeatures.SFTeleport.TeleportTypes;
 
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -25,37 +26,25 @@ public class CMDtpa implements CommandExecutor {
         if (sender instanceof Player) {
             Player player = (Player) sender;
             if (args.length > 0) {
-                if (plugin.teleporters.containsKey(player.getName())) {
-                    if (player.hasPermission(new Permission("sf.tpoverride", PermissionDefault.OP))) {
-                        TeleportTask task = plugin.teleporters.get(player.getName());
-                        int id = task.getId();
-                        plugin.getServer().getScheduler().cancelTask(id);
-                    } else {
-                        player.sendMessage(ChatColor.GRAY + "Teleport already in progress, use /abort to Cancel");
-                        return true;
-                    }
+                if (plugin.teleporters.containsKey(player)) {
+                    player.sendMessage(ChatColor.GRAY + "Teleport already in progress, use /abort to Cancel");
+                    return true;
                 }
                 Player to = plugin.getServer().getPlayer(args[0]);
                 if (to != null) {
-                    if (to.getName().equals(player.getName())) {
+                    if (player.getName().equals(to.getName())) {
                         player.sendMessage(ChatColor.GRAY + "You cannot teleport to yourself, silly.");
                         return true;
                     }
-                    if (player.getGameMode().equals(GameMode.CREATIVE)) {
-                        player.teleport(to);
-                        player.sendMessage(ChatColor.GRAY + "Poof!");
-                        return true;
+                    SFTeleport teleport = new SFTeleport(plugin, TeleportTypes.tpa);
+                    if (player.getGameMode().equals(GameMode.CREATIVE) || player.hasPermission(new Permission("sf.tpoverride", PermissionDefault.OP))) {
+                        teleport.setTimer(false);
                     }
-                    if (player.hasPermission(new Permission("sf.tpoverride", PermissionDefault.OP))) {
-                        player.teleport(to);
-                        player.sendMessage(ChatColor.GRAY + "Poof!");
-                        return true;
-                    }
-                    TeleportTask task = new TeleportTask(plugin, player, to, null, null, true, false, false, false, false);
-                    int id = plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, task);
-                    task.setId(id);
-                    plugin.teleporters.put(player.getName(), task);
                     player.sendMessage(ChatColor.GRAY + "Requesting!");
+                    teleport.setFrom(player);
+                    teleport.setTo(to);
+                    teleport.startTeleport();
+                    plugin.teleporters.put(player, teleport);
                     return true;
                 }
             }

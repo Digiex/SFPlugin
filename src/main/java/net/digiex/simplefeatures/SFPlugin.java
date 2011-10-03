@@ -53,11 +53,11 @@ import de.diddiz.LogBlockQuestioner.LogBlockQuestioner;
 public class SFPlugin extends JavaPlugin {
 
     public static Configuration playerconfig;
-    static LogBlockQuestioner questioner;
+    public static LogBlockQuestioner questioner;
     public Configuration config;
     static final Logger log = Logger.getLogger("Minecraft");
     public static String pluginName = "SimpleFeatures";
-    public HashMap<String, TeleportTask> teleporters = new HashMap<String, TeleportTask>();
+    public HashMap<Player, SFTeleport> teleporters = new HashMap<Player, SFTeleport>();
     public HashMap<String, Boolean> gods = new HashMap<String, Boolean>();
 
     public static boolean isInSpawnProtect(Location loc) {

@@ -1,7 +1,8 @@
 package net.digiex.simplefeatures.commands;
 
 import net.digiex.simplefeatures.SFPlugin;
-import net.digiex.simplefeatures.TeleportTask;
+import net.digiex.simplefeatures.SFTeleport;
+import net.digiex.simplefeatures.SFTeleport.TeleportTypes;
 
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -26,15 +27,9 @@ public class CMDworld implements CommandExecutor {
             String label, String[] args) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            if (plugin.teleporters.containsKey(player.getName())) {
-                if (player.hasPermission(new Permission("sf.tpoverride", PermissionDefault.OP))) {
-                    TeleportTask task = plugin.teleporters.get(player.getName());
-                    int id = task.getId();
-                    plugin.getServer().getScheduler().cancelTask(id);
-                } else {
-                    player.sendMessage(ChatColor.GRAY + "Teleport already in progress, use /abort to cancel.");
-                    return true;
-                }
+            if (plugin.teleporters.containsKey(player)) {
+                player.sendMessage(ChatColor.GRAY + "Teleport already in progress, use /abort to cancel.");
+                return true;
             }
             if (args.length > 0) {
                 World world = null;
@@ -49,7 +44,6 @@ public class CMDworld implements CommandExecutor {
                             args[0].toLowerCase()) != -1) {
                         world = w;
                     }
-
                 }
                 if (world != null) {
                     if (world.getName().contains("_nether")) {
@@ -61,23 +55,15 @@ public class CMDworld implements CommandExecutor {
                             sender.sendMessage("Wait! You need to use nether portals!!! Oh you're an OP... Sorry, my mistake.");
                         }
                     }
-                    
-                    if (player.getGameMode().equals(GameMode.CREATIVE)) {
-                        player.teleport(world.getSpawnLocation());
-                        player.sendMessage(ChatColor.GRAY + "Welcome to " + world.getName().replace("_", " ") + "!");
-                        return true;
+                    SFTeleport teleport = new SFTeleport(plugin, TeleportTypes.world);
+                    if (player.getGameMode().equals(GameMode.CREATIVE) || player.hasPermission(new Permission("sf.tpoverride", PermissionDefault.OP))) {
+                        teleport.setTimer(false);
+
                     }
-                    
-                    if (player.hasPermission(new Permission("sf.tpoverride", PermissionDefault.OP))) {
-                        player.teleport(world.getSpawnLocation());
-                        player.sendMessage(ChatColor.GRAY + "Welcome to " + world.getName().replace("_", " ") + "!");
-                        return true;
-                    }
-                    
-                    TeleportTask task = new TeleportTask(plugin, player, null, world, null, false, false, false, true, false);
-                    int id = plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, task);
-                    task.setId(id);
-                    plugin.teleporters.put(player.getName(), task);
+                    teleport.setFrom(player);
+                    teleport.setWorld(world);
+                    teleport.startTeleport();
+                    plugin.teleporters.put(player, teleport);
                     return true;
 
                 }
