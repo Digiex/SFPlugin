@@ -18,7 +18,7 @@ public class BListener extends BlockListener {
     }
 
     @Override
-    public void onBlockBreak(final BlockBreakEvent event) {
+    public void onBlockBreak(BlockBreakEvent event) {
         if (event.isCancelled()) {
             return;
         }
@@ -28,7 +28,7 @@ public class BListener extends BlockListener {
             if (inspawn) {
                 event.setCancelled(true);
                 p.sendMessage(ChatColor.RED + "You are in a spawn protection area. Please walk further.");
-            } else if (event.getBlock().getY() < 7 && event.getBlock().equals(Material.BEDROCK)) {
+            } else if (event.getBlock().getY() < Double.valueOf(7) && event.getBlock().getType().equals(Material.BEDROCK)) {
                 event.setCancelled(true);
                 p.sendMessage(ChatColor.RED + "Removal of bedrock is not allowed here.");
             }
@@ -36,7 +36,7 @@ public class BListener extends BlockListener {
     }
 
     @Override
-    public void onBlockPlace(final BlockPlaceEvent event) {
+    public void onBlockPlace(BlockPlaceEvent event) {
         if (event.isCancelled()) {
             return;
         }
@@ -46,7 +46,7 @@ public class BListener extends BlockListener {
             if (inspawn) {
                 event.setCancelled(true);
                 p.sendMessage(ChatColor.RED + "You are in a spawn protection area. Please walk further.");
-            } else if (event.getBlock().getY() < 7 && event.getBlock().equals(Material.BEDROCK)) {
+            } else if (event.getBlock().getY() < Double.valueOf(7) && event.getBlock().getType().equals(Material.BEDROCK)) {
                 event.setCancelled(true);
                 p.sendMessage(ChatColor.RED + "Placement of bedrock is not allowed here.");
             }
