@@ -28,7 +28,7 @@ public class BListener extends BlockListener {
             if (inspawn) {
                 event.setCancelled(true);
                 p.sendMessage(ChatColor.RED + "You are in a spawn protection area. Please walk further.");
-            } else if (p.getGameMode() = 1) {
+            } else if (p.getGameMode().equals(Gamemode.CREATIVE)) {
                 if (event.getBlock().getY() < Double.valueOf(7) && event.getBlock().getType().equals(Material.BEDROCK)) {
                     event.setCancelled(true);
                     p.sendMessage(ChatColor.RED + "Removal of bedrock is not allowed here.");
@@ -48,7 +48,7 @@ public class BListener extends BlockListener {
             if (inspawn) {
                 event.setCancelled(true);
                 p.sendMessage(ChatColor.RED + "You are in a spawn protection area. Please walk further.");
-            } else if (p.getGameMode() = 1) {
+            } else if (p.getGameMode().equals(Gamemode.CREATIVE)) {
                 if (event.getBlock().getY() < Double.valueOf(7) && event.getBlock().getType().equals(Material.BEDROCK)) {
                     event.setCancelled(true);
                     p.sendMessage(ChatColor.RED + "Placement of bedrock is not allowed here.");
