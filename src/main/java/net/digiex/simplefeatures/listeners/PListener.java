@@ -42,20 +42,44 @@ public class PListener extends PlayerListener {
 
 		if (event.getClickedBlock().getType() == Material.BED_BLOCK) {
 			Player player = event.getPlayer();
-			SFHome home = plugin
-					.getDatabase()
-					.find(SFHome.class)
-					.where()
-					.ieq("worldName", player.getLocation().getWorld().getName())
-					.ieq("playerName", player.getName()).findUnique();
-			if (home == null) {
-				home = new SFHome();
-				home.setPlayer(player);
+			plugin.getServer()
+					.getScheduler()
+					.scheduleAsyncDelayedTask(plugin,
+							new AskSetHomeTask(player));
+		}
+	}
+
+	private class AskSetHomeTask implements Runnable {
+		private Player player;
+
+		public AskSetHomeTask(Player player) {
+			this.player = player;
+		}
+
+		@Override
+		public void run() {
+
+			String answer = SFPlugin.questioner.ask(this.player, ChatColor.YELLOW+"Do you want to set your home to this bed?", "yes", "no");
+			if (answer == "yes") {
+				SFHome home = plugin
+						.getDatabase()
+						.find(SFHome.class)
+						.where()
+						.ieq("worldName",
+								player.getLocation().getWorld().getName())
+						.ieq("playerName", player.getName()).findUnique();
+				if (home == null) {
+					home = new SFHome();
+					home.setPlayer(player);
+				}
+				home.setLocation(player.getLocation());
+				plugin.getDatabase().save(home);
+				player.sendMessage(ChatColor.YELLOW
+						+ "Your home for this world is now set to this bed!");
+			} else {
+				player.sendMessage(ChatColor.GRAY
+						+ "Setting home here cancelled.");
 			}
-			home.setLocation(player.getLocation());
-			plugin.getDatabase().save(home);
-			player.sendMessage(ChatColor.YELLOW
-					+ "Your home for this world is now set to this bed!");
 		}
 	}
 
@@ -70,6 +94,10 @@ public class PListener extends PlayerListener {
 					.setDisplayName(
 							ChatColor.GREEN + e.getPlayer().getName()
 									+ ChatColor.WHITE);
+		}
+		String plistname = e.getPlayer().getDisplayName();
+		if (plistname.length() < 17) {
+			e.getPlayer().setPlayerListName(plistname);
 		}
 	}
 
@@ -134,7 +162,8 @@ public class PListener extends PlayerListener {
 		if (home != null) {
 			event.setRespawnLocation(home.getLocation());
 		}
-
+		Teleported(event.getPlayer().getLocation().getWorld(), event
+				.getRespawnLocation().getWorld(), event.getPlayer());
 	}
 
 	@Override
