@@ -8,12 +8,8 @@
 	<description>Provides simple commands and features for CraftBukkit servers.</description>
 	<repositories>
 		<repository>
-			<id>bukkit-repo</id>
-			<url>http://artifacts.lukegb.com/repo</url>
-		</repository>
-		<repository>
 			<id>DigiexMaven</id>
-			<url>http://artifactory.xzkingzxburnzx.tk/repo</url>
+			<url>http://artifactory.xzkingzxburnzx.tk/repo/</url>
 		</repository>
 	</repositories>
 	<!-- Dependencies -->
