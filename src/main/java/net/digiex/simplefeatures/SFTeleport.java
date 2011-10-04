@@ -1,5 +1,7 @@
 package net.digiex.simplefeatures;
 
+import java.util.logging.Level;
+
 import org.bukkit.entity.Player;
 import org.bukkit.World;
 import org.bukkit.Location;
@@ -144,24 +146,32 @@ public class SFTeleport {
 		@Override
 		public void run() {
 			setQuestion();
-			TPAnswers answer = getAnswer(SFPlugin.questioner.ask(getTo(),
-					question, "yes", "no"));
-			switch (answer) {
-			case yes:
-				if (shouldIaskQuestions()) {
-					getFrom().sendMessage("Teleport request accepted");
-					getTo().sendMessage("Teleport request accepted");
+			switch (getType()) {
+			case tpa:
+			case tpahere:
+				TPAnswers answer = getAnswer(SFPlugin.questioner.ask(getTo(),
+						question, "yes", "no"));
+				switch (answer) {
+				case yes:
+					if (shouldIaskQuestions()) {
+						getFrom().sendMessage("Teleport request accepted");
+						getTo().sendMessage("Teleport request accepted");
+					}
+					startCountDown();
+					removeFromTPList();
+					break;
+				case no:
+					if (shouldIaskQuestions()) {
+						getFrom().sendMessage("Teleport request rejected");
+						getTo().sendMessage("Teleport request rejected");
+					}
+					removeFromTPList();
+					break;
 				}
+				break;
+			default:
 				startCountDown();
 				removeFromTPList();
-				break;
-			case no:
-				if (shouldIaskQuestions()) {
-					getFrom().sendMessage("Teleport request rejected");
-					getTo().sendMessage("Teleport request rejected");
-				}
-				removeFromTPList();
-				break;
 			}
 		}
 
@@ -194,7 +204,7 @@ public class SFTeleport {
 				break;
 			case tpahere:
 				fromP = getTo();
-				infoMsg = "You will be teleported to " + to.getDisplayName()
+				infoMsg = "You will be teleported to " + from.getDisplayName()
 						+ " in 30 seconds...";
 				break;
 			case home:
@@ -231,6 +241,7 @@ public class SFTeleport {
 					Thread.sleep(1000);
 					fromP.sendMessage("Poof!");
 					doTeleport();
+					removeFromTPList();
 				} catch (InterruptedException e) {
 					removeFromTPList();
 				}
@@ -239,7 +250,8 @@ public class SFTeleport {
 				fromP.sendMessage("Poof!");
 				removeFromTPList();
 			}
-
+			SFPlugin.log(Level.INFO, parent.teleporters.toString());
+			return;
 		}
 	}
 }
