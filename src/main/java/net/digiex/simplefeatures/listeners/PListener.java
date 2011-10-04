@@ -59,7 +59,10 @@ public class PListener extends PlayerListener {
 		@Override
 		public void run() {
 
-			String answer = SFPlugin.questioner.ask(this.player, ChatColor.YELLOW+"Do you want to set your home to this bed?", "yes", "no");
+			String answer = SFPlugin.questioner.ask(this.player,
+					ChatColor.YELLOW
+							+ "Do you want to set your home to this bed?",
+					"yes", "no");
 			if (answer == "yes") {
 				SFHome home = plugin
 						.getDatabase()
@@ -85,6 +88,13 @@ public class PListener extends PlayerListener {
 
 	@Override
 	public void onPlayerJoin(PlayerJoinEvent e) {
+		if (!e.getPlayer().isWhitelisted()) {
+			e.getPlayer().kickPlayer(
+					ChatColor.RED + "Not on whitelist, " + ChatColor.WHITE
+							+ " see " + ChatColor.AQUA
+							+ "http://digiex.net/minecraft");
+			return;
+		}
 		setGameMode(e.getPlayer(), e.getPlayer().getWorld());
 		if (e.getPlayer().isOp()) {
 			e.getPlayer().setDisplayName(
