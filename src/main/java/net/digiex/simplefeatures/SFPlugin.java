@@ -34,6 +34,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
+import org.bukkit.WorldCreator;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -57,7 +58,6 @@ public class SFPlugin extends JavaPlugin {
     public Configuration config;
     static final Logger log = Logger.getLogger("Minecraft");
     public static String pluginName = "SimpleFeatures";
-    public HashMap<Player, SFTeleport> teleporters = new HashMap<Player, SFTeleport>();
     public HashMap<String, Boolean> gods = new HashMap<String, Boolean>();
 
     public static boolean isInSpawnProtect(Location loc) {
@@ -143,8 +143,11 @@ public class SFPlugin extends JavaPlugin {
                 String environment = config.getString("worlds." + worldKey
                         + ".environment", "NORMAL"); // Grab the Environment as
                 // a String.
-                World newworld = getServer().createWorld(worldKey,
-                        getEnvFromString(environment));
+                //World newworld = getServer().createWorld(worldKey,
+                //        getEnvFromString(environment));
+                WorldCreator wc = new WorldCreator(worldKey);
+                wc.environment(getEnvFromString(environment));
+                World newworld = getServer().createWorld(wc);
                 // Increment the world count
                 newworld.setPVP(config.getBoolean(
                         "worlds." + worldKey + ".pvp", false));
@@ -347,4 +350,49 @@ public class SFPlugin extends JavaPlugin {
             }
         });
     }
+    public boolean isGod(String playername){
+    	return gods.containsKey(playername);
+    }
+    public void setGodOn(String playername){
+		gods.put(playername, true);
+    }
+    public void setGodOn(String playername, int duration){
+		GodRemoveTask task = new GodRemoveTask(this, playername);
+		int id = this.getServer().getScheduler()
+				.scheduleSyncDelayedTask(this, task, duration);
+		task.setId(id);
+		setGodOn(playername);
+    }
+    public void setGodOff(String playername){
+    	gods.remove(playername);
+    }
+	public class GodRemoveTask implements Runnable {
+
+		private SFPlugin plugin;
+		private String player;
+		private int id;
+
+		public GodRemoveTask(SFPlugin plugin, String playername) {
+			this.plugin = plugin;
+			this.player = playername;
+		}
+
+		@Override
+		public void run() {
+			plugin.setGodOff(player);
+			plugin.getServer().getScheduler().cancelTask(id);
+		}
+
+		public String getPlayerName() {
+			return this.player;
+		}
+
+		public int getId() {
+			return this.id;
+		}
+
+		public void setId(int id) {
+			this.id = id;
+		}
+	}
 }

@@ -29,7 +29,7 @@ public class EListener extends EntityListener {
     public void onEntityDamage(EntityDamageEvent event) {
         if (event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
-            if (plugin.gods.containsKey(player.getName())) {
+            if (plugin.isGod(player.getName())) {
                 // will still take damage if hungry, bukkit must not tigger this event when dieing by hunger
                 event.setCancelled(true);
                 player.setFireTicks(0);

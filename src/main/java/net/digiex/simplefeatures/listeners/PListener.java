@@ -181,45 +181,13 @@ public class PListener extends PlayerListener {
 		if (!(e.isCancelled()) && e.getTo() != null) {
 			Teleported(e.getFrom().getWorld(), e.getTo().getWorld(),
 					e.getPlayer());
-			if (!plugin.gods.containsKey(e.getPlayer().getName())) {
-				GodTask task = new GodTask(plugin, e.getPlayer());
-				int id = plugin.getServer().getScheduler()
-						.scheduleSyncDelayedTask(plugin, task, 200);
-				task.setId(id);
-				plugin.gods.put(e.getPlayer().getName(), true);
+			if (!plugin.isGod(e.getPlayer().getName())) {
+				plugin.setGodOn(e.getPlayer().getName(), 200);
 			}
 		}
 	}
 
-	public class GodTask implements Runnable {
 
-		private SFPlugin plugin;
-		private Player player;
-		private int id;
-
-		public GodTask(SFPlugin plugin, Player player) {
-			this.plugin = plugin;
-			this.player = player;
-		}
-
-		@Override
-		public void run() {
-			plugin.gods.remove(player.getName());
-			plugin.getServer().getScheduler().cancelTask(id);
-		}
-
-		public Player getPlayer() {
-			return this.player;
-		}
-
-		public int getId() {
-			return this.id;
-		}
-
-		public void setId(int id) {
-			this.id = id;
-		}
-	}
 
 	public void setGameMode(Player player, World world) {
 		int gamemode = plugin.config.getInt("worlds." + world.getName()

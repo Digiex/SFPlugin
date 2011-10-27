@@ -2,17 +2,13 @@ package net.digiex.simplefeatures.commands;
 
 import net.digiex.simplefeatures.SFHome;
 import net.digiex.simplefeatures.SFPlugin;
-import net.digiex.simplefeatures.SFTeleport;
-import net.digiex.simplefeatures.SFTeleport.TeleportTypes;
+import net.digiex.simplefeatures.teleports.SFTeleportTask;
 
 import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.permissions.Permission;
-import org.bukkit.permissions.PermissionDefault;
 
 public class CMDhome implements CommandExecutor {
 
@@ -40,7 +36,7 @@ public class CMDhome implements CommandExecutor {
             sender.sendMessage(ChatColor.RED + "I don't know how to move you!");
             return true;
         }
-        if (plugin.teleporters.containsKey(player)) {
+        if (SFTeleportTask.teleporters.contains(player.getName())) {
             player.sendMessage(ChatColor.GRAY + "Teleport already in progress, use /abort to Cancel");
             return true;
         }
@@ -49,14 +45,7 @@ public class CMDhome implements CommandExecutor {
             sender.sendMessage(ChatColor.RED + "I don't know where that is!");
             return true;
         }
-        SFTeleport teleport = new SFTeleport(plugin, TeleportTypes.home);
-        if (player.getGameMode().equals(GameMode.CREATIVE) || player.hasPermission(new Permission("sf.tpoverride", PermissionDefault.OP))) {
-            teleport.setTimer(false);
-        }
-        teleport.setHome(home.getLocation());
-        teleport.setFrom(player);
-        teleport.startTeleport();
-        plugin.teleporters.put(player, teleport);
+        plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new SFTeleportTask(player, player, null, home.getLocation(), false, null, "Teleporting to home"));
         return true;
     }
 }
