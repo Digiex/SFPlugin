@@ -1,5 +1,6 @@
 package net.digiex.simplefeatures.teleports;
 
+import java.util.HashSet;
 import java.util.Set;
 import net.digiex.simplefeatures.SFPlugin;
 
@@ -20,7 +21,7 @@ public class SFTeleportTask implements Runnable{
 	private String infoMsg;
 	private boolean timer;
 	private Player askSubject;
-	public static Set<String> teleporters;
+	public static Set<String> teleporters = new HashSet<String>();
 	public SFTeleportTask(Player who, Player what, Player askSubject, Location where,boolean ask, String question, String infoMsg){
 		this.who = who;
 		this.what = what;
