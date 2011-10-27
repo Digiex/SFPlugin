@@ -36,7 +36,7 @@ public class CMDhome implements CommandExecutor {
             sender.sendMessage(ChatColor.RED + "I don't know how to move you!");
             return true;
         }
-        if (SFTeleportTask.teleporters.contains(player.getName())) {
+        if (SFTeleportTask.teleporters.containsKey(player.getName())) {
             player.sendMessage(ChatColor.GRAY + "Teleport already in progress, use /abort to Cancel");
             return true;
         }
@@ -45,7 +45,8 @@ public class CMDhome implements CommandExecutor {
             sender.sendMessage(ChatColor.RED + "I don't know where that is!");
             return true;
         }
-        plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new SFTeleportTask(player, player, null, home.getLocation(), false, null, "Teleporting to home"));
+        int taskId = plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new SFTeleportTask(player, player, null, home.getLocation(), false, null, "Teleporting to home"));
+        SFTeleportTask.teleporters.put(player.getName(), taskId);
         return true;
     }
 }

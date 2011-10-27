@@ -93,6 +93,7 @@ public class PListener extends PlayerListener {
 					ChatColor.RED + "Not on whitelist, " + ChatColor.WHITE
 							+ " see " + ChatColor.AQUA
 							+ "http://digiex.net/minecraft");
+			e.setJoinMessage(ChatColor.YELLOW+e.getPlayer().getDisplayName()+" tried to join, but is not on whitelist!");
 			return;
 		}
 		setGameMode(e.getPlayer(), e.getPlayer().getWorld());

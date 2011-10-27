@@ -11,35 +11,49 @@ import org.bukkit.entity.Player;
 
 public class CMDtpahere implements CommandExecutor {
 
-    SFPlugin plugin;
+	SFPlugin plugin;
 
-    public CMDtpahere(SFPlugin parent) {
-        this.plugin = parent;
-    }
+	public CMDtpahere(SFPlugin parent) {
+		this.plugin = parent;
+	}
 
-    @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (sender instanceof Player) {
-            Player player = (Player) sender;
-            if (args.length > 0) {
-                Player to = SFPlugin.getPlayer(sender, args[0]);
-                if (to != null) {
-                    if (SFTeleportTask.teleporters.contains(to.getName())) {
-                        player.sendMessage(ChatColor.GRAY + to.getDisplayName() + " is already teleporting, try again later.");
-                        return true;
-                    }
-                    if (player.getName().equals(to.getName())) {
-                        player.sendMessage(ChatColor.GRAY + "You cannot teleport to yourself, silly.");
-                        return true;
-                    }
-                  
-                    player.sendMessage(ChatColor.GRAY + "Requesting!");
-                    plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new SFTeleportTask(player, to, to, player.getLocation(), true, player.getDisplayName()+" wants to teleport you to them", "Teleporting to "+player.getDisplayName()));
-                    
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+	@Override
+	public boolean onCommand(CommandSender sender, Command command,
+			String label, String[] args) {
+		if (sender instanceof Player) {
+			Player player = (Player) sender;
+			if (args.length > 0) {
+				Player to = SFPlugin.getPlayer(sender, args[0]);
+				if (to != null) {
+					if (SFTeleportTask.teleporters.containsKey(to.getName())) {
+						player.sendMessage(ChatColor.GRAY + to.getDisplayName()
+								+ " is already teleporting, try again later.");
+						return true;
+					}
+					if (player.getName().equals(to.getName())) {
+						player.sendMessage(ChatColor.GRAY
+								+ "You cannot teleport to yourself, silly.");
+						return true;
+					}
+
+					player.sendMessage(ChatColor.GRAY + "Requesting!");
+					int taskId = plugin
+							.getServer()
+							.getScheduler()
+							.scheduleAsyncDelayedTask(
+									plugin,
+									new SFTeleportTask(player, to, to, player
+											.getLocation(), true, player
+											.getDisplayName()
+											+ " wants to teleport you to them",
+											"Teleporting to "
+													+ player.getDisplayName()));
+					SFTeleportTask.teleporters.put(to.getName(), taskId);
+
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 }
