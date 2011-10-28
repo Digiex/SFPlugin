@@ -1,8 +1,6 @@
 package net.digiex.simplefeatures.teleports;
 
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
 import net.digiex.simplefeatures.SFPlugin;
 
 import org.bukkit.GameMode;
