@@ -93,7 +93,8 @@ public class PListener extends PlayerListener {
 					ChatColor.RED + "Not on whitelist, " + ChatColor.WHITE
 							+ " see " + ChatColor.AQUA
 							+ "http://digiex.net/minecraft");
-			e.setJoinMessage(ChatColor.YELLOW+e.getPlayer().getDisplayName()+" tried to join, but is not on whitelist!");
+			e.setJoinMessage(ChatColor.YELLOW + e.getPlayer().getDisplayName()
+					+ " tried to join, but is not on whitelist!");
 			return;
 		}
 		setGameMode(e.getPlayer(), e.getPlayer().getWorld());
@@ -119,6 +120,13 @@ public class PListener extends PlayerListener {
 		}
 		SFPlugin.log(Level.INFO, e.getPlayer().getName()
 				+ "'s gamemode changed to " + e.getNewGameMode().toString());
+		if (!(e.getPlayer().getHealth() > 0)) {
+
+			e.getPlayer().getInventory().clear();
+			e.getPlayer().setHealth(20);
+			e.getPlayer().setFoodLevel(20);
+		}
+
 		SFInventory inv = new SFInventory();
 		inv.setGameMode(e.getPlayer().getGameMode());
 		inv.setPlayerName(e.getPlayer().getName());
@@ -132,19 +140,24 @@ public class PListener extends PlayerListener {
 
 		e.getPlayer().getInventory().clear();
 		try {
-			inv = plugin.getSFInventory(e.getNewGameMode(), e.getPlayer()
-					.getName());
-			ItemStack[] contents = SFPlugin.stringToItemStack(inv
-					.getInventory());
-			if (contents != null) {
-				e.getPlayer().getInventory().setContents(contents);
+			if (!(inv.getHealth() > 0)) {
+				e.getPlayer().setHealth(20);
+				e.getPlayer().setFoodLevel(20);
+			} else {
+				inv = plugin.getSFInventory(e.getNewGameMode(), e.getPlayer()
+						.getName());
+				ItemStack[] contents = SFPlugin.stringToItemStack(inv
+						.getInventory());
+				if (contents != null) {
+					e.getPlayer().getInventory().setContents(contents);
+				}
+				ItemStack[] armor = SFPlugin.stringToItemStack(inv.getArmor());
+				if (armor != null) {
+					e.getPlayer().getInventory().setArmorContents(armor);
+				}
+				e.getPlayer().setHealth(inv.getHealth());
+				e.getPlayer().setFoodLevel(inv.getFood());
 			}
-			ItemStack[] armor = SFPlugin.stringToItemStack(inv.getArmor());
-			if (armor != null) {
-				e.getPlayer().getInventory().setArmorContents(armor);
-			}
-			e.getPlayer().setHealth(inv.getHealth());
-			e.getPlayer().setFoodLevel(inv.getFood());
 		} catch (NullPointerException ex) {
 			SFPlugin.log(Level.INFO, "Some inventory contents were null for "
 					+ e.getPlayer().getName() + ". Stacktrace for debugging:");
@@ -187,8 +200,6 @@ public class PListener extends PlayerListener {
 			}
 		}
 	}
-
-
 
 	public void setGameMode(Player player, World world) {
 		int gamemode = plugin.config.getInt("worlds." + world.getName()
