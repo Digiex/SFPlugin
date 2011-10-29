@@ -1,6 +1,8 @@
 package net.digiex.simplefeatures.listeners;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 
 import net.digiex.simplefeatures.SFHome;
@@ -18,11 +20,14 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerPortalEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.scheduler.BukkitScheduler;
 
 public class PListener extends PlayerListener {
@@ -48,41 +53,72 @@ public class PListener extends PlayerListener {
 			plugin.getServer()
 					.getScheduler()
 					.scheduleAsyncDelayedTask(plugin,
-							new AskSetHomeTask(player));
+							new AskSetHomeTask(player,player.getLocation()));
 		}
+	}
+
+	private static final Set<String> updateProps;
+	static {
+		updateProps = new HashSet<String>();
+		updateProps.add("x");
+		updateProps.add("y");
+		updateProps.add("z");
+		updateProps.add("yaw");
+		updateProps.add("pitch");
+		updateProps.add("world_name");
 	}
 
 	private class AskSetHomeTask implements Runnable {
 		private Player player;
-
-		public AskSetHomeTask(Player player) {
+		private Location homeLoc;
+		public AskSetHomeTask(Player player, Location homeLoc) {
 			this.player = player;
+			this.homeLoc = homeLoc;
 		}
 
 		@Override
 		public void run() {
-			Location homeLoc = player.getLocation();
 			String answer = SFPlugin.questioner.ask(this.player,
 					ChatColor.YELLOW
 							+ "Do you want to set your home to this bed?",
 					"yes", "no");
 			if (answer == "yes") {
-				SFHome home = plugin
-						.getDatabase()
-						.find(SFHome.class)
-						.where()
-						.ieq("worldName",
-								player.getLocation().getWorld().getName())
-						.ieq("playerName", player.getName()).findUnique();
-				if (home != null) {
-					plugin.getDatabase().delete(home);
+
+				com.avaje.ebean.EbeanServer db = plugin.getDatabase();
+				db.beginTransaction();
+
+				try {
+					SFHome home = db
+							.find(SFHome.class)
+							.where()
+							.ieq("worldName",
+									player.getLocation().getWorld().getName())
+							.ieq("playerName", player.getName()).findUnique();
+					boolean isUpdate = false;
+
+					if (home == null) {
+						player.sendMessage(ChatColor.YELLOW
+								+ "Home for this world created!");
+
+						home = new SFHome();
+						home.setPlayer(player);
+					} else {
+
+						player.sendMessage(ChatColor.YELLOW
+								+ "Home for this world updated!");
+
+						isUpdate = true;
+					}
+
+					home.setLocation(homeLoc);
+
+					if (isUpdate)
+						db.update(home, updateProps);
+					db.save(home);
+					db.commitTransaction();
+				} finally {
+					db.endTransaction();
 				}
-				SFHome newhome = new SFHome();
-				newhome.setPlayer(player);
-				newhome.setLocation(homeLoc);
-				plugin.getDatabase().save(newhome);
-				player.sendMessage(ChatColor.YELLOW
-						+ "Your home for this world is now set to this bed!");
 			} else {
 				player.sendMessage(ChatColor.GRAY
 						+ "Setting home here cancelled.");
@@ -101,6 +137,12 @@ public class PListener extends PlayerListener {
 							+ "http://digiex.net/minecraft");
 			return;
 		}
+		PermissionAttachment attachment = e.getPlayer().addAttachment(plugin);
+		if (!e.getPlayer().isOp()) {
+			attachment.setPermission("bukkit.command.plugins", false);
+			attachment.setPermission("bukkit.command.version", false);
+		}
+		plugin.permissionAttachements.put(e.getPlayer().getName(), attachment);
 		setGameMode(e.getPlayer(), e.getPlayer().getWorld());
 		if (e.getPlayer().isOp()) {
 			e.getPlayer().setDisplayName(
@@ -122,6 +164,26 @@ public class PListener extends PlayerListener {
 			e.getPlayer().sendMessage(
 					ChatColor.AQUA + "You have " + msgs.size()
 							+ " new mail! Type /read to view.");
+		}
+	}
+
+	@Override
+	public void onPlayerQuit(PlayerQuitEvent e) {
+		if (e.getPlayer().isWhitelisted()) {
+			e.getPlayer().removeAttachment(
+					plugin.permissionAttachements.get(e.getPlayer().getName()));
+		}
+	}
+
+	@Override
+	public void onPlayerKick(PlayerKickEvent e) {
+		System.out
+				.println(e.getPlayer().getName() + " lost connection: kicked");
+		if (!e.getPlayer().isWhitelisted()) {
+			e.setLeaveMessage(null);
+		} else {
+			e.getPlayer().removeAttachment(
+					plugin.permissionAttachements.get(e.getPlayer().getName()));
 		}
 	}
 

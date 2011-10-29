@@ -2,6 +2,7 @@ package net.digiex.simplefeatures;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Filter;
 import java.util.logging.Level;
@@ -47,6 +48,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
+import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
@@ -61,6 +63,7 @@ public class SFPlugin extends JavaPlugin {
 	static final Logger log = Logger.getLogger("Minecraft");
 	public static String pluginName = "SimpleFeatures";
 	public HashMap<String, Boolean> gods = new HashMap<String, Boolean>();
+	public HashMap<String, PermissionAttachment> permissionAttachements = new HashMap<String, PermissionAttachment>();
 
 	public static boolean isInSpawnProtect(Location loc) {
 		final Vector player = loc.toVector();
@@ -106,7 +109,7 @@ public class SFPlugin extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-		// TODO Auto-generated method stub
+		log(Level.INFO, "Plugin disabled.");
 	}
 
 	@Override
@@ -176,6 +179,10 @@ public class SFPlugin extends JavaPlugin {
 				Priority.Highest, this);
 		pm.registerEvent(Event.Type.PLAYER_RESPAWN, playerListener,
 				Priority.Monitor, this);
+		pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener,
+				Priority.Highest, this);
+		pm.registerEvent(Event.Type.PLAYER_KICK, playerListener,
+				Priority.Highest, this);
 		pm.registerEvent(Event.Type.PLAYER_GAME_MODE_CHANGE, playerListener,
 				Priority.Monitor, this);
 		pm.registerEvent(Event.Type.PLAYER_PORTAL, playerListener,

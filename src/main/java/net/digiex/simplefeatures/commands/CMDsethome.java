@@ -1,5 +1,8 @@
 package net.digiex.simplefeatures.commands;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import net.digiex.simplefeatures.SFHome;
 import net.digiex.simplefeatures.SFPlugin;
 
@@ -8,9 +11,23 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionDefault;
 
 public class CMDsethome implements CommandExecutor {
 	SFPlugin plugin;
+	// Properties the EbeanServer must be told to update. It
+	// doesn't appear to be smart enough to figure these out on its own.
+	private static final Set<String> updateProps;
+	static {
+		updateProps = new HashSet<String>();
+		updateProps.add("x");
+		updateProps.add("y");
+		updateProps.add("z");
+		updateProps.add("yaw");
+		updateProps.add("pitch");
+		updateProps.add("world_name");
+	}
 
 	public CMDsethome(SFPlugin parent) {
 		this.plugin = parent;
@@ -18,33 +35,51 @@ public class CMDsethome implements CommandExecutor {
 
 	public boolean onCommand(CommandSender sender, Command command,
 			String label, String[] args) {
-		String name = null;
-		if (args.length > 0) {
-			name = args[0];
-		}
-		Player player = SFPlugin.getPlayer(sender, name);
-		if (player == null) {
+		if (sender instanceof Player) {
+			Player player = (Player) sender;
+			if (!player.hasPermission(new Permission("sf.sethome",
+					PermissionDefault.OP))) {
+				player.sendMessage(ChatColor.RED + "Use a bed to set a home!");
+				return true;
+			}
+			com.avaje.ebean.EbeanServer db = plugin.getDatabase();
+			db.beginTransaction();
+
+			try {
+				SFHome home = db
+						.find(SFHome.class)
+						.where()
+						.ieq("worldName",
+								player.getLocation().getWorld().getName())
+						.ieq("playerName", player.getName()).findUnique();
+				boolean isUpdate = false;
+
+				if (home == null) {
+					player.sendMessage(ChatColor.YELLOW
+							+ "Home for this world created!");
+
+					home = new SFHome();
+					home.setPlayer(player);
+				} else {
+
+					player.sendMessage(ChatColor.YELLOW
+							+ "Home for this world updated!");
+
+					isUpdate = true;
+				}
+
+				home.setLocation(((Player) sender).getLocation());
+
+				if (isUpdate)
+					db.update(home, updateProps);
+				db.save(home);
+				db.commitTransaction();
+			} finally {
+				db.endTransaction();
+			}
 			return true;
-		} else if ((player != sender) && (!sender.isOp())) {
-			sender.sendMessage(ChatColor.RED
-					+ "You don't have permission to set other players homes");
-			return true;
-		} else if (!(sender instanceof Player)) {
-			sender.sendMessage(ChatColor.RED + "I don't know where you are!");
-			return true;
 		}
-		SFHome home = plugin.getDatabase().find(SFHome.class).where()
-				.ieq("worldName", player.getLocation().getWorld().getName())
-				.ieq("playerName", player.getName()).findUnique();
-		if (home != null) {
-			plugin.getDatabase().delete(home);
-		}
-		SFHome newhome = new SFHome();
-		newhome.setPlayer(player);
-		newhome.setLocation(player.getLocation());
-		plugin.getDatabase().save(newhome);
-		player.sendMessage(ChatColor.YELLOW+"Home for this world set!");
-		return true;
+		return false;
 	}
 
 }
