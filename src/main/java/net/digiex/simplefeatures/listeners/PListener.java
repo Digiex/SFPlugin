@@ -73,10 +73,11 @@ public class PListener extends PlayerListener {
 						.ieq("worldName",
 								player.getLocation().getWorld().getName())
 						.ieq("playerName", player.getName()).findUnique();
-				if (home == null) {
-					home = new SFHome();
-					home.setPlayer(player);
+				if (home != null) {
+					plugin.getDatabase().delete(home);
 				}
+				home = new SFHome();
+				home.setPlayer(player);
 				home.setLocation(player.getLocation());
 				plugin.getDatabase().save(home);
 				player.sendMessage(ChatColor.YELLOW
@@ -114,10 +115,12 @@ public class PListener extends PlayerListener {
 			e.getPlayer().setPlayerListName(plistname);
 		}
 		List<SFMail> msgs;
-			msgs = plugin.getDatabase().find(SFMail.class).where()
-					.ieq("toPlayer", e.getPlayer().getName()).findList();
+		msgs = plugin.getDatabase().find(SFMail.class).where()
+				.ieq("toPlayer", e.getPlayer().getName()).findList();
 		if (!msgs.isEmpty()) {
-		e.getPlayer().sendMessage(ChatColor.AQUA+"You have "+msgs.size()+" new mail! Type /read to view.");
+			e.getPlayer().sendMessage(
+					ChatColor.AQUA + "You have " + msgs.size()
+							+ " new mail! Type /read to view.");
 		}
 	}
 

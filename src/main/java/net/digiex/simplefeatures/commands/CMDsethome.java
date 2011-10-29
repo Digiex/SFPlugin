@@ -34,13 +34,14 @@ public class CMDsethome implements CommandExecutor {
 			return true;
 		}
 		SFHome home = plugin.getDatabase().find(SFHome.class).where()
-				.ieq("worldName", player.getLocation().getWorld().getName()).ieq("playerName", player.getName())
-				.findUnique();
-		if (home == null) {
-			home = new SFHome();
-			home.setPlayer(player);
+				.ieq("worldName", player.getLocation().getWorld().getName())
+				.ieq("playerName", player.getName()).findUnique();
+		if (home != null) {
+			plugin.getDatabase().delete(home);
 		}
-		home.setLocation(((Player) sender).getLocation());
+		home = new SFHome();
+		home.setPlayer(player);
+		home.setLocation(player.getLocation());
 		plugin.getDatabase().save(home);
 		return true;
 	}
