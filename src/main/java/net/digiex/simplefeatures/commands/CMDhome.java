@@ -12,41 +12,47 @@ import org.bukkit.entity.Player;
 
 public class CMDhome implements CommandExecutor {
 
-    SFPlugin plugin;
+	SFPlugin plugin;
 
-    public CMDhome(SFPlugin parent) {
-        this.plugin = parent;
-    }
+	public CMDhome(SFPlugin parent) {
+		this.plugin = parent;
+	}
 
-    @Override
-    public boolean onCommand(CommandSender sender, Command command,
-            String label, String[] args) {
-        String name = null;
-        if (args.length > 0) {
-            name = args[0];
-        }
-        Player player = SFPlugin.getPlayer(sender, name);
-        if (player == null) {
-            return true;
-        } else if ((player != sender) && (!sender.isOp())) {
-            sender.sendMessage(ChatColor.RED
-                    + "You don't have permission to go to other players homes");
-            return true;
-        } else if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "I don't know how to move you!");
-            return true;
-        }
-        if (SFTeleportTask.teleporters.containsKey(player.getName())) {
-            player.sendMessage(ChatColor.GRAY + "Teleport already in progress, use /abort to Cancel");
-            return true;
-        }
-        SFHome home = plugin.getDatabase().find(SFHome.class).where().ieq("worldName", player.getLocation().getWorld().getName()).ieq("playerName", player.getName()).findUnique();
-        if (home == null) {
-            sender.sendMessage(ChatColor.RED + "I don't know where that is!");
-            return true;
-        }
-        int taskId = plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new SFTeleportTask(player, player, null, home.getLocation(), false, null, "Teleporting to home"));
-        SFTeleportTask.teleporters.put(player.getName(), taskId);
-        return true;
-    }
+	@Override
+	public boolean onCommand(CommandSender sender, Command command,
+			String label, String[] args) {
+		Player player = null;
+		if (sender instanceof Player) {
+			player = (Player) sender;
+		} else {
+			return true;
+		}
+		String homename = player.getLocation().getWorld().getName();
+		if (args.length > 0) {
+			homename = args[0];
+		}
+		if (SFTeleportTask.teleporters.containsKey(player.getName())) {
+			player.sendMessage(ChatColor.GRAY
+					+ "Teleport already in progress, use /abort to Cancel");
+			return true;
+		}
+		SFHome home = plugin.getDatabase().find(SFHome.class).where()
+				.ieq("worldName", homename).ieq("playerName", player.getName())
+				.findUnique();
+		if (home == null) {
+			sender.sendMessage(ChatColor.RED + "No home for world called "
+					+ homename + "!");
+			return true;
+		}
+		int taskId = plugin
+				.getServer()
+				.getScheduler()
+				.scheduleAsyncDelayedTask(
+						plugin,
+						new SFTeleportTask(player, player, null, home
+								.getLocation(), false, null,
+								"Teleporting to home"));
+		SFTeleportTask.teleporters.put(player.getName(), taskId);
+		return true;
+	}
 }
