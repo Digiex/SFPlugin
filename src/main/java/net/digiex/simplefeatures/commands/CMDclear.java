@@ -10,36 +10,35 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-public class CMDlastmsgs implements CommandExecutor {
-	SFPlugin plugin;
+public class CMDclear  implements CommandExecutor {
 
-	public CMDlastmsgs(SFPlugin parent) {
+
+	private SFPlugin plugin;
+
+	public CMDclear(SFPlugin parent) {
 		this.plugin = parent;
 	}
+
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command,
 			String label, String[] args) {
 		List<SFMail> msgs;
-		if (args.length > 0) {
 			msgs = plugin.getDatabase().find(SFMail.class).where()
-					.ieq("toPlayer", sender.getName())
-					.ieq("fromPlayer", args[0]).setMaxRows(5)
-					.orderBy("timestamp DESC").findList();
-		} else {
-			msgs = plugin.getDatabase().find(SFMail.class).where()
-					.ieq("toPlayer", sender.getName()).setMaxRows(5)
-					.orderBy("timestamp DESC").findList();
-		}
+					.ieq("toPlayer", sender.getName()).findList();
 		if (msgs.isEmpty()) {
-			sender.sendMessage(ChatColor.RED + "Nothing found!");
+			sender.sendMessage(ChatColor.RED + "Nothing to clear!");
 			return true;
 		} else {
+			int i = 0;
 			for (SFMail msg : msgs) {
-				sender.sendMessage(ChatColor.YELLOW + msg.getFromPlayer()
-						+ ChatColor.WHITE + ": " + msg.getMessage());
+				plugin.getDatabase().delete(msg);
+				i++;
 			}
+			sender.sendMessage(ChatColor.YELLOW+"Successfully cleared "+i+" messages.");
 			return true;
 		}
 	}
+
+
 }

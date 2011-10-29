@@ -1,9 +1,11 @@
 package net.digiex.simplefeatures.listeners;
 
+import java.util.List;
 import java.util.logging.Level;
 
 import net.digiex.simplefeatures.SFHome;
 import net.digiex.simplefeatures.SFInventory;
+import net.digiex.simplefeatures.SFMail;
 import net.digiex.simplefeatures.SFPlugin;
 
 import org.bukkit.ChatColor;
@@ -89,12 +91,12 @@ public class PListener extends PlayerListener {
 	@Override
 	public void onPlayerJoin(PlayerJoinEvent e) {
 		if (!e.getPlayer().isWhitelisted()) {
+			e.setJoinMessage(ChatColor.YELLOW + e.getPlayer().getDisplayName()
+					+ " tried to join, but is not on whitelist!");
 			e.getPlayer().kickPlayer(
 					ChatColor.RED + "Not on whitelist, " + ChatColor.WHITE
 							+ " see " + ChatColor.AQUA
 							+ "http://digiex.net/minecraft");
-			e.setJoinMessage(ChatColor.YELLOW + e.getPlayer().getDisplayName()
-					+ " tried to join, but is not on whitelist!");
 			return;
 		}
 		setGameMode(e.getPlayer(), e.getPlayer().getWorld());
@@ -110,6 +112,12 @@ public class PListener extends PlayerListener {
 		String plistname = e.getPlayer().getDisplayName();
 		if (plistname.length() < 17) {
 			e.getPlayer().setPlayerListName(plistname);
+		}
+		List<SFMail> msgs;
+			msgs = plugin.getDatabase().find(SFMail.class).where()
+					.ieq("toPlayer", e.getPlayer().getName()).findList();
+		if (!msgs.isEmpty()) {
+		e.getPlayer().sendMessage(ChatColor.RED+"You have "+msgs.size()+"x new mail!");
 		}
 	}
 

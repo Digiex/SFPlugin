@@ -84,11 +84,6 @@ commands:
         usage: |
                /<command> <message>
                Example: /<command> is a shark!
-    lastmsgs:
-        description: Shows last 5 messages sent to you.
-        usage: |
-               /<command> [from player]
-               Example: /<command> Snookieboy
     entities:
         description: Debugging
         usage: |
@@ -99,3 +94,26 @@ commands:
         usage: |
                /<command>
                Example: /<command>
+    send:
+        aliases: [mail]
+        description: Sends a player a offline message
+        usage: |
+               /<command> <player> <message>
+               Example: /<command> Snookieboy I smell sharks!
+    clear:
+        description: Clear all mails
+        usage: |
+               /<command>
+               Example: /<command>
+    read:
+        aliases: [lastmsgs]
+        description: Read your mail
+        usage: |
+               /<command> [page]
+               Example: /<command> 2
+    sendall:
+        aliases: [mailall]
+        description: Sends all players a offline message
+        usage: |
+               /<command> <message>
+               Example: /<command> I smell sharks!
