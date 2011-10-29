@@ -35,6 +35,9 @@ public class CMDworld implements CommandExecutor {
 					if (w.getName().contains("_nether")) {
 						wname = "Nether";
 					}
+					if (w.getName().contains("_skylands")) {
+						wname = "End";
+					}
 					if (wname.equalsIgnoreCase(args[0])) {
 						world = w;
 					} else if (wname.toLowerCase().indexOf(
@@ -50,6 +53,15 @@ public class CMDworld implements CommandExecutor {
 							return true;
 						} else {
 							sender.sendMessage("Wait! You need to use nether portals!!! Oh you're an OP... Sorry, my mistake.");
+						}
+					}
+					if (world.getName().contains("_skylands")) {
+						if (!((Player) sender).isOp()) {
+							sender.sendMessage(ChatColor.RED
+									+ "Use a Enderportal in Survival to enter The End");
+							return true;
+						} else {
+							sender.sendMessage("Wait! You need to use Enderportals!!! Oh you're an OP... Sorry, my mistake.");
 						}
 					}
 					int taskId = plugin
@@ -90,6 +102,16 @@ public class CMDworld implements CommandExecutor {
 				}
 				if (allownether) {
 					sender.sendMessage(ChatColor.GRAY + "Nether");
+				}
+			} else if (w.getName().contains("_skylands")) {
+				boolean allowskylands = false;
+				if (sender instanceof Player) {
+					allowskylands = ((Player) sender).isOp();
+				} else {
+					allowskylands = true;
+				}
+				if (allowskylands) {
+					sender.sendMessage(ChatColor.GRAY + "End");
 				}
 			} else {
 				sender.sendMessage(ChatColor.YELLOW + w.getName());
