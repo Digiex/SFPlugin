@@ -39,10 +39,11 @@ public class CMDsethome implements CommandExecutor {
 		if (home != null) {
 			plugin.getDatabase().delete(home);
 		}
-		home = new SFHome();
-		home.setPlayer(player);
-		home.setLocation(player.getLocation());
-		plugin.getDatabase().save(home);
+		SFHome newhome = new SFHome();
+		newhome.setPlayer(player);
+		newhome.setLocation(player.getLocation());
+		plugin.getDatabase().save(newhome);
+		player.sendMessage(ChatColor.YELLOW+"Home for this world set!");
 		return true;
 	}
 

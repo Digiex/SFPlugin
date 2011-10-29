@@ -10,6 +10,7 @@ import net.digiex.simplefeatures.SFPlugin;
 
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -60,7 +61,7 @@ public class PListener extends PlayerListener {
 
 		@Override
 		public void run() {
-
+			Location homeLoc = player.getLocation();
 			String answer = SFPlugin.questioner.ask(this.player,
 					ChatColor.YELLOW
 							+ "Do you want to set your home to this bed?",
@@ -76,10 +77,10 @@ public class PListener extends PlayerListener {
 				if (home != null) {
 					plugin.getDatabase().delete(home);
 				}
-				home = new SFHome();
-				home.setPlayer(player);
-				home.setLocation(player.getLocation());
-				plugin.getDatabase().save(home);
+				SFHome newhome = new SFHome();
+				newhome.setPlayer(player);
+				newhome.setLocation(homeLoc);
+				plugin.getDatabase().save(newhome);
 				player.sendMessage(ChatColor.YELLOW
 						+ "Your home for this world is now set to this bed!");
 			} else {
