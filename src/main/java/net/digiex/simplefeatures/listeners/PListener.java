@@ -1,9 +1,11 @@
 package net.digiex.simplefeatures.listeners;
 
+import java.util.List;
 import java.util.logging.Level;
 
 import net.digiex.simplefeatures.SFHome;
 import net.digiex.simplefeatures.SFInventory;
+import net.digiex.simplefeatures.SFMail;
 import net.digiex.simplefeatures.SFPlugin;
 
 import org.bukkit.ChatColor;
@@ -42,25 +44,61 @@ public class PListener extends PlayerListener {
 
 		if (event.getClickedBlock().getType() == Material.BED_BLOCK) {
 			Player player = event.getPlayer();
-			SFHome home = plugin
-					.getDatabase()
-					.find(SFHome.class)
-					.where()
-					.ieq("worldName", player.getLocation().getWorld().getName())
-					.ieq("playerName", player.getName()).findUnique();
-			if (home == null) {
-				home = new SFHome();
-				home.setPlayer(player);
+			plugin.getServer()
+					.getScheduler()
+					.scheduleAsyncDelayedTask(plugin,
+							new AskSetHomeTask(player));
+		}
+	}
+
+	private class AskSetHomeTask implements Runnable {
+		private Player player;
+
+		public AskSetHomeTask(Player player) {
+			this.player = player;
+		}
+
+		@Override
+		public void run() {
+
+			String answer = SFPlugin.questioner.ask(this.player,
+					ChatColor.YELLOW
+							+ "Do you want to set your home to this bed?",
+					"yes", "no");
+			if (answer == "yes") {
+				SFHome home = plugin
+						.getDatabase()
+						.find(SFHome.class)
+						.where()
+						.ieq("worldName",
+								player.getLocation().getWorld().getName())
+						.ieq("playerName", player.getName()).findUnique();
+				if (home == null) {
+					home = new SFHome();
+					home.setPlayer(player);
+				}
+				home.setLocation(player.getLocation());
+				plugin.getDatabase().save(home);
+				player.sendMessage(ChatColor.YELLOW
+						+ "Your home for this world is now set to this bed!");
+			} else {
+				player.sendMessage(ChatColor.GRAY
+						+ "Setting home here cancelled.");
 			}
-			home.setLocation(player.getLocation());
-			plugin.getDatabase().save(home);
-			player.sendMessage(ChatColor.YELLOW
-					+ "Your home for this world is now set to this bed!");
 		}
 	}
 
 	@Override
 	public void onPlayerJoin(PlayerJoinEvent e) {
+		if (!e.getPlayer().isWhitelisted()) {
+			e.setJoinMessage(ChatColor.YELLOW + e.getPlayer().getDisplayName()
+					+ " tried to join, but is not on whitelist!");
+			e.getPlayer().kickPlayer(
+					ChatColor.RED + "Not on whitelist, " + ChatColor.WHITE
+							+ " see " + ChatColor.AQUA
+							+ "http://digiex.net/minecraft");
+			return;
+		}
 		setGameMode(e.getPlayer(), e.getPlayer().getWorld());
 		if (e.getPlayer().isOp()) {
 			e.getPlayer().setDisplayName(
@@ -71,6 +109,16 @@ public class PListener extends PlayerListener {
 							ChatColor.GREEN + e.getPlayer().getName()
 									+ ChatColor.WHITE);
 		}
+		String plistname = e.getPlayer().getDisplayName();
+		if (plistname.length() < 17) {
+			e.getPlayer().setPlayerListName(plistname);
+		}
+		List<SFMail> msgs;
+			msgs = plugin.getDatabase().find(SFMail.class).where()
+					.ieq("toPlayer", e.getPlayer().getName()).findList();
+		if (!msgs.isEmpty()) {
+		e.getPlayer().sendMessage(ChatColor.RED+"You have "+msgs.size()+"x new mail!");
+		}
 	}
 
 	@Override
@@ -80,6 +128,13 @@ public class PListener extends PlayerListener {
 		}
 		SFPlugin.log(Level.INFO, e.getPlayer().getName()
 				+ "'s gamemode changed to " + e.getNewGameMode().toString());
+		if (!(e.getPlayer().getHealth() > 0)) {
+
+			e.getPlayer().getInventory().clear();
+			e.getPlayer().setHealth(20);
+			e.getPlayer().setFoodLevel(20);
+		}
+
 		SFInventory inv = new SFInventory();
 		inv.setGameMode(e.getPlayer().getGameMode());
 		inv.setPlayerName(e.getPlayer().getName());
@@ -93,19 +148,24 @@ public class PListener extends PlayerListener {
 
 		e.getPlayer().getInventory().clear();
 		try {
-			inv = plugin.getSFInventory(e.getNewGameMode(), e.getPlayer()
-					.getName());
-			ItemStack[] contents = SFPlugin.stringToItemStack(inv
-					.getInventory());
-			if (contents != null) {
-				e.getPlayer().getInventory().setContents(contents);
+			if (!(inv.getHealth() > 0)) {
+				e.getPlayer().setHealth(20);
+				e.getPlayer().setFoodLevel(20);
+			} else {
+				inv = plugin.getSFInventory(e.getNewGameMode(), e.getPlayer()
+						.getName());
+				ItemStack[] contents = SFPlugin.stringToItemStack(inv
+						.getInventory());
+				if (contents != null) {
+					e.getPlayer().getInventory().setContents(contents);
+				}
+				ItemStack[] armor = SFPlugin.stringToItemStack(inv.getArmor());
+				if (armor != null) {
+					e.getPlayer().getInventory().setArmorContents(armor);
+				}
+				e.getPlayer().setHealth(inv.getHealth());
+				e.getPlayer().setFoodLevel(inv.getFood());
 			}
-			ItemStack[] armor = SFPlugin.stringToItemStack(inv.getArmor());
-			if (armor != null) {
-				e.getPlayer().getInventory().setArmorContents(armor);
-			}
-			e.getPlayer().setHealth(inv.getHealth());
-			e.getPlayer().setFoodLevel(inv.getFood());
 		} catch (NullPointerException ex) {
 			SFPlugin.log(Level.INFO, "Some inventory contents were null for "
 					+ e.getPlayer().getName() + ". Stacktrace for debugging:");
@@ -134,7 +194,8 @@ public class PListener extends PlayerListener {
 		if (home != null) {
 			event.setRespawnLocation(home.getLocation());
 		}
-
+		Teleported(event.getPlayer().getLocation().getWorld(), event
+				.getRespawnLocation().getWorld(), event.getPlayer());
 	}
 
 	@Override
@@ -142,43 +203,9 @@ public class PListener extends PlayerListener {
 		if (!(e.isCancelled()) && e.getTo() != null) {
 			Teleported(e.getFrom().getWorld(), e.getTo().getWorld(),
 					e.getPlayer());
-			if (!plugin.gods.containsKey(e.getPlayer().getName())) {
-				GodTask task = new GodTask(plugin, e.getPlayer());
-				int id = plugin.getServer().getScheduler()
-						.scheduleSyncDelayedTask(plugin, task, 200);
-				task.setId(id);
-				plugin.gods.put(e.getPlayer().getName(), true);
+			if (!plugin.isGod(e.getPlayer().getName())) {
+				plugin.setGodOn(e.getPlayer().getName(), 200);
 			}
-		}
-	}
-
-	public class GodTask implements Runnable {
-
-		private SFPlugin plugin;
-		private Player player;
-		private int id;
-
-		public GodTask(SFPlugin plugin, Player player) {
-			this.plugin = plugin;
-			this.player = player;
-		}
-
-		@Override
-		public void run() {
-			plugin.gods.remove(player.getName());
-			plugin.getServer().getScheduler().cancelTask(id);
-		}
-
-		public Player getPlayer() {
-			return this.player;
-		}
-
-		public int getId() {
-			return this.id;
-		}
-
-		public void setId(int id) {
-			this.id = id;
 		}
 	}
 
