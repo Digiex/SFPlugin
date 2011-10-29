@@ -7,6 +7,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Creature;
+import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.Item;
@@ -34,6 +35,11 @@ public class CMDentities implements CommandExecutor {
 					return false;
 				}
 			} else {
+				if(args[0].equalsIgnoreCase("sharks") && sender instanceof Player){
+					Player pla = (Player) sender;
+					pla.getWorld().spawnCreature(pla.getLocation(), CreatureType.ENDER_DRAGON);
+					return true;
+				}
 				w = plugin.getServer().getWorld(args[0]);
 			}
 			if (w != null) {
