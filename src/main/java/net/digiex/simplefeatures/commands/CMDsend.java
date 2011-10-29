@@ -48,7 +48,7 @@ public class CMDsend  implements CommandExecutor {
 			parent.getDatabase().save(save);
 			Player p = parent.getServer().getPlayer(target.getName());
 			if(p != null){
-				p.sendMessage(ChatColor.YELLOW+"You have new mail! Type /read to read it!");
+				p.sendMessage(ChatColor.AQUA+"You have new mail! Type /read to read it!");
 			}
 			return true;
 		}

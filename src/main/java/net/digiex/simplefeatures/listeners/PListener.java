@@ -117,7 +117,7 @@ public class PListener extends PlayerListener {
 			msgs = plugin.getDatabase().find(SFMail.class).where()
 					.ieq("toPlayer", e.getPlayer().getName()).findList();
 		if (!msgs.isEmpty()) {
-		e.getPlayer().sendMessage(ChatColor.RED+"You have "+msgs.size()+"x new mail!");
+		e.getPlayer().sendMessage(ChatColor.AQUA+"You have "+msgs.size()+" new mail! Type /read to view.");
 		}
 	}
 

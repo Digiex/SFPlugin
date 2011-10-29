@@ -9,7 +9,6 @@ import net.digiex.simplefeatures.SFMail;
 import net.digiex.simplefeatures.SFPlugin;
 
 import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -58,7 +57,7 @@ public class CMDsendall implements CommandExecutor {
 					parent.getDatabase().save(save);
 					Player p = parent.getServer().getPlayer(pname);
 					if (p != null) {
-						p.sendMessage(ChatColor.YELLOW
+						p.sendMessage(ChatColor.AQUA
 								+ "You have new mail! Type /read to read it!");
 					}
 					sent.add(pname);
