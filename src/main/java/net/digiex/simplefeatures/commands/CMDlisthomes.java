@@ -47,7 +47,6 @@ public class CMDlisthomes implements CommandExecutor {
 				if (result.length() > 0) {
 					result += ", ";
 				}
-				result += player.getBedSpawnLocation().getWorld().getName() + " (Bed)";
 			}
 			sender.sendMessage("All home(s): " + result);
 		}
