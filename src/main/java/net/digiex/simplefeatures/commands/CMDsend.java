@@ -1,12 +1,10 @@
 package net.digiex.simplefeatures.commands;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import net.digiex.simplefeatures.SFMail;
 import net.digiex.simplefeatures.SFPlugin;
 
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -14,17 +12,17 @@ import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 
-public class CMDmsg implements CommandExecutor {
-	SFPlugin plugin;
-	private Map<Player, CommandSender> lastMessages = new HashMap<Player, CommandSender>();
+public class CMDsend  implements CommandExecutor {
 
-	public CMDmsg(SFPlugin parent) {
-		this.plugin = parent;
+	private SFPlugin parent;
+
+	public CMDsend(SFPlugin parent) {
+		this.parent = parent;
 	}
 
 	@Override
-	public boolean onCommand(CommandSender sender, Command command,
-			String label, String[] args) {
+	public boolean onCommand(CommandSender sender, Command cmnd, String string,
+			String[] args) {
 		if (args.length < 2) {
 			return false;
 		}
@@ -38,29 +36,23 @@ public class CMDmsg implements CommandExecutor {
 		if (args.length > 0) {
 			pname = args[0];
 		}
-		Player target = SFPlugin.getPlayer(sender, pname);
+		OfflinePlayer target = SFPlugin.getOfflinePlayer(sender, pname);
 
 		if (target != null) {
 			String message = SFPlugin
 					.recompileMessage(args, 1, args.length - 1);
-			String name = "console";
-
-			if (sender instanceof Player) {
-				name = ((Player) sender).getDisplayName();
+			sender.sendMessage(String.format("Mail sent to %s: %s",
+					target.getName(), message));
+			SFMail save = new SFMail();
+			save.newMail(sender.getName(), target.getName(), message);
+			parent.getDatabase().save(save);
+			Player p = parent.getServer().getPlayer(target.getName());
+			if(p != null){
+				p.sendMessage(ChatColor.YELLOW+"You have new mail! Type /read to read it!");
 			}
-
-			target.sendMessage(String.format("[%s]->[you]: %s", name, message));
-			sender.sendMessage(String.format("[you]->[%s]: %s",
-					target.getDisplayName(), message));
-
-			lastMessages.put(target, sender);
+			return true;
 		}
-
-		return true;
-	}
-
-	public CommandSender getLastSender(Player player) {
-		return lastMessages.get(player);
+		return false;
 	}
 
 }

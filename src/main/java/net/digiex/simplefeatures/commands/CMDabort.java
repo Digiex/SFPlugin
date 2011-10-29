@@ -5,45 +5,40 @@ package net.digiex.simplefeatures.commands;
  */
 
 import net.digiex.simplefeatures.SFPlugin;
-import net.digiex.simplefeatures.SFTeleport;
+import net.digiex.simplefeatures.teleports.SFTeleportTask;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.ChatColor;
+import org.bukkit.scheduler.BukkitWorker;
 
 public class CMDabort implements CommandExecutor {
-    
-    private SFPlugin parent;
-    
-    public CMDabort(SFPlugin parent) {
-        this.parent = parent;
-    }
 
-    @Override
-    public boolean onCommand(CommandSender cs, Command cmnd, String string, String[] strings) {
-        if (cs instanceof Player) {
-            Player player = (Player) cs;
-            if (parent.teleporters.containsKey(player)) {
-                SFTeleport teleport = parent.teleporters.get(player);
-                int id = teleport.getId();
-                /*if (strings.length == 0) {
-                    if (strings[0].equals("-f")) {
-                        parent.getServer().getScheduler().cancelTask(id);
-                 *  This is for testing purposes only.
-                        return true;
-                    }
-                }*/
-                if (teleport.getCounting()) {
-                    parent.getServer().getScheduler().cancelTask(id);
-                    player.sendMessage(ChatColor.GRAY + "Teleport aborted!");
-                } else {
-                    player.sendMessage(ChatColor.GRAY + "Nothing to abort.");
-                }
-                return true;
-            }
-        }
-        return false;
-    }
+	private SFPlugin parent;
+
+	public CMDabort(SFPlugin parent) {
+		this.parent = parent;
+	}
+
+	@Override
+	public boolean onCommand(CommandSender cs, Command cmnd, String string,
+			String[] strings) {
+		cs.sendMessage("Sorry, aborting is not implemented yet :(");
+		boolean found = false;
+		for (BukkitWorker worker : parent.getServer().getScheduler()
+				.getActiveWorkers()) {
+			if (worker.getOwner() instanceof SFPlugin) {
+				if (SFTeleportTask.teleporters.get(cs.getName()).equals(worker.getTaskId())) {
+					found = true;
+					parent.getServer().getScheduler().cancelTask(worker.getTaskId());
+					cs.sendMessage("Teleportation aborted! (id: "+worker.getTaskId()+")");
+				}
+			}
+			cs.sendMessage(worker.getThread().getName());
+		}
+		if(!found){
+			cs.sendMessage("Nothing to cancel!");
+		}
+		return true;
+	}
 }
