@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 
-public class CMDsend  implements CommandExecutor {
+public class CMDsend implements CommandExecutor {
 
 	private SFPlugin parent;
 
@@ -27,7 +27,8 @@ public class CMDsend  implements CommandExecutor {
 			return false;
 		}
 
-		if (!sender.hasPermission(new Permission("sfp.msg",PermissionDefault.TRUE))) {
+		if (!sender.hasPermission(new Permission("sfp.msg",
+				PermissionDefault.TRUE))) {
 			sender.sendMessage(ChatColor.RED
 					+ "You do not have permission to send private messages");
 			return true;
@@ -36,7 +37,7 @@ public class CMDsend  implements CommandExecutor {
 		if (args.length > 0) {
 			pname = args[0];
 		}
-		OfflinePlayer target = SFPlugin.getOfflinePlayer(sender, pname);
+		OfflinePlayer target = SFPlugin.getOfflinePlayer(sender, pname, parent);
 
 		if (target != null) {
 			String message = SFPlugin
@@ -47,8 +48,9 @@ public class CMDsend  implements CommandExecutor {
 			save.newMail(sender.getName(), target.getName(), message);
 			parent.getDatabase().save(save);
 			Player p = parent.getServer().getPlayer(target.getName());
-			if(p != null){
-				p.sendMessage(ChatColor.AQUA+"You have new mail! Type /read to read it!");
+			if (p != null) {
+				p.sendMessage(ChatColor.AQUA
+						+ "You have new mail! Type /read to read it!");
 			}
 			return true;
 		}

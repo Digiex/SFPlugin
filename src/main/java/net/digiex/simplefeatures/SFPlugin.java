@@ -1,7 +1,5 @@
 package net.digiex.simplefeatures;
 
-import java.io.File;
-import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +11,7 @@ import java.util.logging.Logger;
 import javax.persistence.PersistenceException;
 
 import net.digiex.simplefeatures.commands.CMDabort;
+import net.digiex.simplefeatures.commands.CMDcleanup;
 import net.digiex.simplefeatures.commands.CMDclear;
 import net.digiex.simplefeatures.commands.CMDentities;
 import net.digiex.simplefeatures.commands.CMDhome;
@@ -39,7 +38,6 @@ import net.digiex.simplefeatures.listeners.PListener;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.WorldCreator;
@@ -212,6 +210,7 @@ public class SFPlugin extends JavaPlugin {
 		getCommand("send").setExecutor(new CMDsend(this));
 		getCommand("sendall").setExecutor(new CMDsendall(this));
 		getCommand("clear").setExecutor(new CMDclear(this));
+		getCommand("cleanup").setExecutor(new CMDcleanup(this));
 		setupDatabase();
 	}
 
@@ -250,70 +249,72 @@ public class SFPlugin extends JavaPlugin {
 		}
 	}
 
-	public static OfflinePlayer getOfflinePlayer(CommandSender sender, String name) {
-        if (name != null) {
-            List<OfflinePlayer> players  = matchOfflinePlayer(name, sender.getServer());
-            if (players.isEmpty()) {
-                sender.sendMessage("I don't know who '" + name + "' is!");
-                return null;
-            } else {
-                return players.get(0);
-            }
-        } else {
-            if (!(sender instanceof Player)) {
-                return null;
-            } else {
-                return (OfflinePlayer) sender;
-            }
-        }
+	public static OfflinePlayer getOfflinePlayer(CommandSender sender,
+			String name, SFPlugin plugin) {
+		if (name != null) {
+			List<OfflinePlayer> players = matchOfflinePlayer(name, plugin);
+			if (players.isEmpty()) {
+				sender.sendMessage("I don't know who '" + name + "' is!");
+				return null;
+			} else {
+				return players.get(0);
+			}
+		} else {
+			if (!(sender instanceof Player)) {
+				return null;
+			} else {
+				return (OfflinePlayer) sender;
+			}
+		}
 	}
-	public static List<OfflinePlayer> matchOfflinePlayer(String partialName, Server server) {
+
+	public static List<OfflinePlayer> matchOfflinePlayer(String partialName,
+			SFPlugin plugin) {
 		List<OfflinePlayer> matchedOfflinePlayers = new ArrayList<OfflinePlayer>();
-		for(World w : server.getWorlds()){
-			File dir = new File(w.getName(),"players");
-			// It is also possible to filter the list of returned files.
-			// This example does not return any files that start with `.'.
-			FilenameFilter filter = new FilenameFilter() {
-				public boolean accept(File dir, String name) {
-					return name.endsWith(".dat");
-				}
-			};
-			for(String file : dir.list(filter)){
-				String pname = file.replace(".dat", "");
-				if (partialName.equalsIgnoreCase(pname)) {
+		int i = 0;
+		List<String> found = new ArrayList<String>();
+		List<SFInventory> invs;
+		invs = plugin.getDatabase().find(SFInventory.class).findList();
+		for (SFInventory inv : invs) {
+			if (!found.contains(inv.getPlayerName())) {
+				found.add(inv.getPlayerName());
+				i++;
+				if (partialName.equalsIgnoreCase(inv.getPlayerName())) {
 					// Exact match
 					matchedOfflinePlayers.clear();
-					matchedOfflinePlayers.add(server.getOfflinePlayer(pname));
+					matchedOfflinePlayers.add(plugin.getServer()
+							.getOfflinePlayer(inv.getPlayerName()));
 					break;
-				} 
-				if (pname.toLowerCase().indexOf(partialName.toLowerCase()) != -1) {  
-					// Partial match 
-					matchedOfflinePlayers.add(server.getOfflinePlayer(pname));  
-				}   
+				}
+				if (inv.getPlayerName().toLowerCase()
+						.indexOf(partialName.toLowerCase()) != -1) {
+					// Partial match
+					matchedOfflinePlayers.add(plugin.getServer()
+							.getOfflinePlayer(inv.getPlayerName()));
+				}
 			}
-
 		}
-
 
 		return matchedOfflinePlayers;
 	}
-	public static Player getPlayer(CommandSender sender, String name) {
-        if (name != null) {
-            List<Player> players = sender.getServer().matchPlayer(name);
 
-            if (players.isEmpty()) {
-                sender.sendMessage("I don't know who '" + name + "' is!");
-                return null;
-            } else {
-                return players.get(0);
-            }
-        } else {
-            if (!(sender instanceof Player)) {
-                return null;
-            } else {
-                return (Player) sender;
-            }
-        }
+	public static Player getPlayer(CommandSender sender, String name) {
+		if (name != null) {
+			List<Player> players = sender.getServer().matchPlayer(name);
+
+			if (players.isEmpty()) {
+				sender.sendMessage("I don't know who '" + name + "' is!");
+				return null;
+			} else {
+				return players.get(0);
+			}
+		} else {
+			if (!(sender instanceof Player)) {
+				return null;
+			} else {
+				return (Player) sender;
+			}
+		}
 	}
 
 	public static String itemStackToString(ItemStack[] itemStacks) {
