@@ -1,17 +1,13 @@
 package net.digiex.simplefeatures.commands;
 
-import java.io.File;
-import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.digiex.simplefeatures.SFHome;
 import net.digiex.simplefeatures.SFInventory;
 import net.digiex.simplefeatures.SFMail;
 import net.digiex.simplefeatures.SFPlugin;
 
 import org.bukkit.ChatColor;
-import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
