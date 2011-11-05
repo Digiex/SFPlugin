@@ -4,6 +4,7 @@ import net.digiex.simplefeatures.SFPlugin;
 import net.digiex.simplefeatures.teleports.SFTeleportTask;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -27,14 +28,19 @@ public class CMDspawn implements CommandExecutor {
 						+ "Teleport already in progress, use /abort to Cancel");
 				return true;
 			}
+			Location spawnLoc = player.getWorld().getSpawnLocation();
+			if (player.getWorld().getName().contains("_nether")
+					|| player.getWorld().getName().contains("_skylands")) {
+				spawnLoc = plugin.getServer().getWorld("Survival")
+						.getSpawnLocation();
+			}
 			int taskId = plugin
 					.getServer()
 					.getScheduler()
 					.scheduleAsyncDelayedTask(
 							plugin,
-							new SFTeleportTask(player, player, null, player
-									.getWorld().getSpawnLocation(), false,
-									null, "Teleporting to spawn"));
+							new SFTeleportTask(player, player, null, spawnLoc,
+									false, null, "Teleporting to spawn"));
 			SFTeleportTask.teleporters.put(player.getName(), taskId);
 
 			return true;

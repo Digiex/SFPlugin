@@ -1,5 +1,6 @@
 package net.digiex.simplefeatures.listeners;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -52,13 +53,20 @@ public class PListener extends PlayerListener {
 
 		if (event.getClickedBlock().getType() == Material.BED_BLOCK) {
 			Player player = event.getPlayer();
-			plugin.getServer()
+			if (homeTasks.containsKey(player.getName())) {
+				plugin.getServer().getScheduler()
+						.cancelTask(homeTasks.get(player.getName()));
+			}
+			int taskId = plugin
+					.getServer()
 					.getScheduler()
 					.scheduleAsyncDelayedTask(plugin,
 							new AskSetHomeTask(player, player.getLocation()));
+			homeTasks.put(player.getName(), taskId);
 		}
 	}
 
+	public static HashMap<String, Integer> homeTasks = new HashMap<String, Integer>();
 	private static final Set<String> updateProps;
 	static {
 		updateProps = new HashSet<String>();
@@ -84,7 +92,7 @@ public class PListener extends PlayerListener {
 			String answer = SFPlugin.questioner.ask(this.player,
 					ChatColor.YELLOW
 							+ "Do you want to set your home to this bed?",
-					"yes", "no");
+					"set", "cancel");
 			if (answer == "yes") {
 
 				com.avaje.ebean.EbeanServer db = plugin.getDatabase();
@@ -126,6 +134,7 @@ public class PListener extends PlayerListener {
 				player.sendMessage(ChatColor.GRAY
 						+ "Setting home here cancelled.");
 			}
+			homeTasks.remove(player.getName());
 		}
 	}
 

@@ -42,6 +42,12 @@ public class CMDsethome implements CommandExecutor {
 				player.sendMessage(ChatColor.RED + "Use a bed to set a home!");
 				return true;
 			}
+			if (player.getWorld().getName().contains("_nether")
+					|| player.getWorld().getName().contains("_skylands")) {
+				player.sendMessage(ChatColor.RED
+						+ "You can not set a home in this dimension!");
+				return true;
+			}
 			com.avaje.ebean.EbeanServer db = plugin.getDatabase();
 			db.beginTransaction();
 

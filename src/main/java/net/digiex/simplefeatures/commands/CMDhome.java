@@ -15,7 +15,7 @@ public class CMDhome implements CommandExecutor {
 	SFPlugin plugin;
 
 	public CMDhome(SFPlugin parent) {
-		this.plugin = parent;
+		plugin = parent;
 	}
 
 	@Override
@@ -28,6 +28,10 @@ public class CMDhome implements CommandExecutor {
 			return true;
 		}
 		String homename = player.getLocation().getWorld().getName();
+		if (player.getWorld().getName().contains("_nether")
+				|| player.getWorld().getName().contains("_skylands")) {
+			homename = "Survival";
+		}
 		if (args.length > 0) {
 			homename = args[0];
 		}
