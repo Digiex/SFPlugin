@@ -17,7 +17,7 @@ import org.bukkit.permissions.PermissionDefault;
 
 public class CMDsendall implements CommandExecutor {
 
-	private SFPlugin parent;
+	private final SFPlugin parent;
 
 	public CMDsendall(SFPlugin parent) {
 		this.parent = parent;
@@ -31,6 +31,7 @@ public class CMDsendall implements CommandExecutor {
 			sender.sendMessage(ChatColor.RED + "Don't do that again or "
 					+ ChatColor.AQUA + "sharks" + ChatColor.RED
 					+ " will eat you! Seriously, no permission to do that.");
+			return true;
 		}
 		if (args.length < 1) {
 			return false;
@@ -38,11 +39,10 @@ public class CMDsendall implements CommandExecutor {
 		String message = SFPlugin.recompileMessage(args, 0, args.length - 1);
 		int i = 0;
 		List<String> sent = new ArrayList<String>();
-		
+
 		List<SFInventory> invs;
-		invs = parent.getDatabase().find(SFInventory.class)
-				.findList();
-		for(SFInventory inv : invs){
+		invs = parent.getDatabase().find(SFInventory.class).findList();
+		for (SFInventory inv : invs) {
 			if (!sent.contains(inv.getPlayerName())) {
 				SFMail save = new SFMail();
 				save.newMail(sender.getName(), inv.getPlayerName(), message);
