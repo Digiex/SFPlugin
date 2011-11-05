@@ -130,9 +130,13 @@ public class PListener extends PlayerListener {
 			e.getPlayer().setFoodLevel(20);
 		}
 
-		SFInventory inv = new SFInventory();
-		inv.setGameMode(e.getPlayer().getGameMode());
-		inv.setPlayerName(e.getPlayer().getName());
+		SFInventory inv = plugin.getSFInventory(e.getPlayer().getGameMode(), e
+				.getPlayer().getName());
+		if (inv == null) {
+			inv = new SFInventory();
+			inv.setGameMode(e.getPlayer().getGameMode().getValue());
+			inv.setPlayerName(e.getPlayer().getName());
+		}
 		inv.setInventory(SFPlugin.itemStackToString(e.getPlayer()
 				.getInventory().getContents()));
 		inv.setArmor(SFPlugin.itemStackToString(e.getPlayer().getInventory()
@@ -146,7 +150,7 @@ public class PListener extends PlayerListener {
 		inv.setRemainingAir(e.getPlayer().getRemainingAir());
 		inv.setSaturation(e.getPlayer().getSaturation());
 		inv.setTotalExperience(e.getPlayer().getTotalExperience());
-		plugin.updateSFInventory(inv);
+		plugin.saveSFInventory(inv);
 
 		e.getPlayer().getInventory().clear();
 		try {

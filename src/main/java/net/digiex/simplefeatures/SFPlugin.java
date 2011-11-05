@@ -213,14 +213,14 @@ public class SFPlugin extends JavaPlugin {
 
 	boolean permissionsEnabled = true; // 0 = unloaded, 1 = loaded successfully,
 
-	public boolean deleteSFInventory(GameMode gameMode, String playerName) {
-		SFInventory inv = getSFInventory(gameMode, playerName);
-		if (inv != null) {
-			getDatabase().delete(inv);
-			return true;
-		}
-		return false;
-	}
+	// public boolean deleteSFInventory(GameMode gameMode, String playerName) {
+	// SFInventory inv = getSFInventory(gameMode, playerName);
+	// if (inv != null) {
+	// getDatabase().delete(inv);
+	// return true;
+	// }
+	// return false;
+	// }
 
 	@Override
 	public List<Class<?>> getDatabaseClasses() {
@@ -403,10 +403,5 @@ public class SFPlugin extends JavaPlugin {
 					+ getDescription().getName() + " due to first time usage");
 			installDDL();
 		}
-	}
-
-	public void updateSFInventory(SFInventory inv) {
-		deleteSFInventory(inv.getGamemode(), inv.getPlayerName());
-		saveSFInventory(inv);
 	}
 }
