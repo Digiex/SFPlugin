@@ -81,7 +81,7 @@ public class PListener extends PlayerListener {
 					home.setLocation(homeLoc);
 
 					if (isUpdate) {
-						db.update(home, updateProps);
+						db.update(home, homeUpdateProps);
 					}
 					db.save(home);
 					db.commitTransaction();
@@ -102,15 +102,32 @@ public class PListener extends PlayerListener {
 
 	public static HashMap<String, Integer> homeTasks = new HashMap<String, Integer>();
 
-	private static final Set<String> updateProps;
+	private static final Set<String> homeUpdateProps;
 	static {
-		updateProps = new HashSet<String>();
-		updateProps.add("x");
-		updateProps.add("y");
-		updateProps.add("z");
-		updateProps.add("yaw");
-		updateProps.add("pitch");
-		updateProps.add("world_name");
+		homeUpdateProps = new HashSet<String>();
+		homeUpdateProps.add("x");
+		homeUpdateProps.add("y");
+		homeUpdateProps.add("z");
+		homeUpdateProps.add("yaw");
+		homeUpdateProps.add("pitch");
+		homeUpdateProps.add("world_name");
+	}
+	private static final Set<String> invUpdateProps;
+	static {
+		invUpdateProps = new HashSet<String>();
+		invUpdateProps.add("player_name");
+		invUpdateProps.add("inventory");
+		invUpdateProps.add("armor");
+		invUpdateProps.add("health");
+		invUpdateProps.add("food");
+		invUpdateProps.add("game_mode");
+		invUpdateProps.add("experience");
+		invUpdateProps.add("exhaustion");
+		invUpdateProps.add("fire_ticks");
+		invUpdateProps.add("level");
+		invUpdateProps.add("remaining_air");
+		invUpdateProps.add("saturation");
+		invUpdateProps.add("total_experience");
 	}
 
 	public PListener(SFPlugin parent) {
@@ -129,37 +146,47 @@ public class PListener extends PlayerListener {
 			e.getPlayer().setHealth(20);
 			e.getPlayer().setFoodLevel(20);
 		}
-
-		SFInventory inv = plugin.getSFInventory(e.getPlayer().getGameMode(), e
-				.getPlayer().getName());
-		if (inv == null) {
-			inv = new SFInventory();
+		com.avaje.ebean.EbeanServer db = plugin.getDatabase();
+		db.beginTransaction();
+		boolean isUpdate = false;
+		try {
+			SFInventory inv = db.find(SFInventory.class).where()
+					.eq("gameMode", e.getPlayer().getGameMode().getValue())
+					.ieq("playerName", e.getPlayer().getName()).findUnique();
+			if (inv == null) {
+				inv = new SFInventory();
+			} else {
+				isUpdate = true;
+			}
 			inv.setGameMode(e.getPlayer().getGameMode().getValue());
 			inv.setPlayerName(e.getPlayer().getName());
+			inv.setInventory(SFPlugin.itemStackToString(e.getPlayer()
+					.getInventory().getContents()));
+			inv.setArmor(SFPlugin.itemStackToString(e.getPlayer()
+					.getInventory().getArmorContents()));
+			inv.setHealth(e.getPlayer().getHealth());
+			inv.setFood(e.getPlayer().getFoodLevel());
+			inv.setExperience(e.getPlayer().getExperience());
+			inv.setExhaustion(e.getPlayer().getExhaustion());
+			inv.setFireTicks(e.getPlayer().getFireTicks());
+			inv.setLevel(e.getPlayer().getLevel());
+			inv.setRemainingAir(e.getPlayer().getRemainingAir());
+			inv.setSaturation(e.getPlayer().getSaturation());
+			inv.setTotalExperience(e.getPlayer().getTotalExperience());
+			if (isUpdate) {
+				db.update(inv, invUpdateProps);
+			}
+			db.save(inv);
+			db.commitTransaction();
+		} finally {
+			db.endTransaction();
 		}
-		inv.setInventory(SFPlugin.itemStackToString(e.getPlayer()
-				.getInventory().getContents()));
-		inv.setArmor(SFPlugin.itemStackToString(e.getPlayer().getInventory()
-				.getArmorContents()));
-		inv.setHealth(e.getPlayer().getHealth());
-		inv.setFood(e.getPlayer().getFoodLevel());
-		inv.setExperience(e.getPlayer().getExperience());
-		inv.setExhaustion(e.getPlayer().getExhaustion());
-		inv.setFireTicks(e.getPlayer().getFireTicks());
-		inv.setLevel(e.getPlayer().getLevel());
-		inv.setRemainingAir(e.getPlayer().getRemainingAir());
-		inv.setSaturation(e.getPlayer().getSaturation());
-		inv.setTotalExperience(e.getPlayer().getTotalExperience());
-		plugin.saveSFInventory(inv);
-
 		e.getPlayer().getInventory().clear();
 		try {
-			if (!(inv.getHealth() > 0)) {
-				e.getPlayer().setHealth(20);
-				e.getPlayer().setFoodLevel(20);
-			} else {
-				inv = plugin.getSFInventory(e.getNewGameMode(), e.getPlayer()
-						.getName());
+			SFInventory inv = db.find(SFInventory.class).where()
+					.eq("gameMode", e.getNewGameMode().getValue())
+					.ieq("playerName", e.getPlayer().getName()).findUnique();
+			if (inv != null) {
 				ItemStack[] contents = SFPlugin.stringToItemStack(inv
 						.getInventory());
 				if (contents != null) {
@@ -169,8 +196,13 @@ public class PListener extends PlayerListener {
 				if (armor != null) {
 					e.getPlayer().getInventory().setArmorContents(armor);
 				}
-				e.getPlayer().setHealth(inv.getHealth());
-				e.getPlayer().setFoodLevel(inv.getFood());
+				if (!(inv.getHealth() > 0)) {
+					e.getPlayer().setHealth(20);
+					e.getPlayer().setFoodLevel(20);
+				} else {
+					e.getPlayer().setHealth(inv.getHealth());
+					e.getPlayer().setFoodLevel(inv.getFood());
+				}
 				e.getPlayer().setExperience(inv.getExperience());
 				e.getPlayer().setExhaustion(inv.getExhaustion());
 				e.getPlayer().setFireTicks(inv.getFireTicks());
@@ -179,6 +211,7 @@ public class PListener extends PlayerListener {
 				e.getPlayer().setSaturation(inv.getSaturation());
 				e.getPlayer().setTotalExperience(inv.getTotalExperience());
 			}
+
 		} catch (NullPointerException ex) {
 			SFPlugin.log(Level.INFO, "Some inventory contents were null for "
 					+ e.getPlayer().getName());
@@ -366,7 +399,7 @@ public class PListener extends PlayerListener {
 				lastLoc.setPitch(loc.getPitch());
 				lastLoc.setWorldName(loc.getWorld().getName());
 				if (isUpdate) {
-					db.update(lastLoc, updateProps);
+					db.update(lastLoc, homeUpdateProps);
 				}
 				db.save(lastLoc);
 				db.commitTransaction();

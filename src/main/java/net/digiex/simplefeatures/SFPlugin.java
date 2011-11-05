@@ -35,7 +35,6 @@ import net.digiex.simplefeatures.listeners.BListener;
 import net.digiex.simplefeatures.listeners.EListener;
 import net.digiex.simplefeatures.listeners.PListener;
 
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
@@ -253,13 +252,6 @@ public class SFPlugin extends JavaPlugin {
 		} catch (IllegalArgumentException e) {
 			return null;
 		}
-	}
-
-	public SFInventory getSFInventory(GameMode gameMode, String playerName) {
-		int gm = gameMode.getValue();
-		SFInventory inv = getDatabase().find(SFInventory.class).where()
-				.eq("gameMode", gm).ieq("playerName", playerName).findUnique();
-		return inv;
 	}
 
 	@Override

@@ -52,10 +52,6 @@ public class SFInventory {
 		return food;
 	}
 
-	public int getGamemode() {
-		return gameMode;
-	}
-
 	public int getGameMode() {
 		return gameMode;
 	}
