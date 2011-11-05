@@ -181,6 +181,8 @@ public class SFPlugin extends JavaPlugin {
 				Priority.Monitor, this);
 		pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener,
 				Priority.Highest, this);
+		pm.registerEvent(Event.Type.PLAYER_PRELOGIN, playerListener,
+				Priority.Highest, this);
 		pm.registerEvent(Event.Type.PLAYER_KICK, playerListener,
 				Priority.Highest, this);
 		pm.registerEvent(Event.Type.PLAYER_GAME_MODE_CHANGE, playerListener,

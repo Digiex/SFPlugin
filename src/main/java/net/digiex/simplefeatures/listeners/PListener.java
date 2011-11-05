@@ -23,6 +23,8 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerPortalEvent;
+import org.bukkit.event.player.PlayerPreLoginEvent;
+import org.bukkit.event.player.PlayerPreLoginEvent.Result;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -128,16 +130,21 @@ public class PListener extends PlayerListener {
 	}
 
 	@Override
-	public void onPlayerJoin(PlayerJoinEvent e) {
-		if (!e.getPlayer().isWhitelisted()) {
-			e.setJoinMessage(ChatColor.YELLOW + e.getPlayer().getDisplayName()
-					+ " tried to join, but is not on whitelist!");
-			e.getPlayer().kickPlayer(
-					ChatColor.RED + "Not on whitelist, " + ChatColor.WHITE
-							+ " see " + ChatColor.AQUA
-							+ "http://digiex.net/minecraft");
+	public void onPlayerPreLogin(PlayerPreLoginEvent e) {
+		if (!plugin.getServer().getOfflinePlayer(e.getName()).isWhitelisted()) {
+			plugin.getServer().broadcastMessage(
+					ChatColor.YELLOW + e.getName()
+							+ " tried to join, but is not on whitelist!");
+			e.disallow(Result.KICK_WHITELIST, ChatColor.RED
+					+ "Not on whitelist, " + ChatColor.WHITE + " see "
+					+ ChatColor.AQUA + "http://digiex.net/minecraft");
 			return;
 		}
+	}
+
+	@Override
+	public void onPlayerJoin(PlayerJoinEvent e) {
+
 		PermissionAttachment attachment = e.getPlayer().addAttachment(plugin);
 		if (!e.getPlayer().isOp()) {
 			attachment.setPermission("bukkit.command.plugins", false);
@@ -170,9 +177,10 @@ public class PListener extends PlayerListener {
 
 	@Override
 	public void onPlayerQuit(PlayerQuitEvent e) {
-		if (e.getPlayer().isWhitelisted()) {
+		if (plugin.permissionAttachements.containsKey(e.getPlayer().getName())) {
 			e.getPlayer().removeAttachment(
 					plugin.permissionAttachements.get(e.getPlayer().getName()));
+			plugin.permissionAttachements.remove(e.getPlayer().getName());
 		}
 	}
 
@@ -182,9 +190,11 @@ public class PListener extends PlayerListener {
 				.println(e.getPlayer().getName() + " lost connection: kicked");
 		if (!e.getPlayer().isWhitelisted()) {
 			e.setLeaveMessage(null);
-		} else {
+		}
+		if (plugin.permissionAttachements.containsKey(e.getPlayer().getName())) {
 			e.getPlayer().removeAttachment(
 					plugin.permissionAttachements.get(e.getPlayer().getName()));
+			plugin.permissionAttachements.remove(e.getPlayer().getName());
 		}
 	}
 
@@ -249,7 +259,7 @@ public class PListener extends PlayerListener {
 		} catch (NullPointerException ex) {
 			SFPlugin.log(Level.INFO, "Some inventory contents were null for "
 					+ e.getPlayer().getName());
-			//ex.printStackTrace();
+			// ex.printStackTrace();
 		}
 	}
 
