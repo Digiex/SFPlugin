@@ -53,7 +53,7 @@ public class PListener extends PlayerListener {
 			plugin.getServer()
 					.getScheduler()
 					.scheduleAsyncDelayedTask(plugin,
-							new AskSetHomeTask(player,player.getLocation()));
+							new AskSetHomeTask(player, player.getLocation()));
 		}
 	}
 
@@ -71,6 +71,7 @@ public class PListener extends PlayerListener {
 	private class AskSetHomeTask implements Runnable {
 		private Player player;
 		private Location homeLoc;
+
 		public AskSetHomeTask(Player player, Location homeLoc) {
 			this.player = player;
 			this.homeLoc = homeLoc;
@@ -195,7 +196,6 @@ public class PListener extends PlayerListener {
 		SFPlugin.log(Level.INFO, e.getPlayer().getName()
 				+ "'s gamemode changed to " + e.getNewGameMode().toString());
 		if (!(e.getPlayer().getHealth() > 0)) {
-
 			e.getPlayer().getInventory().clear();
 			e.getPlayer().setHealth(20);
 			e.getPlayer().setFoodLevel(20);
@@ -210,6 +210,13 @@ public class PListener extends PlayerListener {
 				.getArmorContents()));
 		inv.setHealth(e.getPlayer().getHealth());
 		inv.setFood(e.getPlayer().getFoodLevel());
+		inv.setExperience(e.getPlayer().getExperience());
+		inv.setExhaustion(e.getPlayer().getExhaustion());
+		inv.setFireTicks(e.getPlayer().getFireTicks());
+		inv.setLevel(e.getPlayer().getLevel());
+		inv.setRemainingAir(e.getPlayer().getRemainingAir());
+		inv.setSaturation(e.getPlayer().getSaturation());
+		inv.setTotalExperience(e.getPlayer().getTotalExperience());
 		plugin.updateSFInventory(inv);
 
 		e.getPlayer().getInventory().clear();
@@ -231,11 +238,18 @@ public class PListener extends PlayerListener {
 				}
 				e.getPlayer().setHealth(inv.getHealth());
 				e.getPlayer().setFoodLevel(inv.getFood());
+				e.getPlayer().setExperience(inv.getExperience());
+				e.getPlayer().setExhaustion(inv.getExhaustion());
+				e.getPlayer().setFireTicks(inv.getFireTicks());
+				e.getPlayer().setLevel(inv.getLevel());
+				e.getPlayer().setRemainingAir(inv.getRemainingAir());
+				e.getPlayer().setSaturation(inv.getSaturation());
+				e.getPlayer().setTotalExperience(inv.getTotalExperience());
 			}
 		} catch (NullPointerException ex) {
 			SFPlugin.log(Level.INFO, "Some inventory contents were null for "
-					+ e.getPlayer().getName() + ". Stacktrace for debugging:");
-			ex.printStackTrace();
+					+ e.getPlayer().getName());
+			//ex.printStackTrace();
 		}
 	}
 

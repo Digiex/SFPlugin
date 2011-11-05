@@ -22,11 +22,17 @@ public class SFInventory {
 	@NotEmpty
 	private String inventory;
 	private String armor;
-	
-	
+
 	private int health = 20;
 	private int food = 20;
 	private int gameMode = 0;
+	private int experience = 0;
+	private float exhaustion;
+	private int fireTicks = 0;
+	private int level = 0;
+	private int remainingAir = 20;
+	private float saturation;
+	private int totalExperience = 0;
 
 	public int getId() {
 		return this.id;
@@ -43,7 +49,7 @@ public class SFInventory {
 	public void setInventory(String inventory) {
 		this.inventory = inventory;
 	}
-	
+
 	public GameMode getGamemode() {
 		return GameMode.getByValue(this.gameMode);
 	}
@@ -90,5 +96,61 @@ public class SFInventory {
 
 	public void setGameMode(int gameMode) {
 		this.gameMode = gameMode;
+	}
+
+	public int getExperience() {
+		return experience;
+	}
+
+	public void setExperience(int experience) {
+		this.experience = experience;
+	}
+
+	public float getExhaustion() {
+		return exhaustion;
+	}
+
+	public void setExhaustion(float exhaustion) {
+		this.exhaustion = exhaustion;
+	}
+
+	public int getFireTicks() {
+		return fireTicks;
+	}
+
+	public void setFireTicks(int fireTicks) {
+		this.fireTicks = fireTicks;
+	}
+
+	public int getLevel() {
+		return level;
+	}
+
+	public void setLevel(int level) {
+		this.level = level;
+	}
+
+	public int getRemainingAir() {
+		return remainingAir;
+	}
+
+	public void setRemainingAir(int remainingAir) {
+		this.remainingAir = remainingAir;
+	}
+
+	public float getSaturation() {
+		return saturation;
+	}
+
+	public void setSaturation(float saturation) {
+		this.saturation = saturation;
+	}
+
+	public int getTotalExperience() {
+		return totalExperience;
+	}
+
+	public void setTotalExperience(int totalExperience) {
+		this.totalExperience = totalExperience;
 	}
 }
