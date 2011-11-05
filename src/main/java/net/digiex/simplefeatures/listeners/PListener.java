@@ -35,52 +35,9 @@ import org.bukkit.scheduler.BukkitScheduler;
 
 public class PListener extends PlayerListener {
 
-	SFPlugin plugin;
-	public BukkitScheduler tasks;
-
-	public PListener(SFPlugin parent) {
-		plugin = parent;
-	}
-
-	@Override
-	public void onPlayerInteract(final PlayerInteractEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
-		if (event.getAction() != Action.RIGHT_CLICK_BLOCK) {
-			return;
-		}
-
-		if (event.getClickedBlock().getType() == Material.BED_BLOCK) {
-			Player player = event.getPlayer();
-			if (homeTasks.containsKey(player.getName())) {
-				plugin.getServer().getScheduler()
-						.cancelTask(homeTasks.get(player.getName()));
-			}
-			int taskId = plugin
-					.getServer()
-					.getScheduler()
-					.scheduleAsyncDelayedTask(plugin,
-							new AskSetHomeTask(player, player.getLocation()));
-			homeTasks.put(player.getName(), taskId);
-		}
-	}
-
-	public static HashMap<String, Integer> homeTasks = new HashMap<String, Integer>();
-	private static final Set<String> updateProps;
-	static {
-		updateProps = new HashSet<String>();
-		updateProps.add("x");
-		updateProps.add("y");
-		updateProps.add("z");
-		updateProps.add("yaw");
-		updateProps.add("pitch");
-		updateProps.add("world_name");
-	}
-
 	private class AskSetHomeTask implements Runnable {
-		private Player player;
-		private Location homeLoc;
+		private final Player player;
+		private final Location homeLoc;
 
 		public AskSetHomeTask(Player player, Location homeLoc) {
 			this.player = player;
@@ -89,11 +46,10 @@ public class PListener extends PlayerListener {
 
 		@Override
 		public void run() {
-			String answer = SFPlugin.questioner.ask(this.player,
-					ChatColor.YELLOW
-							+ "Do you want to set your home to this bed?",
-					"set", "cancel");
-			if (answer == "yes") {
+			String answer = SFPlugin.questioner.ask(player, ChatColor.YELLOW
+					+ "Do you want to set your home to this bed?", "set",
+					"cancel");
+			if (answer == "set") {
 
 				com.avaje.ebean.EbeanServer db = plugin.getDatabase();
 				db.beginTransaction();
@@ -123,8 +79,9 @@ public class PListener extends PlayerListener {
 
 					home.setLocation(homeLoc);
 
-					if (isUpdate)
+					if (isUpdate) {
 						db.update(home, updateProps);
+					}
 					db.save(home);
 					db.commitTransaction();
 				} finally {
@@ -138,73 +95,25 @@ public class PListener extends PlayerListener {
 		}
 	}
 
-	@Override
-	public void onPlayerPreLogin(PlayerPreLoginEvent e) {
-		if (!plugin.getServer().getOfflinePlayer(e.getName()).isWhitelisted()) {
-			plugin.getServer().broadcastMessage(
-					ChatColor.YELLOW + e.getName()
-							+ " tried to join, but is not on whitelist!");
-			e.disallow(Result.KICK_WHITELIST, ChatColor.RED
-					+ "Not on whitelist, " + ChatColor.WHITE + " see "
-					+ ChatColor.AQUA + "http://digiex.net/minecraft");
-			return;
-		}
+	SFPlugin plugin;
+
+	public BukkitScheduler tasks;
+
+	public static HashMap<String, Integer> homeTasks = new HashMap<String, Integer>();
+
+	private static final Set<String> updateProps;
+	static {
+		updateProps = new HashSet<String>();
+		updateProps.add("x");
+		updateProps.add("y");
+		updateProps.add("z");
+		updateProps.add("yaw");
+		updateProps.add("pitch");
+		updateProps.add("world_name");
 	}
 
-	@Override
-	public void onPlayerJoin(PlayerJoinEvent e) {
-
-		PermissionAttachment attachment = e.getPlayer().addAttachment(plugin);
-		if (!e.getPlayer().isOp()) {
-			attachment.setPermission("bukkit.command.plugins", false);
-			attachment.setPermission("bukkit.command.version", false);
-		}
-		plugin.permissionAttachements.put(e.getPlayer().getName(), attachment);
-		setGameMode(e.getPlayer(), e.getPlayer().getWorld());
-		if (e.getPlayer().isOp()) {
-			e.getPlayer().setDisplayName(
-					ChatColor.AQUA + e.getPlayer().getName() + ChatColor.WHITE);
-		} else {
-			e.getPlayer()
-					.setDisplayName(
-							ChatColor.GREEN + e.getPlayer().getName()
-									+ ChatColor.WHITE);
-		}
-		String plistname = e.getPlayer().getDisplayName();
-		if (plistname.length() < 17) {
-			e.getPlayer().setPlayerListName(plistname);
-		}
-		List<SFMail> msgs;
-		msgs = plugin.getDatabase().find(SFMail.class).where()
-				.ieq("toPlayer", e.getPlayer().getName()).findList();
-		if (!msgs.isEmpty()) {
-			e.getPlayer().sendMessage(
-					ChatColor.AQUA + "You have " + msgs.size()
-							+ " new mail! Type /read to view.");
-		}
-	}
-
-	@Override
-	public void onPlayerQuit(PlayerQuitEvent e) {
-		if (plugin.permissionAttachements.containsKey(e.getPlayer().getName())) {
-			e.getPlayer().removeAttachment(
-					plugin.permissionAttachements.get(e.getPlayer().getName()));
-			plugin.permissionAttachements.remove(e.getPlayer().getName());
-		}
-	}
-
-	@Override
-	public void onPlayerKick(PlayerKickEvent e) {
-		System.out
-				.println(e.getPlayer().getName() + " lost connection: kicked");
-		if (!e.getPlayer().isWhitelisted()) {
-			e.setLeaveMessage(null);
-		}
-		if (plugin.permissionAttachements.containsKey(e.getPlayer().getName())) {
-			e.getPlayer().removeAttachment(
-					plugin.permissionAttachements.get(e.getPlayer().getName()));
-			plugin.permissionAttachements.remove(e.getPlayer().getName());
-		}
+	public PListener(SFPlugin parent) {
+		plugin = parent;
 	}
 
 	@Override
@@ -273,10 +182,103 @@ public class PListener extends PlayerListener {
 	}
 
 	@Override
+	public void onPlayerInteract(final PlayerInteractEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
+		if (event.getAction() != Action.RIGHT_CLICK_BLOCK) {
+			return;
+		}
+
+		if (event.getClickedBlock().getType() == Material.BED_BLOCK) {
+			Player player = event.getPlayer();
+			if (homeTasks.containsKey(player.getName())) {
+				plugin.getServer().getScheduler()
+						.cancelTask(homeTasks.get(player.getName()));
+			}
+			int taskId = plugin
+					.getServer()
+					.getScheduler()
+					.scheduleAsyncDelayedTask(plugin,
+							new AskSetHomeTask(player, player.getLocation()));
+			homeTasks.put(player.getName(), taskId);
+		}
+	}
+
+	@Override
+	public void onPlayerJoin(PlayerJoinEvent e) {
+
+		PermissionAttachment attachment = e.getPlayer().addAttachment(plugin);
+		if (!e.getPlayer().isOp()) {
+			attachment.setPermission("bukkit.command.plugins", false);
+			attachment.setPermission("bukkit.command.version", false);
+		}
+		plugin.permissionAttachements.put(e.getPlayer().getName(), attachment);
+		setGameMode(e.getPlayer(), e.getPlayer().getWorld());
+		if (e.getPlayer().isOp()) {
+			e.getPlayer().setDisplayName(
+					ChatColor.AQUA + e.getPlayer().getName() + ChatColor.WHITE);
+		} else {
+			e.getPlayer()
+					.setDisplayName(
+							ChatColor.GREEN + e.getPlayer().getName()
+									+ ChatColor.WHITE);
+		}
+		String plistname = e.getPlayer().getDisplayName();
+		if (plistname.length() < 17) {
+			e.getPlayer().setPlayerListName(plistname);
+		}
+		List<SFMail> msgs;
+		msgs = plugin.getDatabase().find(SFMail.class).where()
+				.ieq("toPlayer", e.getPlayer().getName()).findList();
+		if (!msgs.isEmpty()) {
+			e.getPlayer().sendMessage(
+					ChatColor.AQUA + "You have " + msgs.size()
+							+ " new mail! Type /read to view.");
+		}
+	}
+
+	@Override
+	public void onPlayerKick(PlayerKickEvent e) {
+		System.out
+				.println(e.getPlayer().getName() + " lost connection: kicked");
+		if (!e.getPlayer().isWhitelisted()) {
+			e.setLeaveMessage(null);
+		}
+		if (plugin.permissionAttachements.containsKey(e.getPlayer().getName())) {
+			e.getPlayer().removeAttachment(
+					plugin.permissionAttachements.get(e.getPlayer().getName()));
+			plugin.permissionAttachements.remove(e.getPlayer().getName());
+		}
+	}
+
+	@Override
 	public void onPlayerPortal(PlayerPortalEvent e) {
 		if (!(e.isCancelled()) && e.getTo() != null) {
 			Teleported(e.getFrom().getWorld(), e.getTo().getWorld(),
 					e.getPlayer());
+		}
+	}
+
+	@Override
+	public void onPlayerPreLogin(PlayerPreLoginEvent e) {
+		if (!plugin.getServer().getOfflinePlayer(e.getName()).isWhitelisted()) {
+			plugin.getServer().broadcastMessage(
+					ChatColor.YELLOW + e.getName()
+							+ " tried to join, but is not on whitelist!");
+			e.disallow(Result.KICK_WHITELIST, ChatColor.RED
+					+ "Not on whitelist, " + ChatColor.WHITE + " see "
+					+ ChatColor.AQUA + "http://digiex.net/minecraft");
+			return;
+		}
+	}
+
+	@Override
+	public void onPlayerQuit(PlayerQuitEvent e) {
+		if (plugin.permissionAttachements.containsKey(e.getPlayer().getName())) {
+			e.getPlayer().removeAttachment(
+					plugin.permissionAttachements.get(e.getPlayer().getName()));
+			plugin.permissionAttachements.remove(e.getPlayer().getName());
 		}
 	}
 
