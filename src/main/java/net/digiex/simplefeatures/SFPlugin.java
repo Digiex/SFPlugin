@@ -2,7 +2,6 @@ package net.digiex.simplefeatures;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Filter;
 import java.util.logging.Level;
@@ -62,8 +61,44 @@ public class SFPlugin extends JavaPlugin {
 	public Configuration config;
 	static final Logger log = Logger.getLogger("Minecraft");
 	public static String pluginName = "SimpleFeatures";
-	public HashMap<String, Boolean> gods = new HashMap<String, Boolean>();
-	public HashMap<String, PermissionAttachment> permissionAttachements = new HashMap<String, PermissionAttachment>();
+
+	public static OfflinePlayer getOfflinePlayer(CommandSender sender,
+			String name, SFPlugin plugin) {
+		if (name != null) {
+			List<OfflinePlayer> players = matchOfflinePlayer(name, plugin);
+			if (players.isEmpty()) {
+				sender.sendMessage("I don't know who '" + name + "' is!");
+				return null;
+			} else {
+				return players.get(0);
+			}
+		} else {
+			if (!(sender instanceof Player)) {
+				return null;
+			} else {
+				return (OfflinePlayer) sender;
+			}
+		}
+	}
+
+	public static Player getPlayer(CommandSender sender, String name) {
+		if (name != null) {
+			List<Player> players = sender.getServer().matchPlayer(name);
+
+			if (players.isEmpty()) {
+				sender.sendMessage("I don't know who '" + name + "' is!");
+				return null;
+			} else {
+				return players.get(0);
+			}
+		} else {
+			if (!(sender instanceof Player)) {
+				return null;
+			} else {
+				return (Player) sender;
+			}
+		}
+	}
 
 	public static boolean isInSpawnProtect(Location loc) {
 		final Vector player = loc.toVector();
@@ -75,14 +110,126 @@ public class SFPlugin extends JavaPlugin {
 		return false;
 	}
 
+	public static String itemStackToString(ItemStack[] itemStacks) {
+		String invString = "";
+		for (ItemStack itemStack : itemStacks) {
+			if (itemStack != null) {
+				invString = invString + ";" + itemStack.getTypeId() + ":"
+						+ itemStack.getAmount() + ":"
+						+ itemStack.getDurability();
+
+				if (itemStack.getData() == null) {
+					invString = invString + ":null";
+				} else {
+					invString = invString + ":" + itemStack.getData().getData();
+				}
+
+			} else {
+				invString = invString + ";" + "null";
+			}
+		}
+		return invString;
+	}
+
+	// 2 = loaded with errors int shares =
+	// 0;
+
 	public static void log(Level level, String msg) {
 		log.log(level, "[" + pluginName + "] " + msg);
 	}
 
+	public static List<OfflinePlayer> matchOfflinePlayer(String partialName,
+			SFPlugin plugin) {
+		List<OfflinePlayer> matchedOfflinePlayers = new ArrayList<OfflinePlayer>();
+		int i = 0;
+		List<String> found = new ArrayList<String>();
+		List<SFInventory> invs;
+		invs = plugin.getDatabase().find(SFInventory.class).findList();
+		for (SFInventory inv : invs) {
+			if (!found.contains(inv.getPlayerName())) {
+				found.add(inv.getPlayerName());
+				i++;
+				if (partialName.equalsIgnoreCase(inv.getPlayerName())) {
+					// Exact match
+					matchedOfflinePlayers.clear();
+					matchedOfflinePlayers.add(plugin.getServer()
+							.getOfflinePlayer(inv.getPlayerName()));
+					break;
+				}
+				if (inv.getPlayerName().toLowerCase()
+						.indexOf(partialName.toLowerCase()) != -1) {
+					// Partial match
+					matchedOfflinePlayers.add(plugin.getServer()
+							.getOfflinePlayer(inv.getPlayerName()));
+				}
+			}
+		}
+
+		return matchedOfflinePlayers;
+	}
+
+	public static String recompileMessage(String[] args, int start, int end) {
+		if (start > args.length) {
+			throw new IndexOutOfBoundsException();
+		}
+
+		String result = args[start];
+
+		for (int i = start + 1; i <= end; i++) {
+			result += " " + args[i];
+		}
+
+		return result;
+	}
+
+	public static ItemStack[] stringToItemStack(String invString) {
+		if (invString == null) {
+			return null;
+		}
+		String[] firstSplit = invString.split("\\;");
+		ItemStack[] itemStack = new ItemStack[firstSplit.length - 1];
+
+		for (int i = 0; i < firstSplit.length - 1; i++) {
+			if (!firstSplit[(i + 1)].equals("null")) {
+				String[] secondSplit = firstSplit[(i + 1)].split("\\:");
+				itemStack[i] = new ItemStack(Integer.valueOf(secondSplit[0])
+						.intValue(),
+						Integer.valueOf(secondSplit[1]).intValue(), Short
+								.valueOf(secondSplit[2]).shortValue());
+
+				if (!secondSplit[3].equals("null")) {
+					itemStack[i].setData(new MaterialData(Integer.valueOf(
+							secondSplit[0]).intValue(), Byte.valueOf(
+							secondSplit[3]).byteValue()));
+				}
+			}
+
+		}
+
+		return itemStack;
+	}
+
+	public HashMap<String, PermissionAttachment> permissionAttachements = new HashMap<String, PermissionAttachment>();
+
 	boolean permissionsEnabled = true; // 0 = unloaded, 1 = loaded successfully,
 
-	// 2 = loaded with errors int shares =
-	// 0;
+	public boolean deleteSFInventory(GameMode gameMode, String playerName) {
+		SFInventory inv = getSFInventory(gameMode, playerName);
+		if (inv != null) {
+			getDatabase().delete(inv);
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public List<Class<?>> getDatabaseClasses() {
+		List<Class<?>> list = new ArrayList<Class<?>>();
+		list.add(SFHome.class);
+		list.add(SFInventory.class);
+		list.add(SFMail.class);
+		return list;
+	}
 
 	public Environment getEnvFromString(String env) {
 		// Don't reference the enum directly as there aren't that many, and we
@@ -107,6 +254,13 @@ public class SFPlugin extends JavaPlugin {
 		}
 	}
 
+	public SFInventory getSFInventory(GameMode gameMode, String playerName) {
+		int gm = gameMode.getValue();
+		SFInventory inv = getDatabase().find(SFInventory.class).where()
+				.eq("gameMode", gm).ieq("playerName", playerName).findUnique();
+		return inv;
+	}
+
 	@Override
 	public void onDisable() {
 		log(Level.INFO, "Plugin disabled.");
@@ -115,15 +269,15 @@ public class SFPlugin extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		setFilter();
-		questioner = (LogBlockQuestioner) this.getServer().getPluginManager()
+		questioner = (LogBlockQuestioner) getServer().getPluginManager()
 				.getPlugin("LogBlockQuestioner");
 		PluginManager pm = getServer().getPluginManager();
 		// TODO Auto-generated method stub
-		if (!this.getDataFolder().exists()) {
-			this.getDataFolder().mkdir();
+		if (!getDataFolder().exists()) {
+			getDataFolder().mkdir();
 		}
 
-		config = this.getConfiguration();
+		config = getConfiguration();
 		config.load();
 		config.setHeader("#Feature configuration");
 		config.save();
@@ -195,8 +349,6 @@ public class SFPlugin extends JavaPlugin {
 				Priority.Highest, this);
 		pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener,
 				Priority.Highest, this);
-		pm.registerEvent(Event.Type.ENTITY_DAMAGE, entityListener,
-				Priority.Highest, this);
 		pm.registerEvent(Event.Type.ENTITY_EXPLODE, entityListener,
 				Priority.Highest, this);
 		getCommand("home").setExecutor(new CMDhome(this));
@@ -223,181 +375,8 @@ public class SFPlugin extends JavaPlugin {
 		setupDatabase();
 	}
 
-	@Override
-	public List<Class<?>> getDatabaseClasses() {
-		List<Class<?>> list = new ArrayList<Class<?>>();
-		list.add(SFHome.class);
-		list.add(SFInventory.class);
-		list.add(SFMail.class);
-		return list;
-	}
-
-	public static String recompileMessage(String[] args, int start, int end) {
-		if (start > args.length) {
-			throw new IndexOutOfBoundsException();
-		}
-
-		String result = args[start];
-
-		for (int i = start + 1; i <= end; i++) {
-			result += " " + args[i];
-		}
-
-		return result;
-	}
-
-	private void setupDatabase() {
-		try {
-			getDatabase().find(SFHome.class).findRowCount();
-			getDatabase().find(SFInventory.class).findRowCount();
-			getDatabase().find(SFMail.class).findRowCount();
-		} catch (PersistenceException ex) {
-			System.out.println("Installing database for "
-					+ getDescription().getName() + " due to first time usage");
-			installDDL();
-		}
-	}
-
-	public static OfflinePlayer getOfflinePlayer(CommandSender sender,
-			String name, SFPlugin plugin) {
-		if (name != null) {
-			List<OfflinePlayer> players = matchOfflinePlayer(name, plugin);
-			if (players.isEmpty()) {
-				sender.sendMessage("I don't know who '" + name + "' is!");
-				return null;
-			} else {
-				return players.get(0);
-			}
-		} else {
-			if (!(sender instanceof Player)) {
-				return null;
-			} else {
-				return (OfflinePlayer) sender;
-			}
-		}
-	}
-
-	public static List<OfflinePlayer> matchOfflinePlayer(String partialName,
-			SFPlugin plugin) {
-		List<OfflinePlayer> matchedOfflinePlayers = new ArrayList<OfflinePlayer>();
-		int i = 0;
-		List<String> found = new ArrayList<String>();
-		List<SFInventory> invs;
-		invs = plugin.getDatabase().find(SFInventory.class).findList();
-		for (SFInventory inv : invs) {
-			if (!found.contains(inv.getPlayerName())) {
-				found.add(inv.getPlayerName());
-				i++;
-				if (partialName.equalsIgnoreCase(inv.getPlayerName())) {
-					// Exact match
-					matchedOfflinePlayers.clear();
-					matchedOfflinePlayers.add(plugin.getServer()
-							.getOfflinePlayer(inv.getPlayerName()));
-					break;
-				}
-				if (inv.getPlayerName().toLowerCase()
-						.indexOf(partialName.toLowerCase()) != -1) {
-					// Partial match
-					matchedOfflinePlayers.add(plugin.getServer()
-							.getOfflinePlayer(inv.getPlayerName()));
-				}
-			}
-		}
-
-		return matchedOfflinePlayers;
-	}
-
-	public static Player getPlayer(CommandSender sender, String name) {
-		if (name != null) {
-			List<Player> players = sender.getServer().matchPlayer(name);
-
-			if (players.isEmpty()) {
-				sender.sendMessage("I don't know who '" + name + "' is!");
-				return null;
-			} else {
-				return players.get(0);
-			}
-		} else {
-			if (!(sender instanceof Player)) {
-				return null;
-			} else {
-				return (Player) sender;
-			}
-		}
-	}
-
-	public static String itemStackToString(ItemStack[] itemStacks) {
-		String invString = "";
-		for (ItemStack itemStack : itemStacks) {
-			if (itemStack != null) {
-				invString = invString + ";" + itemStack.getTypeId() + ":"
-						+ itemStack.getAmount() + ":"
-						+ itemStack.getDurability();
-
-				if (itemStack.getData() == null) {
-					invString = invString + ":null";
-				} else {
-					invString = invString + ":" + itemStack.getData().getData();
-				}
-
-			} else {
-				invString = invString + ";" + "null";
-			}
-		}
-		return invString;
-	}
-
-	public static ItemStack[] stringToItemStack(String invString) {
-		if (invString == null) {
-			return null;
-		}
-		String[] firstSplit = invString.split("\\;");
-		ItemStack[] itemStack = new ItemStack[firstSplit.length - 1];
-
-		for (int i = 0; i < firstSplit.length - 1; i++) {
-			if (!firstSplit[(i + 1)].equals("null")) {
-				String[] secondSplit = firstSplit[(i + 1)].split("\\:");
-				itemStack[i] = new ItemStack(Integer.valueOf(secondSplit[0])
-						.intValue(),
-						Integer.valueOf(secondSplit[1]).intValue(), Short
-								.valueOf(secondSplit[2]).shortValue());
-
-				if (!secondSplit[3].equals("null")) {
-					itemStack[i].setData(new MaterialData(Integer.valueOf(
-							secondSplit[0]).intValue(), Byte.valueOf(
-							secondSplit[3]).byteValue()));
-				}
-			}
-
-		}
-
-		return itemStack;
-	}
-
 	public void saveSFInventory(SFInventory inv) {
 		getDatabase().save(inv);
-	}
-
-	public boolean deleteSFInventory(GameMode gameMode, String playerName) {
-		SFInventory inv = getSFInventory(gameMode, playerName);
-		if (inv != null) {
-			getDatabase().delete(inv);
-			return true;
-		}
-		return false;
-	}
-
-	public SFInventory getSFInventory(GameMode gameMode, String playerName) {
-		int gm = gameMode.getValue();
-		SFInventory inv = (SFInventory) getDatabase().find(SFInventory.class)
-				.where().eq("gameMode", gm).ieq("playerName", playerName)
-				.findUnique();
-		return inv;
-	}
-
-	public void updateSFInventory(SFInventory inv) {
-		deleteSFInventory(inv.getGamemode(), inv.getPlayerName());
-		saveSFInventory(inv);
 	}
 
 	public void setFilter() {
@@ -412,53 +391,20 @@ public class SFPlugin extends JavaPlugin {
 		});
 	}
 
-	public boolean isGod(String playername) {
-		return gods.containsKey(playername);
+	private void setupDatabase() {
+		try {
+			getDatabase().find(SFHome.class).findRowCount();
+			getDatabase().find(SFInventory.class).findRowCount();
+			getDatabase().find(SFMail.class).findRowCount();
+		} catch (PersistenceException ex) {
+			System.out.println("Installing database for "
+					+ getDescription().getName() + " due to first time usage");
+			installDDL();
+		}
 	}
 
-	public void setGodOn(String playername) {
-		gods.put(playername, true);
-	}
-
-	public void setGodOn(String playername, int duration) {
-		GodRemoveTask task = new GodRemoveTask(this, playername);
-		int id = this.getServer().getScheduler()
-				.scheduleSyncDelayedTask(this, task, duration);
-		task.setId(id);
-		setGodOn(playername);
-	}
-
-	public void setGodOff(String playername) {
-		gods.remove(playername);
-	}
-
-	public class GodRemoveTask implements Runnable {
-
-		private SFPlugin plugin;
-		private String player;
-		private int id;
-
-		public GodRemoveTask(SFPlugin plugin, String playername) {
-			this.plugin = plugin;
-			this.player = playername;
-		}
-
-		@Override
-		public void run() {
-			plugin.setGodOff(player);
-			plugin.getServer().getScheduler().cancelTask(id);
-		}
-
-		public String getPlayerName() {
-			return this.player;
-		}
-
-		public int getId() {
-			return this.id;
-		}
-
-		public void setId(int id) {
-			this.id = id;
-		}
+	public void updateSFInventory(SFInventory inv) {
+		deleteSFInventory(inv.getGamemode(), inv.getPlayerName());
+		saveSFInventory(inv);
 	}
 }

@@ -304,9 +304,7 @@ public class PListener extends PlayerListener {
 		if (!(e.isCancelled()) && e.getTo() != null) {
 			Teleported(e.getFrom().getWorld(), e.getTo().getWorld(),
 					e.getPlayer());
-			if (!plugin.isGod(e.getPlayer().getName())) {
-				plugin.setGodOn(e.getPlayer().getName(), 200);
-			}
+			e.getPlayer().setNoDamageTicks(200);
 		}
 	}
 
