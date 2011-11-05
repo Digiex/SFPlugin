@@ -8,6 +8,7 @@ import java.util.logging.Level;
 
 import net.digiex.simplefeatures.SFHome;
 import net.digiex.simplefeatures.SFInventory;
+import net.digiex.simplefeatures.SFLocation;
 import net.digiex.simplefeatures.SFMail;
 import net.digiex.simplefeatures.SFPlugin;
 
@@ -284,27 +285,26 @@ public class PListener extends PlayerListener {
 
 	@Override
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
-
-		SFHome home = plugin
-				.getDatabase()
-				.find(SFHome.class)
-				.where()
-				.ieq("worldName",
-						event.getPlayer().getLocation().getWorld().getName())
+		String wname = event.getPlayer().getLocation().getWorld().getName();
+		if (wname.contains("_nether") || wname.contains("_skylands")) {
+			wname = "Survival";
+		}
+		SFHome home = plugin.getDatabase().find(SFHome.class).where()
+				.ieq("worldName", wname)
 				.ieq("playerName", event.getPlayer().getName()).findUnique();
 		if (home != null) {
 			event.setRespawnLocation(home.getLocation());
 		}
-		Teleported(event.getPlayer().getLocation().getWorld(), event
-				.getRespawnLocation().getWorld(), event.getPlayer());
+		Teleported(event.getPlayer().getWorld(), event.getRespawnLocation()
+				.getWorld(), event.getPlayer());
 	}
 
 	@Override
 	public void onPlayerTeleport(PlayerTeleportEvent e) {
 		if (!(e.isCancelled()) && e.getTo() != null) {
+			e.getPlayer().setNoDamageTicks(200);
 			Teleported(e.getFrom().getWorld(), e.getTo().getWorld(),
 					e.getPlayer());
-			e.getPlayer().setNoDamageTicks(200);
 		}
 	}
 
@@ -339,6 +339,38 @@ public class PListener extends PlayerListener {
 			setGameMode(player, to);
 			SFPlugin.log(Level.INFO, player.getName() + " teleported from "
 					+ from.getName() + " to " + to.getName());
+			com.avaje.ebean.EbeanServer db = plugin.getDatabase();
+			db.beginTransaction();
+
+			try {
+				SFLocation lastLoc = db.find(SFLocation.class).where()
+						.ieq("worldName", from.getName())
+						.ieq("playerName", player.getName()).findUnique();
+				boolean isUpdate = false;
+
+				if (lastLoc == null) {
+					lastLoc = new SFLocation();
+					lastLoc.setPlayerName(player.getName());
+				} else {
+					isUpdate = true;
+				}
+				Location loc = player.getLocation();
+				lastLoc.setX(loc.getX());
+				lastLoc.setY(loc.getY());
+				lastLoc.setZ(loc.getZ());
+				lastLoc.setYaw(loc.getYaw());
+				lastLoc.setPitch(loc.getPitch());
+				lastLoc.setWorldName(loc.getWorld().getName());
+				if (isUpdate) {
+					db.update(lastLoc, updateProps);
+				}
+				db.save(lastLoc);
+				db.commitTransaction();
+			} finally {
+				db.endTransaction();
+				SFPlugin.log(Level.INFO, "Last location for world "
+						+ player.getWorld().getName() + " saved");
+			}
 		}
 	}
 }

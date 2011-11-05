@@ -228,6 +228,7 @@ public class SFPlugin extends JavaPlugin {
 		list.add(SFHome.class);
 		list.add(SFInventory.class);
 		list.add(SFMail.class);
+		list.add(SFLocation.class);
 		return list;
 	}
 
@@ -396,6 +397,7 @@ public class SFPlugin extends JavaPlugin {
 			getDatabase().find(SFHome.class).findRowCount();
 			getDatabase().find(SFInventory.class).findRowCount();
 			getDatabase().find(SFMail.class).findRowCount();
+			getDatabase().find(SFLocation.class).findRowCount();
 		} catch (PersistenceException ex) {
 			System.out.println("Installing database for "
 					+ getDescription().getName() + " due to first time usage");

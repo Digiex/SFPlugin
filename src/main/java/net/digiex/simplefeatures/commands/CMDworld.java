@@ -1,9 +1,11 @@
 package net.digiex.simplefeatures.commands;
 
+import net.digiex.simplefeatures.SFLocation;
 import net.digiex.simplefeatures.SFPlugin;
 import net.digiex.simplefeatures.teleports.SFTeleportTask;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -15,7 +17,40 @@ public class CMDworld implements CommandExecutor {
 	SFPlugin plugin;
 
 	public CMDworld(SFPlugin parent) {
-		this.plugin = parent;
+		plugin = parent;
+	}
+
+	private void ListWorlds(CommandSender sender, String tried) {
+		if (tried.length() > 0) {
+			sender.sendMessage(ChatColor.RED + "World \"" + tried
+					+ "\" was not found. Check Spelling.");
+		}
+		sender.sendMessage(ChatColor.GREEN + "Available worlds:");
+		for (World w : plugin.getServer().getWorlds()) {
+			if (w.getName().contains("_nether")) {
+				boolean allownether = false;
+				if (sender instanceof Player) {
+					allownether = ((Player) sender).isOp();
+				} else {
+					allownether = true;
+				}
+				if (allownether) {
+					sender.sendMessage(ChatColor.GRAY + "Nether");
+				}
+			} else if (w.getName().contains("_skylands")) {
+				boolean allowskylands = false;
+				if (sender instanceof Player) {
+					allowskylands = ((Player) sender).isOp();
+				} else {
+					allowskylands = true;
+				}
+				if (allowskylands) {
+					sender.sendMessage(ChatColor.GRAY + "End");
+				}
+			} else {
+				sender.sendMessage(ChatColor.YELLOW + w.getName());
+			}
+		}
 	}
 
 	@Override
@@ -64,14 +99,24 @@ public class CMDworld implements CommandExecutor {
 							sender.sendMessage("Wait! You need to use Enderportals!!! Oh you're an OP... Sorry, my mistake.");
 						}
 					}
+					SFLocation lastLoc = plugin.getDatabase()
+							.find(SFLocation.class).where()
+							.ieq("worldName", world.getName())
+							.ieq("playerName", player.getName()).findUnique();
+					Location loc = world.getSpawnLocation();
+					if (lastLoc != null) {
+						loc = new Location(plugin.getServer().getWorld(
+								lastLoc.getWorldName()), lastLoc.getX(),
+								lastLoc.getY(), lastLoc.getZ(),
+								lastLoc.getYaw(), lastLoc.getPitch());
+					}
 					int taskId = plugin
 							.getServer()
 							.getScheduler()
 							.scheduleAsyncDelayedTask(
 									plugin,
 									new SFTeleportTask(player, player, null,
-											world.getSpawnLocation(), false,
-											null, "Teleporting to "
+											loc, false, null, "Teleporting to "
 													+ world.getName()));
 					SFTeleportTask.teleporters.put(player.getName(), taskId);
 					return true;
@@ -84,38 +129,5 @@ public class CMDworld implements CommandExecutor {
 			return true;
 		}
 		return false;
-	}
-
-	private void ListWorlds(CommandSender sender, String tried) {
-		if (tried.length() > 0) {
-			sender.sendMessage(ChatColor.RED + "World \"" + tried
-					+ "\" was not found. Check Spelling.");
-		}
-		sender.sendMessage(ChatColor.GREEN + "Available worlds:");
-		for (World w : plugin.getServer().getWorlds()) {
-			if (w.getName().contains("_nether")) {
-				boolean allownether = false;
-				if (sender instanceof Player) {
-					allownether = ((Player) sender).isOp();
-				} else {
-					allownether = true;
-				}
-				if (allownether) {
-					sender.sendMessage(ChatColor.GRAY + "Nether");
-				}
-			} else if (w.getName().contains("_skylands")) {
-				boolean allowskylands = false;
-				if (sender instanceof Player) {
-					allowskylands = ((Player) sender).isOp();
-				} else {
-					allowskylands = true;
-				}
-				if (allowskylands) {
-					sender.sendMessage(ChatColor.GRAY + "End");
-				}
-			} else {
-				sender.sendMessage(ChatColor.YELLOW + w.getName());
-			}
-		}
 	}
 }
