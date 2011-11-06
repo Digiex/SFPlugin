@@ -87,8 +87,9 @@ commands:
     entities:
         description: Debugging
         usage: |
-               /<command> [world]
+               /<command> [world] [clear]
                Example: /<command> Survival
+               Example: /<command> Survival clear
     abort:
         description: Aborts a teleport
         usage: |
@@ -120,6 +121,12 @@ commands:
     cleanup:
         aliases: [clean]
         description: Remove files for players that are not whitelisted.
+        usage: |
+               /<command>
+               Example: /<command>
+    random:
+        aliases: [rnd]
+        description: Teleports you to a random location.
         usage: |
                /<command>
                Example: /<command>

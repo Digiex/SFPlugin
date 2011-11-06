@@ -1,8 +1,10 @@
 package net.digiex.simplefeatures.teleports;
 
 import java.util.HashMap;
+
 import net.digiex.simplefeatures.SFPlugin;
 
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -10,20 +12,20 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 
 public class SFTeleportTask implements Runnable {
-	private Player who;
+	private final Player who;
 	// wants
-	private Player what;
+	private final Player what;
 	// to
-	private Location where;
-	private boolean ask;
-	private String question;
-	private String infoMsg;
+	private final Location where;
+	private final boolean ask;
+	private final String question;
+	private final String infoMsg;
 	private boolean timer;
-	private Player askSubject;
+	private final Player askSubject;
 	public static HashMap<String, Integer> teleporters = new HashMap<String, Integer>();
 
-	public SFTeleportTask(Player who, Player what, Player askSubject, Location where,
-			boolean ask, String question, String infoMsg) {
+	public SFTeleportTask(Player who, Player what, Player askSubject,
+			Location where, boolean ask, String question, String infoMsg) {
 		this.who = who;
 		this.what = what;
 		this.where = where;
@@ -34,9 +36,9 @@ public class SFTeleportTask implements Runnable {
 		if (what.getGameMode().equals(GameMode.CREATIVE)
 				|| what.hasPermission(new Permission("sf.tpoverride",
 						PermissionDefault.OP))) {
-			this.timer = false;
+			timer = false;
 		} else {
-			this.timer = true;
+			timer = true;
 		}
 	}
 
@@ -49,7 +51,8 @@ public class SFTeleportTask implements Runnable {
 				askSubject.sendMessage("Teleport request accepted");
 				if (what != askSubject) {
 					what.sendMessage("Teleport request accepted");
-				}if (who != askSubject) {
+				}
+				if (who != askSubject) {
 					who.sendMessage("Teleport request accepted");
 				}
 				startCountDown();
@@ -57,7 +60,8 @@ public class SFTeleportTask implements Runnable {
 				askSubject.sendMessage("Teleport request rejected");
 				if (what != askSubject) {
 					what.sendMessage("Teleport request rejected");
-				}if (who != askSubject) {
+				}
+				if (who != askSubject) {
 					who.sendMessage("Teleport request rejected");
 				}
 			}
@@ -89,7 +93,7 @@ public class SFTeleportTask implements Runnable {
 				Thread.sleep(1000);
 				what.sendMessage("Poof!");
 			} catch (InterruptedException e) {
-				what.sendMessage("Teleportation aborted!");
+				what.sendMessage(infoMsg + ChatColor.RED + " aborted!");
 				return;
 			}
 		} else {

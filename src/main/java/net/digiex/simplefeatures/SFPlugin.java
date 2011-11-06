@@ -3,6 +3,7 @@ package net.digiex.simplefeatures;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Filter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -18,6 +19,7 @@ import net.digiex.simplefeatures.commands.CMDhome;
 import net.digiex.simplefeatures.commands.CMDlisthomes;
 import net.digiex.simplefeatures.commands.CMDme;
 import net.digiex.simplefeatures.commands.CMDmsg;
+import net.digiex.simplefeatures.commands.CMDrandom;
 import net.digiex.simplefeatures.commands.CMDread;
 import net.digiex.simplefeatures.commands.CMDreply;
 import net.digiex.simplefeatures.commands.CMDsend;
@@ -140,26 +142,21 @@ public class SFPlugin extends JavaPlugin {
 	public static List<OfflinePlayer> matchOfflinePlayer(String partialName,
 			SFPlugin plugin) {
 		List<OfflinePlayer> matchedOfflinePlayers = new ArrayList<OfflinePlayer>();
-		int i = 0;
 		List<String> found = new ArrayList<String>();
-		List<SFInventory> invs;
-		invs = plugin.getDatabase().find(SFInventory.class).findList();
-		for (SFInventory inv : invs) {
-			if (!found.contains(inv.getPlayerName())) {
-				found.add(inv.getPlayerName());
-				i++;
-				if (partialName.equalsIgnoreCase(inv.getPlayerName())) {
+		Set<OfflinePlayer> players = plugin.getServer().getWhitelistedPlayers();
+		for (OfflinePlayer player : players) {
+			if (!found.contains(player.getName())) {
+				found.add(player.getName());
+				if (partialName.equalsIgnoreCase(player.getName())) {
 					// Exact match
 					matchedOfflinePlayers.clear();
-					matchedOfflinePlayers.add(plugin.getServer()
-							.getOfflinePlayer(inv.getPlayerName()));
+					matchedOfflinePlayers.add(player);
 					break;
 				}
-				if (inv.getPlayerName().toLowerCase()
+				if (player.getName().toLowerCase()
 						.indexOf(partialName.toLowerCase()) != -1) {
 					// Partial match
-					matchedOfflinePlayers.add(plugin.getServer()
-							.getOfflinePlayer(inv.getPlayerName()));
+					matchedOfflinePlayers.add(player);
 				}
 			}
 		}
@@ -365,6 +362,7 @@ public class SFPlugin extends JavaPlugin {
 		getCommand("sendall").setExecutor(new CMDsendall(this));
 		getCommand("clear").setExecutor(new CMDclear(this));
 		getCommand("cleanup").setExecutor(new CMDcleanup(this));
+		getCommand("random").setExecutor(new CMDrandom(this));
 		setupDatabase();
 	}
 

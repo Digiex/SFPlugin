@@ -5,6 +5,7 @@ import java.util.Set;
 
 import net.digiex.simplefeatures.SFHome;
 import net.digiex.simplefeatures.SFInventory;
+import net.digiex.simplefeatures.SFLocation;
 import net.digiex.simplefeatures.SFMail;
 import net.digiex.simplefeatures.SFPlugin;
 
@@ -19,7 +20,7 @@ public class CMDcleanup implements CommandExecutor {
 	SFPlugin plugin;
 
 	public CMDcleanup(SFPlugin parent) {
-		this.plugin = parent;
+		plugin = parent;
 	}
 
 	@Override
@@ -62,6 +63,17 @@ public class CMDcleanup implements CommandExecutor {
 			}
 		}
 		sender.sendMessage(i + " Mails cleared.");
+		i = 0;
+		List<SFLocation> locs = plugin.getDatabase().find(SFLocation.class)
+				.findList();
+		for (SFLocation loc : locs) {
+			if (!ignore.contains(plugin.getServer().getOfflinePlayer(
+					loc.getPlayerName()))) {
+				i++;
+				plugin.getDatabase().delete(loc);
+			}
+		}
+		sender.sendMessage(i + " last locations cleared.");
 		i = 0;
 		return true;
 	}
