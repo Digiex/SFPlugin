@@ -18,6 +18,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -79,7 +80,7 @@ public class PListener extends PlayerListener {
 					}
 
 					home.setLocation(homeLoc);
-
+					player.setCompassTarget(homeLoc);
 					if (isUpdate) {
 						db.update(home, homeUpdateProps);
 					}
@@ -230,6 +231,10 @@ public class PListener extends PlayerListener {
 
 		if (event.getClickedBlock().getType() == Material.BED_BLOCK) {
 			Player player = event.getPlayer();
+			if (player.getWorld().getName().contains("_nether")
+					|| player.getWorld().getName().contains("_skylands")) {
+				return;
+			}
 			if (homeTasks.containsKey(player.getName())) {
 				plugin.getServer().getScheduler()
 						.cancelTask(homeTasks.get(player.getName()));
@@ -252,6 +257,7 @@ public class PListener extends PlayerListener {
 			attachment.setPermission("bukkit.command.version", false);
 		}
 		plugin.permissionAttachements.put(e.getPlayer().getName(), attachment);
+		updateCompass(e.getPlayer(), e.getPlayer().getWorld());
 		setGameMode(e.getPlayer(), e.getPlayer().getWorld());
 		if (e.getPlayer().isOp()) {
 			e.getPlayer().setDisplayName(
@@ -294,7 +300,7 @@ public class PListener extends PlayerListener {
 	public void onPlayerPortal(PlayerPortalEvent e) {
 		if (!(e.isCancelled()) && e.getTo() != null) {
 			Teleported(e.getFrom().getWorld(), e.getTo().getWorld(),
-					e.getPlayer());
+					e.getPlayer(), e);
 		}
 	}
 
@@ -331,17 +337,34 @@ public class PListener extends PlayerListener {
 				.ieq("playerName", event.getPlayer().getName()).findUnique();
 		if (home != null) {
 			event.setRespawnLocation(home.getLocation());
+		} else {
+			event.setRespawnLocation(plugin.getServer().getWorld(wname)
+					.getSpawnLocation());
 		}
+
 		Teleported(event.getPlayer().getWorld(), event.getRespawnLocation()
-				.getWorld(), event.getPlayer());
+				.getWorld(), event.getPlayer(), event);
 	}
 
 	@Override
 	public void onPlayerTeleport(PlayerTeleportEvent e) {
 		if (!(e.isCancelled()) && e.getTo() != null) {
 			e.getPlayer().setNoDamageTicks(200);
+			// if (e.getPlayer().getVehicle() != null) {
+			// if (e.getFrom().distance(e.getTo()) > 30) {
+			// if (e.getPlayer().getVehicle().eject()) {
+			// e.getPlayer()
+			// .sendMessage(
+			// "Sorry, you cannot take your "
+			// + e.getPlayer().getVehicle()
+			// .getClass()
+			// .getSimpleName()
+			// + " with you.");
+			// }
+			// }
+			// }
 			Teleported(e.getFrom().getWorld(), e.getTo().getWorld(),
-					e.getPlayer());
+					e.getPlayer(), e);
 		}
 	}
 
@@ -371,43 +394,63 @@ public class PListener extends PlayerListener {
 		}
 	}
 
-	public void Teleported(World from, World to, Player player) {
+	public void Teleported(World from, World to, Player player, Event caller) {
 		if (from != to) {
+			if (player.getHealth() > 0
+					&& !(caller instanceof PlayerRespawnEvent)
+					&& player.getLocation().getY() > 1) {
+				com.avaje.ebean.EbeanServer db = plugin.getDatabase();
+				db.beginTransaction();
+
+				try {
+					SFLocation lastLoc = db.find(SFLocation.class).where()
+							.ieq("worldName", from.getName())
+							.ieq("playerName", player.getName()).findUnique();
+					boolean isUpdate = false;
+
+					if (lastLoc == null) {
+						lastLoc = new SFLocation();
+						lastLoc.setPlayerName(player.getName());
+					} else {
+						isUpdate = true;
+					}
+					Location loc = player.getLocation();
+					lastLoc.setX(loc.getX());
+					lastLoc.setY(loc.getY());
+					lastLoc.setZ(loc.getZ());
+					lastLoc.setYaw(loc.getYaw());
+					lastLoc.setPitch(loc.getPitch());
+					lastLoc.setWorldName(loc.getWorld().getName());
+					if (isUpdate) {
+						db.update(lastLoc, homeUpdateProps);
+					}
+					db.save(lastLoc);
+					db.commitTransaction();
+				} finally {
+					db.endTransaction();
+					SFPlugin.log(Level.INFO, "Last location for world "
+							+ player.getWorld().getName() + " saved");
+				}
+			}
 			setGameMode(player, to);
 			SFPlugin.log(Level.INFO, player.getName() + " teleported from "
 					+ from.getName() + " to " + to.getName());
-			com.avaje.ebean.EbeanServer db = plugin.getDatabase();
-			db.beginTransaction();
+			updateCompass(player, to);
+		}
+	}
 
-			try {
-				SFLocation lastLoc = db.find(SFLocation.class).where()
-						.ieq("worldName", from.getName())
-						.ieq("playerName", player.getName()).findUnique();
-				boolean isUpdate = false;
-
-				if (lastLoc == null) {
-					lastLoc = new SFLocation();
-					lastLoc.setPlayerName(player.getName());
-				} else {
-					isUpdate = true;
-				}
-				Location loc = player.getLocation();
-				lastLoc.setX(loc.getX());
-				lastLoc.setY(loc.getY());
-				lastLoc.setZ(loc.getZ());
-				lastLoc.setYaw(loc.getYaw());
-				lastLoc.setPitch(loc.getPitch());
-				lastLoc.setWorldName(loc.getWorld().getName());
-				if (isUpdate) {
-					db.update(lastLoc, homeUpdateProps);
-				}
-				db.save(lastLoc);
-				db.commitTransaction();
-			} finally {
-				db.endTransaction();
-				SFPlugin.log(Level.INFO, "Last location for world "
-						+ player.getWorld().getName() + " saved");
-			}
+	public void updateCompass(Player p, World toWorld) {
+		SFHome home = plugin.getDatabase().find(SFHome.class).where()
+				.ieq("worldName", toWorld.getName())
+				.ieq("playerName", p.getName()).findUnique();
+		if (home != null) {
+			p.setCompassTarget(home.getLocation());
+			SFPlugin.log(Level.INFO, p.getName()
+					+ "'s compass points to home of " + toWorld.getName());
+		} else {
+			p.setCompassTarget(toWorld.getSpawnLocation());
+			SFPlugin.log(Level.INFO, p.getName()
+					+ "'s compass points to spawn of " + toWorld.getName());
 		}
 	}
 }

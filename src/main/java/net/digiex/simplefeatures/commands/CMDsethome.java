@@ -30,9 +30,10 @@ public class CMDsethome implements CommandExecutor {
 	}
 
 	public CMDsethome(SFPlugin parent) {
-		this.plugin = parent;
+		plugin = parent;
 	}
 
+	@Override
 	public boolean onCommand(CommandSender sender, Command command,
 			String label, String[] args) {
 		if (sender instanceof Player) {
@@ -74,10 +75,12 @@ public class CMDsethome implements CommandExecutor {
 					isUpdate = true;
 				}
 
-				home.setLocation(((Player) sender).getLocation());
+				home.setLocation(player.getLocation());
+				player.setCompassTarget(player.getLocation());
 
-				if (isUpdate)
+				if (isUpdate) {
 					db.update(home, updateProps);
+				}
 				db.save(home);
 				db.commitTransaction();
 			} finally {
