@@ -1,7 +1,5 @@
 package net.digiex.simplefeatures.commands;
 
-
-import net.digiex.simplefeatures.SFMail;
 import net.digiex.simplefeatures.SFPlugin;
 
 import org.bukkit.ChatColor;
@@ -17,7 +15,17 @@ public class CMDreply implements CommandExecutor {
 	SFPlugin plugin;
 
 	public CMDreply(SFPlugin parent) {
-		this.plugin = parent;
+		plugin = parent;
+	}
+
+	private CommandSender getTarget(Player player) {
+		PluginCommand command = plugin.getCommand("msg");
+
+		if ((command != null) && (command.getExecutor() instanceof CMDmsg)) {
+			return ((CMDmsg) command.getExecutor()).getLastSender(player);
+		} else {
+			return null;
+		}
 	}
 
 	@Override
@@ -27,7 +35,8 @@ public class CMDreply implements CommandExecutor {
 			return false;
 		}
 
-		if (!sender.hasPermission(new Permission("sfp.msg",PermissionDefault.TRUE))) {
+		if (!sender.hasPermission(new Permission("sfp.msg",
+				PermissionDefault.TRUE))) {
 			sender.sendMessage(ChatColor.RED
 					+ "You do not have permission to send private messages");
 			return true;
@@ -50,22 +59,9 @@ public class CMDreply implements CommandExecutor {
 			target.sendMessage(String.format("[%s]->[you]: %s",
 					player.getDisplayName(), message));
 			sender.sendMessage(String.format("[you]->[%s]: %s", name, message));
-			SFMail save = new SFMail();
-			save.newMail(sender.getName(), target.getName(), message);
-			plugin.getDatabase().save(save);
 		}
 
 		return true;
-	}
-
-	private CommandSender getTarget(Player player) {
-		PluginCommand command = plugin.getCommand("msg");
-
-		if ((command != null) && (command.getExecutor() instanceof CMDmsg)) {
-			return ((CMDmsg) command.getExecutor()).getLastSender(player);
-		} else {
-			return null;
-		}
 	}
 
 }
