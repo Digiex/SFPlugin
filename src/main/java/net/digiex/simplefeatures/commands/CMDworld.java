@@ -121,6 +121,10 @@ public class CMDworld implements CommandExecutor {
 					SFTeleportTask.teleporters.put(player.getName(), taskId);
 					return true;
 
+				} else if (world == player.getWorld()) {
+					sender.sendMessage(ChatColor.RED
+							+ "You are in this world already! Use /spawn");
+					return true;
 				}
 				ListWorlds(sender, args[0]);
 				return true;
