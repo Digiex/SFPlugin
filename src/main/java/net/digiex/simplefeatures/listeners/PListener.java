@@ -35,6 +35,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.scheduler.BukkitScheduler;
 
+import com.wimbli.WorldBorder.BorderData;
+
 public class PListener extends PlayerListener {
 
 	private class AskSetHomeTask implements Runnable {
@@ -299,6 +301,18 @@ public class PListener extends PlayerListener {
 	@Override
 	public void onPlayerPortal(PlayerPortalEvent e) {
 		if (!(e.isCancelled()) && e.getTo() != null) {
+			if (SFPlugin.worldBorderPlugin != null) {
+				BorderData bData = SFPlugin.worldBorderPlugin.GetWorldBorder(e
+						.getTo().getWorld().getName());
+				if (!bData.insideBorder(e.getTo())) {
+					e.getPlayer()
+							.sendMessage(
+									ChatColor.RED
+											+ "You seem to want to go somewhere, but sadly it's outside of the border.");
+					e.setCancelled(true);
+					return;
+				}
+			}
 			Teleported(e.getFrom().getWorld(), e.getTo().getWorld(),
 					e.getPlayer(), e);
 		}
@@ -341,7 +355,6 @@ public class PListener extends PlayerListener {
 			event.setRespawnLocation(plugin.getServer().getWorld(wname)
 					.getSpawnLocation());
 		}
-
 		Teleported(event.getPlayer().getWorld(), event.getRespawnLocation()
 				.getWorld(), event.getPlayer(), event);
 	}
@@ -349,6 +362,18 @@ public class PListener extends PlayerListener {
 	@Override
 	public void onPlayerTeleport(PlayerTeleportEvent e) {
 		if (!(e.isCancelled()) && e.getTo() != null) {
+			if (SFPlugin.worldBorderPlugin != null) {
+				BorderData bData = SFPlugin.worldBorderPlugin.GetWorldBorder(e
+						.getTo().getWorld().getName());
+				if (!bData.insideBorder(e.getTo())) {
+					e.getPlayer()
+							.sendMessage(
+									ChatColor.RED
+											+ "You seem to want to go somewhere, but sadly it's outside of the border.");
+					e.setCancelled(true);
+					return;
+				}
+			}
 			e.getPlayer().setNoDamageTicks(200);
 			// if (e.getPlayer().getVehicle() != null) {
 			// if (e.getFrom().distance(e.getTo()) > 30) {

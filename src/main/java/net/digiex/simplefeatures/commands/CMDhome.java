@@ -10,6 +10,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import com.wimbli.WorldBorder.BorderData;
+
 public class CMDhome implements CommandExecutor {
 
 	SFPlugin plugin;
@@ -47,6 +49,15 @@ public class CMDhome implements CommandExecutor {
 			sender.sendMessage(ChatColor.RED + "No home for world called "
 					+ homename + "!");
 			return true;
+		}
+		if (SFPlugin.worldBorderPlugin != null) {
+			BorderData bData = SFPlugin.worldBorderPlugin.GetWorldBorder(home
+					.getWorldName());
+			if (!bData.insideBorder(home.getLocation())) {
+				player.sendMessage(ChatColor.RED
+						+ "You seem to want to go somewhere, but sadly it's outside of the border.");
+				return true;
+			}
 		}
 		int taskId = plugin
 				.getServer()

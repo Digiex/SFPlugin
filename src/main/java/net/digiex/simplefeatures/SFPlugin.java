@@ -54,6 +54,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 import org.bukkit.util.config.Configuration;
 
+import com.wimbli.WorldBorder.WorldBorder;
+
 import de.diddiz.LogBlockQuestioner.LogBlockQuestioner;
 
 public class SFPlugin extends JavaPlugin {
@@ -62,6 +64,7 @@ public class SFPlugin extends JavaPlugin {
 	public Configuration config;
 	static final Logger log = Logger.getLogger("Minecraft");
 	public static String pluginName = "SimpleFeatures";
+	public static WorldBorder worldBorderPlugin;
 
 	public static OfflinePlayer getOfflinePlayer(CommandSender sender,
 			String name, SFPlugin plugin) {
@@ -261,6 +264,8 @@ public class SFPlugin extends JavaPlugin {
 		setFilter();
 		questioner = (LogBlockQuestioner) getServer().getPluginManager()
 				.getPlugin("LogBlockQuestioner");
+		worldBorderPlugin = (WorldBorder) getServer().getPluginManager()
+				.getPlugin("WorldBorder");
 		PluginManager pm = getServer().getPluginManager();
 		// TODO Auto-generated method stub
 		if (!getDataFolder().exists()) {

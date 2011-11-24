@@ -11,6 +11,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import com.wimbli.WorldBorder.BorderData;
+
 public class CMDspawn implements CommandExecutor {
 
 	SFPlugin plugin;
@@ -72,6 +74,15 @@ public class CMDspawn implements CommandExecutor {
 						}
 					}
 					spawnLoc = world.getSpawnLocation();
+				}
+			}
+			if (SFPlugin.worldBorderPlugin != null) {
+				BorderData bData = SFPlugin.worldBorderPlugin
+						.GetWorldBorder(spawnLoc.getWorld().getName());
+				if (!bData.insideBorder(spawnLoc)) {
+					player.sendMessage(ChatColor.RED
+							+ "You seem to want to go somewhere, but sadly it's outside of the border.");
+					return true;
 				}
 			}
 			int taskId = plugin

@@ -9,12 +9,14 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import com.wimbli.WorldBorder.BorderData;
+
 public class CMDtpahere implements CommandExecutor {
 
 	SFPlugin plugin;
 
 	public CMDtpahere(SFPlugin parent) {
-		this.plugin = parent;
+		plugin = parent;
 	}
 
 	@Override
@@ -35,7 +37,15 @@ public class CMDtpahere implements CommandExecutor {
 								+ "You cannot teleport to yourself, silly.");
 						return true;
 					}
-
+					if (SFPlugin.worldBorderPlugin != null) {
+						BorderData bData = SFPlugin.worldBorderPlugin
+								.GetWorldBorder(to.getWorld().getName());
+						if (!bData.insideBorder(to.getLocation())) {
+							player.sendMessage(ChatColor.RED
+									+ "You seem to want to go somewhere, but sadly it's outside of the border.");
+							return true;
+						}
+					}
 					player.sendMessage(ChatColor.GRAY + "Requesting!");
 					int taskId = plugin
 							.getServer()

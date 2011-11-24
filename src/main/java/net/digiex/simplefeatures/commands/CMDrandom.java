@@ -14,6 +14,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import com.wimbli.WorldBorder.BorderData;
+
 public class CMDrandom implements CommandExecutor {
 
 	private final SFPlugin parent;
@@ -31,6 +33,15 @@ public class CMDrandom implements CommandExecutor {
 					+ "Calculating the meaning of life...");
 			final Location l = new Location(p.getWorld(), randGen(), 128,
 					randGen());
+			if (SFPlugin.worldBorderPlugin != null) {
+				BorderData bData = SFPlugin.worldBorderPlugin.GetWorldBorder(l
+						.getWorld().getName());
+				if (!bData.insideBorder(l)) {
+					p.sendMessage(ChatColor.RED
+							+ "You seem to want to go somewhere, but sadly it's outside of the border.");
+					return true;
+				}
+			}
 			Chunk ch = p.getWorld().getChunkAt(l);
 			if (ch.load(true)) {
 				try {
