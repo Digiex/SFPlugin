@@ -33,7 +33,7 @@ public class CMDspawn implements CommandExecutor {
 			}
 			Location spawnLoc = player.getWorld().getSpawnLocation();
 			if (player.getWorld().getName().contains("_nether")
-					|| player.getWorld().getName().contains("_skylands")) {
+					|| player.getWorld().getName().contains("_the_end")) {
 				spawnLoc = plugin.getServer().getWorld("Survival")
 						.getSpawnLocation();
 			}
@@ -64,7 +64,7 @@ public class CMDspawn implements CommandExecutor {
 							sender.sendMessage("Wait! You need to use nether portals!!! Oh you're an OP... Sorry, my mistake.");
 						}
 					}
-					if (world.getName().contains("_skylands")) {
+					if (world.getName().contains("_the_end")) {
 						if (!((Player) sender).isOp()) {
 							sender.sendMessage(ChatColor.RED
 									+ "Use a Enderportal in Survival to enter The End");

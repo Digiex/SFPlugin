@@ -39,7 +39,7 @@ public class CMDworld implements CommandExecutor {
 				if (allownether) {
 					sender.sendMessage(ChatColor.GRAY + "Nether");
 				}
-			} else if (w.getName().contains("_skylands")) {
+			} else if (w.getName().contains("_the_end")) {
 				boolean allowskylands = false;
 				if (sender instanceof Player) {
 					allowskylands = ((Player) sender).isOp();
@@ -92,7 +92,7 @@ public class CMDworld implements CommandExecutor {
 							sender.sendMessage("Wait! You need to use nether portals!!! Oh you're an OP... Sorry, my mistake.");
 						}
 					}
-					if (world.getName().contains("_skylands")) {
+					if (world.getName().contains("_the_end")) {
 						if (!((Player) sender).isOp()) {
 							sender.sendMessage(ChatColor.RED
 									+ "Use a Enderportal in Survival to enter The End");
