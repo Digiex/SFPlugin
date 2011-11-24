@@ -53,10 +53,12 @@ public class CMDhome implements CommandExecutor {
 		if (SFPlugin.worldBorderPlugin != null) {
 			BorderData bData = SFPlugin.worldBorderPlugin.GetWorldBorder(home
 					.getWorldName());
-			if (!bData.insideBorder(home.getLocation())) {
-				player.sendMessage(ChatColor.RED
-						+ "You seem to want to go somewhere, but sadly it's outside of the border.");
-				return true;
+			if (bData != null) {
+				if (!bData.insideBorder(home.getLocation())) {
+					player.sendMessage(ChatColor.RED
+							+ "You seem to want to go somewhere, but sadly it's outside of the border.");
+					return true;
+				}
 			}
 		}
 		int taskId = plugin

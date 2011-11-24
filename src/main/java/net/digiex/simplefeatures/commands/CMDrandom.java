@@ -36,10 +36,12 @@ public class CMDrandom implements CommandExecutor {
 			if (SFPlugin.worldBorderPlugin != null) {
 				BorderData bData = SFPlugin.worldBorderPlugin.GetWorldBorder(l
 						.getWorld().getName());
-				if (!bData.insideBorder(l)) {
-					p.sendMessage(ChatColor.RED
-							+ "You seem to want to go somewhere, but sadly it's outside of the border.");
-					return true;
+				if (bData != null) {
+					if (!bData.insideBorder(l)) {
+						p.sendMessage(ChatColor.RED
+								+ "You seem to want to go somewhere, but sadly it's outside of the border.");
+						return true;
+					}
 				}
 			}
 			Chunk ch = p.getWorld().getChunkAt(l);

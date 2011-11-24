@@ -40,10 +40,12 @@ public class CMDtpahere implements CommandExecutor {
 					if (SFPlugin.worldBorderPlugin != null) {
 						BorderData bData = SFPlugin.worldBorderPlugin
 								.GetWorldBorder(to.getWorld().getName());
-						if (!bData.insideBorder(to.getLocation())) {
-							player.sendMessage(ChatColor.RED
-									+ "You seem to want to go somewhere, but sadly it's outside of the border.");
-							return true;
+						if (bData != null) {
+							if (!bData.insideBorder(to.getLocation())) {
+								player.sendMessage(ChatColor.RED
+										+ "You seem to want to go somewhere, but sadly it's outside of the border.");
+								return true;
+							}
 						}
 					}
 					player.sendMessage(ChatColor.GRAY + "Requesting!");

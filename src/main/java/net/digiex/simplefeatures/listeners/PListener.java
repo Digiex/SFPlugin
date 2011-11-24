@@ -304,13 +304,15 @@ public class PListener extends PlayerListener {
 			if (SFPlugin.worldBorderPlugin != null) {
 				BorderData bData = SFPlugin.worldBorderPlugin.GetWorldBorder(e
 						.getTo().getWorld().getName());
-				if (!bData.insideBorder(e.getTo())) {
-					e.getPlayer()
-							.sendMessage(
-									ChatColor.RED
-											+ "You seem to want to go somewhere, but sadly it's outside of the border.");
-					e.setCancelled(true);
-					return;
+				if (bData != null) {
+					if (!bData.insideBorder(e.getTo())) {
+						e.getPlayer()
+								.sendMessage(
+										ChatColor.RED
+												+ "You seem to want to go somewhere, but sadly it's outside of the border.");
+						e.setCancelled(true);
+						return;
+					}
 				}
 			}
 			Teleported(e.getFrom().getWorld(), e.getTo().getWorld(),
@@ -365,13 +367,15 @@ public class PListener extends PlayerListener {
 			if (SFPlugin.worldBorderPlugin != null) {
 				BorderData bData = SFPlugin.worldBorderPlugin.GetWorldBorder(e
 						.getTo().getWorld().getName());
-				if (!bData.insideBorder(e.getTo())) {
-					e.getPlayer()
-							.sendMessage(
-									ChatColor.RED
-											+ "You seem to want to go somewhere, but sadly it's outside of the border.");
-					e.setCancelled(true);
-					return;
+				if (bData != null) {
+					if (!bData.insideBorder(e.getTo())) {
+						e.getPlayer()
+								.sendMessage(
+										ChatColor.RED
+												+ "You seem to want to go somewhere, but sadly it's outside of the border.");
+						e.setCancelled(true);
+						return;
+					}
 				}
 			}
 			e.getPlayer().setNoDamageTicks(200);
