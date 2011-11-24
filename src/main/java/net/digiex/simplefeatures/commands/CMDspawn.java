@@ -44,7 +44,7 @@ public class CMDspawn implements CommandExecutor {
 					if (w.getName().contains("_nether")) {
 						wname = "Nether";
 					}
-					if (w.getName().contains("_skylands")) {
+					if (w.getName().contains("_the_end")) {
 						wname = "End";
 					}
 					if (wname.equalsIgnoreCase(args[0])) {
