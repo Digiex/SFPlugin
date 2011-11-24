@@ -11,6 +11,7 @@ import net.digiex.simplefeatures.SFInventory;
 import net.digiex.simplefeatures.SFLocation;
 import net.digiex.simplefeatures.SFMail;
 import net.digiex.simplefeatures.SFPlugin;
+import net.digiex.simplefeatures.teleports.SFTeleportTask;
 
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -34,6 +35,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.scheduler.BukkitWorker;
 
 import com.wimbli.WorldBorder.BorderData;
 
@@ -291,6 +293,16 @@ public class PListener extends PlayerListener {
 		if (!e.getPlayer().isWhitelisted()) {
 			e.setLeaveMessage(null);
 		}
+		for (BukkitWorker worker : plugin.getServer().getScheduler()
+				.getActiveWorkers()) {
+			if (worker.getOwner() instanceof SFPlugin) {
+				if (SFTeleportTask.teleporters.get(e.getPlayer().getName())
+						.equals(worker.getTaskId())) {
+					plugin.getServer().getScheduler()
+							.cancelTask(worker.getTaskId());
+				}
+			}
+		}
 		if (plugin.permissionAttachements.containsKey(e.getPlayer().getName())) {
 			e.getPlayer().removeAttachment(
 					plugin.permissionAttachements.get(e.getPlayer().getName()));
@@ -335,6 +347,16 @@ public class PListener extends PlayerListener {
 
 	@Override
 	public void onPlayerQuit(PlayerQuitEvent e) {
+		for (BukkitWorker worker : plugin.getServer().getScheduler()
+				.getActiveWorkers()) {
+			if (worker.getOwner() instanceof SFPlugin) {
+				if (SFTeleportTask.teleporters.get(e.getPlayer().getName())
+						.equals(worker.getTaskId())) {
+					plugin.getServer().getScheduler()
+							.cancelTask(worker.getTaskId());
+				}
+			}
+		}
 		if (plugin.permissionAttachements.containsKey(e.getPlayer().getName())) {
 			e.getPlayer().removeAttachment(
 					plugin.permissionAttachements.get(e.getPlayer().getName()));
