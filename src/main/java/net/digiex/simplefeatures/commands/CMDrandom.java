@@ -45,9 +45,17 @@ public class CMDrandom implements CommandExecutor {
 				}
 			}
 			Chunk ch = p.getWorld().getChunkAt(l);
+			String where = "place";
+
 			if (ch.load(true)) {
 				try {
 					Block hB = p.getWorld().getHighestBlockAt(l);
+					if (hB.getBiome() != null) {
+						if (hB.getBiome().toString() != null) {
+							where = hB.getBiome().toString().toLowerCase()
+									.replace("_", " ");
+						}
+					}
 					int taskId = parent
 							.getServer()
 							.getScheduler()
@@ -56,9 +64,7 @@ public class CMDrandom implements CommandExecutor {
 									new SFTeleportTask(p, p, null, hB
 											.getLocation(), false, null,
 											"Teleporting you to some random "
-													+ hB.getBiome().toString()
-															.toLowerCase()
-															.replace("_", " ")));
+													+ where));
 					SFTeleportTask.teleporters.put(p.getName(), taskId);
 				} catch (NullPointerException ex) {
 					p.sendMessage(ChatColor.AQUA
