@@ -2,10 +2,10 @@ package net.digiex.simplefeatures.listeners;
 
 import net.digiex.simplefeatures.SFPlugin;
 
-import org.bukkit.Material;
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
 import org.bukkit.GameMode;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -23,7 +23,7 @@ public class BListener extends BlockListener {
 		Player p = event.getPlayer();
 		if (!p.isOp()) {
 			boolean inspawn = SFPlugin.isInSpawnProtect(event.getBlock()
-					.getLocation());
+					.getLocation(), plugin);
 			if (inspawn) {
 				event.setCancelled(true);
 				p.sendMessage(ChatColor.RED
@@ -48,7 +48,7 @@ public class BListener extends BlockListener {
 		Player p = event.getPlayer();
 		if (!p.isOp()) {
 			boolean inspawn = SFPlugin.isInSpawnProtect(event.getBlock()
-					.getLocation());
+					.getLocation(), plugin);
 			if (inspawn) {
 				event.setCancelled(true);
 				p.sendMessage(ChatColor.RED
