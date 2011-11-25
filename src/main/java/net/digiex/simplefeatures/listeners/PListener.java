@@ -135,6 +135,25 @@ public class PListener extends PlayerListener {
 		invUpdateProps.add("total_experience");
 	}
 
+	public static void updatePlayerNameColour(Player p, SFPlugin plugin) {
+
+		if (!p.isOp()) {
+			plugin.permissionAttachements.get(p.getName()).setPermission(
+					"bukkit.command.plugins", false);
+			plugin.permissionAttachements.get(p.getName()).setPermission(
+					"bukkit.command.version", false);
+		}
+		if (p.isOp()) {
+			p.setDisplayName(ChatColor.AQUA + p.getName() + ChatColor.WHITE);
+		} else {
+			p.setDisplayName(ChatColor.GREEN + p.getName() + ChatColor.WHITE);
+		}
+		String plistname = p.getDisplayName();
+		if (plistname.length() < 17) {
+			p.setPlayerListName(plistname);
+		}
+	}
+
 	public PListener(SFPlugin parent) {
 		plugin = parent;
 	}
@@ -256,26 +275,10 @@ public class PListener extends PlayerListener {
 	public void onPlayerJoin(PlayerJoinEvent e) {
 
 		PermissionAttachment attachment = e.getPlayer().addAttachment(plugin);
-		if (!e.getPlayer().isOp()) {
-			attachment.setPermission("bukkit.command.plugins", false);
-			attachment.setPermission("bukkit.command.version", false);
-		}
 		plugin.permissionAttachements.put(e.getPlayer().getName(), attachment);
+		updatePlayerNameColour(e.getPlayer(), plugin);
 		updateCompass(e.getPlayer(), e.getPlayer().getWorld());
 		setGameMode(e.getPlayer(), e.getPlayer().getWorld());
-		if (e.getPlayer().isOp()) {
-			e.getPlayer().setDisplayName(
-					ChatColor.AQUA + e.getPlayer().getName() + ChatColor.WHITE);
-		} else {
-			e.getPlayer()
-					.setDisplayName(
-							ChatColor.GREEN + e.getPlayer().getName()
-									+ ChatColor.WHITE);
-		}
-		String plistname = e.getPlayer().getDisplayName();
-		if (plistname.length() < 17) {
-			e.getPlayer().setPlayerListName(plistname);
-		}
 		List<SFMail> msgs;
 		msgs = plugin.getDatabase().find(SFMail.class).where()
 				.ieq("toPlayer", e.getPlayer().getName()).findList();

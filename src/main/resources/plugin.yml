@@ -130,3 +130,9 @@ commands:
         usage: |
                /<command>
                Example: /<command>
+    admin:
+        aliases: [adm]
+        description: Toggle admin mode on and off.
+        usage: |
+               /<command>
+               Example: /<command>

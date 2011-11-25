@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import javax.persistence.PersistenceException;
 
 import net.digiex.simplefeatures.commands.CMDabort;
+import net.digiex.simplefeatures.commands.CMDadmin;
 import net.digiex.simplefeatures.commands.CMDcleanup;
 import net.digiex.simplefeatures.commands.CMDclear;
 import net.digiex.simplefeatures.commands.CMDentities;
@@ -268,6 +269,7 @@ public class SFPlugin extends JavaPlugin {
 		// Basic Counter to count how many Worlds we are loading.
 		int count = 0;
 		// Grab all the Worlds from the Config.
+		@SuppressWarnings("unchecked")
 		List<String> worldKeys = getConfig().getStringList("worlds");
 
 		// Check that the list is not null.
@@ -362,7 +364,9 @@ public class SFPlugin extends JavaPlugin {
 		getCommand("clear").setExecutor(new CMDclear(this));
 		getCommand("cleanup").setExecutor(new CMDcleanup(this));
 		getCommand("random").setExecutor(new CMDrandom(this));
+		getCommand("admin").setExecutor(new CMDadmin(this));
 		setupDatabase();
+		saveConfig();
 	}
 
 	public void saveSFInventory(SFInventory inv) {
