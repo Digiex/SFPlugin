@@ -39,6 +39,7 @@ public class CMDadmin implements CommandExecutor {
 							p.sendMessage(ChatColor.YELLOW
 									+ "Admin mode turned off!");
 						}
+						return true;
 					} else {
 						sender.sendMessage(ChatColor.RED
 								+ "You are not allowed to do that, sir!");
