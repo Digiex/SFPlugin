@@ -21,8 +21,8 @@ public class CMDadmin implements CommandExecutor {
 			String label, String[] args) {
 		if (sender instanceof Player) {
 			Player p = (Player) sender;
-			if (plugin.getConfig().getStringList("admins")
-					.contains(p.getName())) {
+			if (plugin.getConfig().getConfigurationSection("admins")
+					.getKeys(false).contains(p.getName())) {
 				p.setOp(!p.isOp());
 				PListener.updatePlayerNameColour(p, plugin);
 				if (p.isOp()) {
