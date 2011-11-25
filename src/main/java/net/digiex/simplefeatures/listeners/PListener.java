@@ -277,7 +277,7 @@ public class PListener extends PlayerListener {
 		PermissionAttachment attachment = e.getPlayer().addAttachment(plugin);
 		plugin.permissionAttachements.put(e.getPlayer().getName(), attachment);
 		updatePlayerNameColour(e.getPlayer(), plugin);
-		updateCompass(e.getPlayer(), e.getPlayer().getWorld());
+		// updateCompass(e.getPlayer(), e.getPlayer().getWorld());
 		setGameMode(e.getPlayer(), e.getPlayer().getWorld());
 		List<SFMail> msgs;
 		msgs = plugin.getDatabase().find(SFMail.class).where()
@@ -428,22 +428,15 @@ public class PListener extends PlayerListener {
 		if (gamemode == 1) {
 			if (player.getGameMode() != GameMode.CREATIVE) {
 				player.setGameMode(GameMode.CREATIVE);
-				SFPlugin.log(Level.INFO, "Gamemode set to creative for "
-						+ player.getName());
 			}
 		} else if (gamemode == 0) {
 			if (player.getGameMode() != GameMode.SURVIVAL) {
 				player.setGameMode(org.bukkit.GameMode.SURVIVAL);
 
-				SFPlugin.log(Level.INFO, "Gamemode set to survival for "
-						+ player.getName());
 			}
 		} else {
 			if (player.getGameMode() != plugin.getServer().getDefaultGameMode()) {
 				player.setGameMode(plugin.getServer().getDefaultGameMode());
-				SFPlugin.log(Level.INFO, "Gamemode set to default ("
-						+ plugin.getServer().getDefaultGameMode().toString()
-						+ ") for " + player.getName());
 			}
 		}
 	}
@@ -482,14 +475,12 @@ public class PListener extends PlayerListener {
 					db.commitTransaction();
 				} finally {
 					db.endTransaction();
-					SFPlugin.log(Level.INFO, "Last location for world "
-							+ player.getWorld().getName() + " saved");
 				}
 			}
 			setGameMode(player, to);
 			SFPlugin.log(Level.INFO, player.getName() + " teleported from "
-					+ from.getName() + " to " + to.getName());
-			updateCompass(player, to);
+					+ from.toString() + " to " + to.toString());
+			// updateCompass(player, to);
 		}
 	}
 
@@ -499,12 +490,8 @@ public class PListener extends PlayerListener {
 				.ieq("playerName", p.getName()).findUnique();
 		if (home != null) {
 			p.setCompassTarget(home.getLocation());
-			SFPlugin.log(Level.INFO, p.getName()
-					+ "'s compass points to home of " + toWorld.getName());
 		} else {
 			p.setCompassTarget(toWorld.getSpawnLocation());
-			SFPlugin.log(Level.INFO, p.getName()
-					+ "'s compass points to spawn of " + toWorld.getName());
 		}
 	}
 }

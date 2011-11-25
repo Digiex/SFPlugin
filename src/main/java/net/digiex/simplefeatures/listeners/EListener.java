@@ -5,6 +5,7 @@ import net.digiex.simplefeatures.SFPlugin;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Biome;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -29,15 +30,46 @@ public class EListener extends EntityListener {
 		if (e.getCause() == DamageCause.VOID) {
 			if (ent.getLocation().getBlock().getBiome() == Biome.SKY) {
 				Location l = ent.getLocation();
-				l.setWorld(plugin.getServer().getWorld("Survival"));
+				l.setWorld(plugin.getServer().getWorld(
+						l.getWorld().getName().replace("_the_end", "")));
 				l.setY(200);
+				if (SFPlugin.worldBorderPlugin != null) {
+					if (SFPlugin.worldBorderPlugin.GetWorldBorder("Survival") != null) {
+						if (!SFPlugin.worldBorderPlugin.GetWorldBorder(
+								"Survival").insideBorder(l)) {
+							return;
+						}
+					}
+				}
 				ent.teleport(l);
 			} else {
-				ent.teleport(ent
-						.getWorld()
-						.getHighestBlockAt(ent.getLocation().getBlockX() + 1,
-								ent.getLocation().getBlockZ() + 1)
-						.getLocation());
+				ent.setFallDistance(0);
+				Location tpLoc = null;
+				int i = 0;
+				while (tpLoc == null) {
+					i++;
+					if (i > 20) {
+						tpLoc = ent.getWorld().getSpawnLocation();
+					} else {
+						Block hB = ent.getWorld().getHighestBlockAt(
+								ent.getLocation().getBlockX() + i,
+								ent.getLocation().getBlockZ() + i);
+
+						if (hB.getY() > 1) {
+							tpLoc = hB.getLocation();
+						}
+					}
+				}
+				if (SFPlugin.worldBorderPlugin != null) {
+					if (SFPlugin.worldBorderPlugin.GetWorldBorder(tpLoc
+							.getWorld().getName()) != null) {
+						if (!SFPlugin.worldBorderPlugin.GetWorldBorder(
+								tpLoc.getWorld().getName()).insideBorder(tpLoc)) {
+							return;
+						}
+					}
+				}
+				ent.teleport(tpLoc);
 			}
 			e.setCancelled(true);
 
