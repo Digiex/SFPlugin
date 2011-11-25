@@ -9,6 +9,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 public class CMDadmin implements CommandExecutor {
@@ -23,27 +24,29 @@ public class CMDadmin implements CommandExecutor {
 			String label, String[] args) {
 		if (sender instanceof Player) {
 			Player p = (Player) sender;
-			Set<String> admins = plugin.getConfig()
-					.getConfigurationSection("admins").getKeys(false);
-			if (admins != null) {
-				if (admins.contains(p.getName())) {
-					p.setOp(!p.isOp());
-					PListener.updatePlayerNameColour(p, plugin);
-					if (p.isOp()) {
-						p.sendMessage(ChatColor.YELLOW
-								+ "Admin mode turned on!");
+			ConfigurationSection cs = plugin.getConfig()
+					.getConfigurationSection("admins");
+			if (cs != null) {
+				Set<String> admins = cs.getKeys(false);
+				if (admins != null) {
+					if (admins.contains(p.getName())) {
+						p.setOp(!p.isOp());
+						PListener.updatePlayerNameColour(p, plugin);
+						if (p.isOp()) {
+							p.sendMessage(ChatColor.YELLOW
+									+ "Admin mode turned on!");
+						} else {
+							p.sendMessage(ChatColor.YELLOW
+									+ "Admin mode turned off!");
+						}
 					} else {
-						p.sendMessage(ChatColor.YELLOW
-								+ "Admin mode turned off!");
+						sender.sendMessage(ChatColor.RED
+								+ "You are not allowed to do that, sir!");
+						return true;
 					}
-				} else {
-					sender.sendMessage(ChatColor.RED
-							+ "You are not allowed to do that, sir!");
-					return true;
 				}
 			}
 		}
 		return false;
 	}
-
 }
