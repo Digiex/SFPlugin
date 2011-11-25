@@ -136,12 +136,17 @@ public class PListener extends PlayerListener {
 	}
 
 	public static void updatePlayerNameColour(Player p, SFPlugin plugin) {
-
 		if (!p.isOp()) {
 			plugin.permissionAttachements.get(p.getName()).setPermission(
 					"bukkit.command.plugins", false);
 			plugin.permissionAttachements.get(p.getName()).setPermission(
 					"bukkit.command.version", false);
+		} else {
+
+			plugin.permissionAttachements.get(p.getName()).setPermission(
+					"bukkit.command.plugins", true);
+			plugin.permissionAttachements.get(p.getName()).setPermission(
+					"bukkit.command.version", true);
 		}
 		if (p.isOp()) {
 			p.setDisplayName(ChatColor.AQUA + p.getName() + ChatColor.WHITE);
