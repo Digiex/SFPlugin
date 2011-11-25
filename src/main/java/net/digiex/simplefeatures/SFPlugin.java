@@ -103,10 +103,11 @@ public class SFPlugin extends JavaPlugin {
 		}
 	}
 
-	public static boolean isInSpawnProtect(Location loc) {
+	public static boolean isInSpawnProtect(Location loc, SFPlugin plugin) {
 		final Vector player = loc.toVector();
 		final Vector spawn = loc.getWorld().getSpawnLocation().toVector();
-		final double safe = 50;
+		final double safe = plugin.getConfig().getDouble(
+				"worlds." + loc.getWorld().getName() + ".spawnprotect", 50);
 		if (spawn.distance(player) < safe) {
 			return true;
 		}
