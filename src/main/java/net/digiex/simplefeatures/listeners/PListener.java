@@ -419,6 +419,11 @@ public class PListener extends PlayerListener {
 			// }
 			Teleported(e.getFrom().getWorld(), e.getTo().getWorld(),
 					e.getPlayer(), e);
+			if (e.getFrom().getWorld() != e.getTo().getWorld()) {
+				SFPlugin.log(Level.INFO, e.getPlayer().getName()
+						+ " teleported from " + e.getFrom().toString() + " to "
+						+ e.getTo().toString());
+			}
 		}
 	}
 
@@ -478,8 +483,6 @@ public class PListener extends PlayerListener {
 				}
 			}
 			setGameMode(player, to);
-			SFPlugin.log(Level.INFO, player.getName() + " teleported from "
-					+ from.toString() + " to " + to.toString());
 			// updateCompass(player, to);
 		}
 	}
