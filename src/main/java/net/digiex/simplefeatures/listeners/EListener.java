@@ -50,6 +50,11 @@ public class EListener extends EntityListener {
 		if (e.isCancelled()) {
 			return;
 		}
+		if (plugin.getConfig().getBoolean(
+				"worlds." + e.getLocation().getWorld().getName()
+						+ ".explosions", false)) {
+			return;
+		}
 		e.setCancelled(true);
 		if (e.getEntity() instanceof org.bukkit.entity.TNTPrimed) {
 			e.getLocation()

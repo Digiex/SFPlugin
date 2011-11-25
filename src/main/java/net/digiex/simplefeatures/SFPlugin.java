@@ -52,7 +52,6 @@ import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
-import org.bukkit.util.config.Configuration;
 
 import com.wimbli.WorldBorder.WorldBorder;
 
@@ -61,7 +60,6 @@ import de.diddiz.LogBlockQuestioner.LogBlockQuestioner;
 public class SFPlugin extends JavaPlugin {
 
 	public static LogBlockQuestioner questioner;
-	public Configuration config;
 	static final Logger log = Logger.getLogger("Minecraft");
 	public static String pluginName = "SimpleFeatures";
 	public static WorldBorder worldBorderPlugin;
@@ -262,33 +260,25 @@ public class SFPlugin extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		setFilter();
-		questioner = (LogBlockQuestioner) getServer().getPluginManager()
-				.getPlugin("LogBlockQuestioner");
-		worldBorderPlugin = (WorldBorder) getServer().getPluginManager()
-				.getPlugin("WorldBorder");
 		PluginManager pm = getServer().getPluginManager();
-		// TODO Auto-generated method stub
-		if (!getDataFolder().exists()) {
-			getDataFolder().mkdir();
-		}
-
-		config = getConfiguration();
-		config.load();
-		config.setHeader("#Feature configuration");
-		config.save();
+		questioner = (LogBlockQuestioner) pm.getPlugin("LogBlockQuestioner");
+		worldBorderPlugin = (WorldBorder) pm.getPlugin("WorldBorder");
 		// Worlds
 
 		// Basic Counter to count how many Worlds we are loading.
 		int count = 0;
 		// Grab all the Worlds from the Config.
-		List<String> worldKeys = config.getKeys("worlds");
+		List<String> worldKeys = getConfig().getStringList("worlds");
 
 		// Check that the list is not null.
 		if (worldKeys != null) {
 			for (String worldKey : worldKeys) {
 				// Grab the initial values from the config file.
-				String environment = config.getString("worlds." + worldKey
-						+ ".environment", "NORMAL"); // Grab the Environment as
+				String environment = getConfig().getString(
+						"worlds." + worldKey + ".environment", "NORMAL"); // Grab
+																			// the
+																			// Environment
+																			// as
 				// a String.
 				// World newworld = getServer().createWorld(worldKey,
 				// getEnvFromString(environment));
@@ -296,11 +286,13 @@ public class SFPlugin extends JavaPlugin {
 				wc.environment(getEnvFromString(environment));
 				World newworld = getServer().createWorld(wc);
 				// Increment the world count
-				newworld.setPVP(config.getBoolean(
+				newworld.setPVP(getConfig().getBoolean(
 						"worlds." + worldKey + ".pvp", false));
-				newworld.setSpawnFlags(config.getBoolean("worlds." + worldKey
-						+ ".monsters", false), config.getBoolean("worlds."
-						+ worldKey + ".animals", false));
+				newworld.setSpawnFlags(
+						getConfig().getBoolean(
+								"worlds." + worldKey + ".monsters", false),
+						getConfig().getBoolean(
+								"worlds." + worldKey + ".animals", false));
 				log(Level.INFO,
 						"World " + newworld.getName() + " loaded, environment "
 								+ newworld.getEnvironment().toString()

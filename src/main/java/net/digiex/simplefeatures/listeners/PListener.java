@@ -420,8 +420,8 @@ public class PListener extends PlayerListener {
 	}
 
 	public void setGameMode(Player player, World world) {
-		int gamemode = plugin.config.getInt("worlds." + world.getName()
-				+ ".gamemode", 5);
+		int gamemode = plugin.getConfig().getInt(
+				"worlds." + world.getName() + ".gamemode", 5);
 		if (gamemode == 1) {
 			if (player.getGameMode() != GameMode.CREATIVE) {
 				player.setGameMode(GameMode.CREATIVE);
