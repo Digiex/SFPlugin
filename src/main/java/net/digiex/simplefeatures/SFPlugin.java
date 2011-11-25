@@ -269,8 +269,8 @@ public class SFPlugin extends JavaPlugin {
 		// Basic Counter to count how many Worlds we are loading.
 		int count = 0;
 		// Grab all the Worlds from the Config.
-		@SuppressWarnings("unchecked")
-		List<String> worldKeys = getConfig().getStringList("worlds");
+		Set<String> worldKeys = getConfig().getConfigurationSection("worlds")
+				.getKeys(false);
 
 		// Check that the list is not null.
 		if (worldKeys != null) {
