@@ -36,12 +36,14 @@ public class CMDadmin implements CommandExecutor {
 						plugin.getServer().broadcastMessage(
 								p.getDisplayName() + ChatColor.GRAY
 										+ " has enabled operator privileges!");
+						p.getWorld().strikeLightningEffect(p.getLocation());
 					} else {
 						p.sendMessage(ChatColor.YELLOW
 								+ "Admin mode turned off!");
 						plugin.getServer().broadcastMessage(
 								p.getDisplayName() + ChatColor.GRAY
 										+ " has disabled operator privileges!");
+						p.getWorld().strikeLightningEffect(p.getLocation());
 					}
 					return true;
 				} else {
