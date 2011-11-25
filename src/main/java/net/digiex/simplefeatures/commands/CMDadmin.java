@@ -1,5 +1,7 @@
 package net.digiex.simplefeatures.commands;
 
+import java.util.Set;
+
 import net.digiex.simplefeatures.SFPlugin;
 import net.digiex.simplefeatures.listeners.PListener;
 
@@ -21,19 +23,24 @@ public class CMDadmin implements CommandExecutor {
 			String label, String[] args) {
 		if (sender instanceof Player) {
 			Player p = (Player) sender;
-			if (plugin.getConfig().getConfigurationSection("admins")
-					.getKeys(false).contains(p.getName())) {
-				p.setOp(!p.isOp());
-				PListener.updatePlayerNameColour(p, plugin);
-				if (p.isOp()) {
-					p.sendMessage(ChatColor.YELLOW + "Admin mode turned on!");
+			Set<String> admins = plugin.getConfig()
+					.getConfigurationSection("admins").getKeys(false);
+			if (admins != null) {
+				if (admins.contains(p.getName())) {
+					p.setOp(!p.isOp());
+					PListener.updatePlayerNameColour(p, plugin);
+					if (p.isOp()) {
+						p.sendMessage(ChatColor.YELLOW
+								+ "Admin mode turned on!");
+					} else {
+						p.sendMessage(ChatColor.YELLOW
+								+ "Admin mode turned off!");
+					}
 				} else {
-					p.sendMessage(ChatColor.YELLOW + "Admin mode turned off!");
+					sender.sendMessage(ChatColor.RED
+							+ "You are not allowed to do that, sir!");
+					return true;
 				}
-			} else {
-				sender.sendMessage(ChatColor.RED
-						+ "You are not allowed to do that, sir!");
-				return true;
 			}
 		}
 		return false;
