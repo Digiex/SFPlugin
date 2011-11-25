@@ -255,7 +255,7 @@ public class PListener extends PlayerListener {
 		if (event.getClickedBlock().getType() == Material.BED_BLOCK) {
 			Player player = event.getPlayer();
 			if (player.getWorld().getName().contains("_nether")
-					|| player.getWorld().getName().contains("_skylands")) {
+					|| player.getWorld().getName().contains("_the_end")) {
 				return;
 			}
 			if (homeTasks.containsKey(player.getName())) {
@@ -370,7 +370,7 @@ public class PListener extends PlayerListener {
 	@Override
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
 		String wname = event.getPlayer().getLocation().getWorld().getName();
-		if (wname.contains("_nether") || wname.contains("_skylands")) {
+		if (wname.contains("_nether") || wname.contains("_the_end")) {
 			wname = "Survival";
 		}
 		SFHome home = plugin.getDatabase().find(SFHome.class).where()

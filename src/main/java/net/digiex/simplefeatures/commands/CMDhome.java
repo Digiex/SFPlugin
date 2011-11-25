@@ -31,7 +31,7 @@ public class CMDhome implements CommandExecutor {
 		}
 		String homename = player.getLocation().getWorld().getName();
 		if (player.getWorld().getName().contains("_nether")
-				|| player.getWorld().getName().contains("_skylands")) {
+				|| player.getWorld().getName().contains("_the_end")) {
 			homename = "Survival";
 		}
 		if (args.length > 0) {

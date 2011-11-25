@@ -44,7 +44,7 @@ public class CMDsethome implements CommandExecutor {
 				return true;
 			}
 			if (player.getWorld().getName().contains("_nether")
-					|| player.getWorld().getName().contains("_skylands")) {
+					|| player.getWorld().getName().contains("_the_end")) {
 				player.sendMessage(ChatColor.RED
 						+ "You can not set a home in this dimension!");
 				return true;
