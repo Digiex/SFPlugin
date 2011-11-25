@@ -11,6 +11,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityListener;
+import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class EListener extends EntityListener {
@@ -94,5 +95,19 @@ public class EListener extends EntityListener {
 					.dropItemNaturally(e.getLocation(),
 							new ItemStack(Material.TNT, 1));
 		}
+	}
+
+	@Override
+	public void onItemSpawn(ItemSpawnEvent e) {
+		if (e.isCancelled()) {
+			return;
+		}
+		if (plugin.getConfig()
+				.getBoolean(
+						"worlds." + e.getLocation().getWorld().getName()
+								+ ".itemdrops", true)) {
+			return;
+		}
+		e.setCancelled(true);
 	}
 }

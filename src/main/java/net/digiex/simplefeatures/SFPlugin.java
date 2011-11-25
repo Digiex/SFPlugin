@@ -343,6 +343,8 @@ public class SFPlugin extends JavaPlugin {
 				Priority.Highest, this);
 		pm.registerEvent(Event.Type.ENTITY_DAMAGE, entityListener,
 				Priority.Highest, this);
+		pm.registerEvent(Event.Type.ITEM_SPAWN, entityListener,
+				Priority.Highest, this);
 		getCommand("home").setExecutor(new CMDhome(this));
 		getCommand("sethome").setExecutor(new CMDsethome(this));
 		getCommand("setspawn").setExecutor(new CMDsetspawn(this));
