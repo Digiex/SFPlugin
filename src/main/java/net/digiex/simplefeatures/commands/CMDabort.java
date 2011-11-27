@@ -14,7 +14,7 @@ import org.bukkit.scheduler.BukkitWorker;
 
 public class CMDabort implements CommandExecutor {
 
-	private SFPlugin parent;
+	private final SFPlugin parent;
 
 	public CMDabort(SFPlugin parent) {
 		this.parent = parent;
@@ -23,20 +23,19 @@ public class CMDabort implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender cs, Command cmnd, String string,
 			String[] strings) {
-		cs.sendMessage("Sorry, aborting is not implemented yet :(");
 		boolean found = false;
 		for (BukkitWorker worker : parent.getServer().getScheduler()
 				.getActiveWorkers()) {
 			if (worker.getOwner() instanceof SFPlugin) {
-				if (SFTeleportTask.teleporters.get(cs.getName()).equals(worker.getTaskId())) {
+				if (SFTeleportTask.teleporters.get(cs.getName()).equals(
+						worker.getTaskId())) {
 					found = true;
-					parent.getServer().getScheduler().cancelTask(worker.getTaskId());
-					cs.sendMessage("Teleportation aborted! (id: "+worker.getTaskId()+")");
+					parent.getServer().getScheduler()
+							.cancelTask(worker.getTaskId());
 				}
 			}
-			cs.sendMessage(worker.getThread().getName());
 		}
-		if(!found){
+		if (!found) {
 			cs.sendMessage("Nothing to cancel!");
 		}
 		return true;

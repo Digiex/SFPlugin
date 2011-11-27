@@ -3,7 +3,6 @@ package net.digiex.simplefeatures.commands;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.digiex.simplefeatures.SFMail;
 import net.digiex.simplefeatures.SFPlugin;
 
 import org.bukkit.ChatColor;

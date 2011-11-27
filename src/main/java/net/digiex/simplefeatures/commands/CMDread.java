@@ -28,8 +28,8 @@ public class CMDread implements CommandExecutor {
 			try {
 				page = Integer.parseInt(args[0]);
 			} catch (NumberFormatException ex) {
-				sender.sendMessage("Are you sure that " + args[0]
-						+ " is a number?");
+				sender.sendMessage(ChatColor.RED + "Are you sure that "
+						+ args[0] + " is a number?");
 				return false;
 			}
 		}
@@ -39,21 +39,22 @@ public class CMDread implements CommandExecutor {
 				.findList();
 
 		if (msgs.isEmpty()) {
-			sender.sendMessage(ChatColor.RED + "Nothing found!");
+			sender.sendMessage(ChatColor.RED + "Your mailbox is empty.");
 			return true;
 		} else {
-			final int start = (page - 1) * 9;
-			final int pages = msgs.size() / 9 + (msgs.size() % 9 > 0 ? 1 : 0);
+			final int start = (page - 1) * 5;
+			final int pages = msgs.size() / 5 + (msgs.size() % 5 > 0 ? 1 : 0);
 
 			sender.sendMessage(ChatColor.GREEN + "Page " + page + " of "
 					+ pages);
-			for (int i = start; i < msgs.size() && i < start + 9; i++) {
+			for (int i = start; i < msgs.size() && i < start + 5; i++) {
 				sender.sendMessage(ChatColor.GRAY
 						+ ((new SimpleDateFormat("dd.MM")).format(new Date(msgs
 								.get(i).getTimestamp()))) + " "
 						+ ChatColor.YELLOW + msgs.get(i).getFromPlayer()
 						+ ChatColor.WHITE + ": " + msgs.get(i).getMessage());
 			}
+			sender.sendMessage(ChatColor.AQUA + "Use /clear to empty mailbox");
 			return true;
 		}
 	}
