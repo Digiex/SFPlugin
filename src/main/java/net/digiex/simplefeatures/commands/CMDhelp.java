@@ -131,7 +131,8 @@ public class CMDhelp implements CommandExecutor {
 								&& !(value.get(PERMISSION).equals(""))) {
 							if (player.hasPermission((String) value
 									.get(PERMISSION))) {
-								retval.add("§c" + k.getKey() + "§7: "
+								retval.add(ChatColor.RED + k.getKey()
+										+ ChatColor.YELLOW + ": "
 										+ value.get(DESCRIPTION));
 							}
 						} else if (value.containsKey(PERMISSION)
@@ -148,7 +149,8 @@ public class CMDhelp implements CommandExecutor {
 								}
 							}
 							if (enabled) {
-								retval.add("§c" + k.getKey() + "§7: "
+								retval.add(ChatColor.RED + k.getKey()
+										+ ChatColor.YELLOW + ": "
 										+ value.get(DESCRIPTION));
 							}
 						} else if (value.containsKey(PERMISSIONS)
@@ -156,7 +158,8 @@ public class CMDhelp implements CommandExecutor {
 								&& !(value.get(PERMISSIONS).equals(""))) {
 							if (player.hasPermission((String) value
 									.get(PERMISSION))) {
-								retval.add("§c" + k.getKey() + "§7: "
+								retval.add(ChatColor.RED + k.getKey()
+										+ ChatColor.YELLOW + ": "
 										+ value.get(DESCRIPTION));
 							}
 						} else if (value.containsKey(PERMISSIONS)
@@ -173,17 +176,20 @@ public class CMDhelp implements CommandExecutor {
 								}
 							}
 							if (enabled) {
-								retval.add("§c" + k.getKey() + "§7: "
+								retval.add(ChatColor.RED + k.getKey()
+										+ ChatColor.YELLOW + ": "
 										+ value.get(DESCRIPTION));
 							}
 						} else if (player
 								.hasPermission(new Permission("sf.help."
 										+ pluginName, PermissionDefault.TRUE))) {
-							retval.add("§c" + k.getKey() + "§7: "
+							retval.add(ChatColor.RED + k.getKey()
+									+ ChatColor.YELLOW + ": "
 									+ value.get(DESCRIPTION));
 						} else {
 							if (showpermless || player.isOp()) {
-								retval.add("§c" + k.getKey() + "§7: "
+								retval.add(ChatColor.RED + k.getKey()
+										+ ChatColor.YELLOW + ": "
 										+ value.get(DESCRIPTION)
 										+ " (permless)");
 							}
