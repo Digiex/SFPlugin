@@ -17,6 +17,7 @@ import net.digiex.simplefeatures.commands.CMDcleanup;
 import net.digiex.simplefeatures.commands.CMDclear;
 import net.digiex.simplefeatures.commands.CMDentities;
 import net.digiex.simplefeatures.commands.CMDhome;
+import net.digiex.simplefeatures.commands.CMDlastseen;
 import net.digiex.simplefeatures.commands.CMDlisthomes;
 import net.digiex.simplefeatures.commands.CMDme;
 import net.digiex.simplefeatures.commands.CMDmsg;
@@ -368,6 +369,7 @@ public class SFPlugin extends JavaPlugin {
 		getCommand("cleanup").setExecutor(new CMDcleanup(this));
 		getCommand("random").setExecutor(new CMDrandom(this));
 		getCommand("admin").setExecutor(new CMDadmin(this));
+		getCommand("lastseen").setExecutor(new CMDlastseen(this));
 		setupDatabase();
 		saveConfig();
 	}
