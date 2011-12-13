@@ -17,6 +17,7 @@ import net.digiex.simplefeatures.commands.CMDcleanup;
 import net.digiex.simplefeatures.commands.CMDclear;
 import net.digiex.simplefeatures.commands.CMDentities;
 import net.digiex.simplefeatures.commands.CMDhome;
+import net.digiex.simplefeatures.commands.CMDlastseen;
 import net.digiex.simplefeatures.commands.CMDlisthomes;
 import net.digiex.simplefeatures.commands.CMDme;
 import net.digiex.simplefeatures.commands.CMDmsg;
@@ -135,12 +136,12 @@ public class SFPlugin extends JavaPlugin {
 		return invString;
 	}
 
-	// 2 = loaded with errors int shares =
-	// 0;
-
 	public static void log(Level level, String msg) {
 		log.log(level, "[" + pluginName + "] " + msg);
 	}
+
+	// 2 = loaded with errors int shares =
+	// 0;
 
 	public static List<OfflinePlayer> matchOfflinePlayer(String partialName,
 			SFPlugin plugin) {
@@ -208,6 +209,8 @@ public class SFPlugin extends JavaPlugin {
 		return itemStack;
 	}
 
+	protected int AutoSaveTaskID;
+
 	public HashMap<String, PermissionAttachment> permissionAttachements = new HashMap<String, PermissionAttachment>();
 
 	boolean permissionsEnabled = true; // 0 = unloaded, 1 = loaded successfully,
@@ -257,6 +260,7 @@ public class SFPlugin extends JavaPlugin {
 	@Override
 	public void onDisable() {
 		log(Level.INFO, "Plugin disabled.");
+		getServer().getScheduler().cancelTask(AutoSaveTaskID);
 	}
 
 	@Override
@@ -368,7 +372,13 @@ public class SFPlugin extends JavaPlugin {
 		getCommand("cleanup").setExecutor(new CMDcleanup(this));
 		getCommand("random").setExecutor(new CMDrandom(this));
 		getCommand("admin").setExecutor(new CMDadmin(this));
+		getCommand("lastseen").setExecutor(new CMDlastseen(this));
 		setupDatabase();
+		int interval = getConfig().getInt("autosave.interval", 300);
+		log(Level.INFO, "Players and worlds will be saved every " + interval
+				+ " seconds.");
+		AutoSaveTaskID = getServer().getScheduler().scheduleSyncRepeatingTask(
+				this, new AutoSaveThread(this), interval * 20, interval * 20);
 		saveConfig();
 	}
 
