@@ -291,6 +291,11 @@ public class SFPlugin extends JavaPlugin {
 				// getEnvFromString(environment));
 				WorldCreator wc = new WorldCreator(worldKey);
 				wc.environment(getEnvFromString(environment));
+				long seed = getConfig().getLong("worlds." + worldKey + ".seed",
+						0);
+				if (seed != 0) {
+					wc.seed(seed);
+				}
 				World newworld = getServer().createWorld(wc);
 				// Increment the world count
 				newworld.setPVP(getConfig().getBoolean(
