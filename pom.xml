@@ -6,6 +6,9 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>SimpleFeatures</name>
 	<description>Provides simple commands and features for CraftBukkit servers.</description>
+        <properties>
+                <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        </properties>
 	<repositories>
 		<repository>
 			<id>DigiexMaven</id>
@@ -24,6 +27,11 @@
 			<groupId>LogBlockQuestioner</groupId>
 			<artifactId>LogBlockQuestioner</artifactId>
 			<version>LogBlockQuestioner</version>
+		</dependency>
+                <dependency>
+			<groupId>WorldBorder</groupId>
+			<artifactId>WorldBorder</artifactId>
+			<version>WorldBorder</version>
 		</dependency>
 	</dependencies>
 	<build>
