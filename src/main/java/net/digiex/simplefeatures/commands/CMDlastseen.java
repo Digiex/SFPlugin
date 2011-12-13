@@ -111,8 +111,10 @@ public class CMDlastseen implements CommandExecutor {
 					+ "Status: "
 					+ (target.isOnline() ? ChatColor.GREEN + "online"
 							: ChatColor.RED + "offline"));
-			sender.sendMessage(ChatColor.YELLOW + "Last seen "
-					+ formatDateDiffSinceTimestamp(target.getLastPlayed()));
+			if (!target.isOnline()) {
+				sender.sendMessage(ChatColor.YELLOW + "Last seen "
+						+ formatDateDiffSinceTimestamp(target.getLastPlayed()));
+			}
 			sender.sendMessage(ChatColor.YELLOW + "Joined "
 					+ formatDateDiffSinceTimestamp(target.getFirstPlayed()));
 		} else {
