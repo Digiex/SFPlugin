@@ -362,23 +362,24 @@ public class PListener extends PlayerListener {
 
 	@Override
 	public void onPlayerQuit(PlayerQuitEvent e) {
-		for (BukkitWorker worker : plugin.getServer().getScheduler()
-				.getActiveWorkers()) {
-			if (worker.getOwner() instanceof SFPlugin) {
-				if (SFTeleportTask.teleporters.get(e.getPlayer().getName())
-						.equals(worker.getTaskId())) {
-					try {
+		try {
+			for (BukkitWorker worker : plugin.getServer().getScheduler()
+					.getActiveWorkers()) {
+				if (worker.getOwner() instanceof SFPlugin) {
+					if (SFTeleportTask.teleporters.get(e.getPlayer().getName())
+							.equals(worker.getTaskId())) {
+
 						plugin.getServer().getScheduler()
 								.cancelTask(worker.getTaskId());
-					} catch (Exception ex) {
-						SFPlugin.log(Level.INFO,
-								"Tried to cancel a teleport of "
-										+ e.getPlayer().getName()
-										+ " but it had been cancelled before ("
-										+ ex.getMessage() + ")");
+
 					}
 				}
 			}
+		} catch (Exception ex) {
+			SFPlugin.log(Level.INFO, "Tried to cancel a teleport of "
+					+ e.getPlayer().getName()
+					+ " but it had been cancelled before (" + ex.getMessage()
+					+ ")");
 		}
 		if (plugin.permissionAttachements.containsKey(e.getPlayer().getName())) {
 			e.getPlayer().removeAttachment(
