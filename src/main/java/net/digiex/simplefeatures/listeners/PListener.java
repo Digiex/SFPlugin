@@ -367,8 +367,16 @@ public class PListener extends PlayerListener {
 			if (worker.getOwner() instanceof SFPlugin) {
 				if (SFTeleportTask.teleporters.get(e.getPlayer().getName())
 						.equals(worker.getTaskId())) {
-					plugin.getServer().getScheduler()
-							.cancelTask(worker.getTaskId());
+					try {
+						plugin.getServer().getScheduler()
+								.cancelTask(worker.getTaskId());
+					} catch (Exception ex) {
+						SFPlugin.log(Level.INFO,
+								"Tried to cancel a teleport of "
+										+ e.getPlayer().getName()
+										+ " but it had been cancelled before ("
+										+ ex.getMessage() + ")");
+					}
 				}
 			}
 		}
