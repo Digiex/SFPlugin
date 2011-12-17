@@ -20,7 +20,7 @@ public class CMDwho implements CommandExecutor {
 	SFPlugin plugin;
 
 	public CMDwho(SFPlugin parent) {
-		this.plugin = parent;
+		plugin = parent;
 	}
 
 	@Override
@@ -51,6 +51,59 @@ public class CMDwho implements CommandExecutor {
 		return false;
 	}
 
+	private void PerformPlayerList(CommandSender sender, String[] args) {
+		StringBuilder online = new StringBuilder();
+		online.append(ChatColor.BLUE).append("There are ")
+				.append(ChatColor.RED)
+				.append(plugin.getServer().getOnlinePlayers().length);
+		online.append(ChatColor.BLUE).append(" out of a maximum ")
+				.append(ChatColor.RED)
+				.append(plugin.getServer().getMaxPlayers());
+		online.append(ChatColor.BLUE).append(" players online.");
+		sender.sendMessage(online.toString());
+
+		Map<String, List<Player>> sort = new HashMap<String, List<Player>>();
+		for (Player p : plugin.getServer().getOnlinePlayers()) {
+
+			String world = p.getWorld().getName();
+			if (world.contains("_nether")) {
+				world = "Nether";
+			}
+			List<Player> list = sort.get(world);
+			if (list == null) {
+				list = new ArrayList<Player>();
+				sort.put(world, list);
+			}
+			list.add(p);
+		}
+		String[] worlds = sort.keySet().toArray(new String[0]);
+		Arrays.sort(worlds, String.CASE_INSENSITIVE_ORDER);
+		for (String world : worlds) {
+			StringBuilder groupString = new StringBuilder();
+			groupString.append(world).append(": ");
+			List<Player> players = sort.get(world);
+			// Collections.sort(players); TODO: Make this work
+			boolean first = true;
+			for (Player player : players) {
+				if (!first) {
+					groupString.append(", ");
+				} else {
+					first = false;
+				}
+				if (player.isSleeping()) {
+					groupString.append(ChatColor.GRAY + "[SLEEPING]");
+				}
+				if (player.isSleepingIgnored()) {
+					groupString.append(ChatColor.GRAY + "[AFK]");
+				}
+				groupString.append(ChatColor.WHITE + player.getDisplayName());
+				groupString.append(ChatColor.WHITE);
+			}
+			sender.sendMessage(groupString.toString());
+		}
+
+	}
+
 	private void PerformWhois(CommandSender sender, String[] args) {
 		String name = null;
 		if (args.length > 0) {
@@ -77,60 +130,6 @@ public class CMDwho implements CommandExecutor {
 					+ player.getLocation().getBlockZ());
 
 		}
-	}
-
-	private void PerformPlayerList(CommandSender sender, String[] args) {
-		StringBuilder online = new StringBuilder();
-		online.append(ChatColor.BLUE).append("There are ")
-				.append(ChatColor.RED)
-				.append(plugin.getServer().getOnlinePlayers().length);
-		online.append(ChatColor.BLUE).append(" out of a maximum ")
-				.append(ChatColor.RED)
-				.append(plugin.getServer().getMaxPlayers());
-		online.append(ChatColor.BLUE).append(" players online.");
-		sender.sendMessage(online.toString());
-
-		Map<String, List<Player>> sort = new HashMap<String, List<Player>>();
-		for (Player p : plugin.getServer().getOnlinePlayers()) {
-
-			String world = p.getWorld().getName();
-			if(world.contains("_nether")){
-				world = "Nether";
-			}
-			List<Player> list = sort.get(world);
-			if (list == null) {
-				list = new ArrayList<Player>();
-				sort.put(world, list);
-			}
-			list.add(p);
-		}
-		String[] worlds = sort.keySet().toArray(new String[0]);
-		Arrays.sort(worlds, String.CASE_INSENSITIVE_ORDER);
-		for (String world : worlds) {
-			StringBuilder groupString = new StringBuilder();
-			groupString.append(world).append(": ");
-			List<Player> players = sort.get(world);
-			//Collections.sort(players); TODO: Make this work
-			boolean first = true;
-			for (Player player : players) {
-				if (!first) {
-					groupString.append(", ");
-				} else {
-					first = false;
-				}
-				if (player.isSleeping()) {
-					groupString.append(ChatColor.GRAY+"[SLEEPING");
-					if (player.isSleepingIgnored()) {
-						groupString.append(" (ignored)");
-					}
-					groupString.append("]"+ChatColor.WHITE);
-				}
-				groupString.append(player.getDisplayName());
-				groupString.append(ChatColor.WHITE);
-			}
-			sender.sendMessage(groupString.toString());
-		}
-
 	}
 
 }
