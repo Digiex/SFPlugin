@@ -283,9 +283,11 @@ public class SFPlugin extends JavaPlugin {
 		}
 		// Admins
 		if (!c.isSet("admins")) {
+			List<String> admlist = new ArrayList<String>();
 			for (OfflinePlayer op : getServer().getOperators()) {
-				c.getList("admins").add(op.getName());
+				admlist.add(op.getName());
 			}
+			c.set("admins", admlist);
 		}
 		saveConfig();
 	}
