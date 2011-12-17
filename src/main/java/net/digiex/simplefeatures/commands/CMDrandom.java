@@ -20,6 +20,7 @@ import com.wimbli.WorldBorder.BorderData;
 public class CMDrandom implements CommandExecutor {
 
 	private final SFPlugin parent;
+	public boolean sharks = true;
 
 	public CMDrandom(SFPlugin parent) {
 		this.parent = parent;
@@ -28,6 +29,10 @@ public class CMDrandom implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command command,
 			String label, String[] args) {
+		sender.sendMessage("Sorry, but this command has been disabled due to the lag it causes. We will try to fix this as soon as possible.");
+		if (sharks) {
+			return true;
+		}
 		if (sender instanceof Player) {
 			final Player p = (Player) sender;
 			p.sendMessage(ChatColor.YELLOW
