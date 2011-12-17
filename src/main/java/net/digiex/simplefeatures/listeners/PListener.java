@@ -19,6 +19,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.World.Environment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.block.Action;
@@ -270,15 +271,18 @@ public class PListener extends PlayerListener {
 			return;
 		}
 		if (event.getMaterial() == Material.COMPASS) {
+			if (event.getPlayer().getWorld().getEnvironment() == Environment.NETHER
+					&& event.getPlayer().getWorld().getEnvironment() == Environment.THE_END) {
+				return;
+			}
 			List<SFCompassPoint> points = plugin.getDatabase()
 					.find(SFCompassPoint.class).where()
 					.ieq("playerName", event.getPlayer().getName())
 					.ieq("worldName", event.getPlayer().getWorld().getName())
 					.findList();
 			if (points.isEmpty()) {
-				event.getPlayer()
-						.sendMessage(
-								"You have no compass points. Type /compasspoint for more help");
+				event.getPlayer().sendMessage(
+						"You have no compass points. Type /cp for more help");
 				return;
 			} else {
 				Integer point = activeCompassPoints.get(event.getPlayer()
@@ -307,7 +311,7 @@ public class PListener extends PlayerListener {
 								cp.getY(), cp.getZ(), cp.getYaw(), cp
 										.getPitch()));
 				event.getPlayer().sendMessage(
-						ChatColor.DARK_BLUE + "Your compass points now to "
+						ChatColor.YELLOW + "Your compass points now to "
 								+ ChatColor.AQUA + cp.getPointName());
 				event.setCancelled(true);
 				return;

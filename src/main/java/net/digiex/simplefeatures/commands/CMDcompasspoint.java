@@ -8,6 +8,7 @@ import net.digiex.simplefeatures.SFCompassPoint;
 import net.digiex.simplefeatures.SFPlugin;
 
 import org.bukkit.ChatColor;
+import org.bukkit.World.Environment;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -59,6 +60,12 @@ public class CMDcompasspoint implements CommandExecutor {
 					}
 					return true;
 				} else if (args[0].equalsIgnoreCase("add")) {
+					if (p.getWorld().getEnvironment() == Environment.NETHER
+							&& p.getWorld().getEnvironment() == Environment.THE_END) {
+						sender.sendMessage(ChatColor.YELLOW
+								+ "Compasses do not work in the nether nor in the end");
+						return true;
+					}
 					if (args.length > 1) {
 						com.avaje.ebean.EbeanServer db = plugin.getDatabase();
 						db.beginTransaction();
