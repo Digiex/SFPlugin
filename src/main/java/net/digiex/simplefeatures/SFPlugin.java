@@ -235,7 +235,6 @@ public class SFPlugin extends JavaPlugin {
 	// }
 	private final ArrayList<UUID> SFWorlds = new ArrayList<UUID>();
 
-	@SuppressWarnings("unchecked")
 	private void createDefaultConfig() {
 		// Worlds
 		FileConfiguration c = getConfig();
