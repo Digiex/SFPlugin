@@ -69,6 +69,7 @@ public class CMDrandom implements CommandExecutor {
 				} catch (NullPointerException ex) {
 					p.sendMessage(ChatColor.AQUA
 							+ "The gods have spoken, no teleport this time!");
+					ch.unload(true);
 				}
 			} else {
 				p.sendMessage("Failed to load chunk!");
