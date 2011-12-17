@@ -8,6 +8,7 @@ import net.digiex.simplefeatures.teleports.SFTeleportTask;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -31,8 +32,8 @@ public class CMDrandom implements CommandExecutor {
 			final Player p = (Player) sender;
 			p.sendMessage(ChatColor.YELLOW
 					+ "Calculating the meaning of life...");
-			final Location l = new Location(p.getWorld(), randGen(), 128,
-					randGen());
+			final Location l = new Location(p.getWorld(),
+					randGen(p.getWorld()), 128, randGen(p.getWorld()));
 			if (SFPlugin.worldBorderPlugin != null) {
 				BorderData bData = SFPlugin.worldBorderPlugin.GetWorldBorder(l
 						.getWorld().getName());
@@ -46,41 +47,45 @@ public class CMDrandom implements CommandExecutor {
 			}
 			Chunk ch = p.getWorld().getChunkAt(l);
 			String where = "place";
-
-			if (ch.load(true)) {
-				try {
-					Block hB = p.getWorld().getHighestBlockAt(l);
-					if (hB.getBiome() != null) {
-						if (hB.getBiome().toString() != null) {
-							where = hB.getBiome().toString().toLowerCase()
-									.replace("_", " ");
-						}
-					}
-					int taskId = parent
-							.getServer()
-							.getScheduler()
-							.scheduleAsyncDelayedTask(
-									parent,
-									new SFTeleportTask(p, p, null, hB
-											.getLocation(), false, null,
-											"Teleporting you to some random "
-													+ where));
-					SFTeleportTask.teleporters.put(p.getName(), taskId);
-				} catch (NullPointerException ex) {
-					p.sendMessage(ChatColor.AQUA
-							+ "The gods have spoken, no teleport this time!");
+			if (!ch.isLoaded()) {
+				if (!ch.load()) {
+					p.sendMessage("Failed to load chunk!");
+					return true;
 				}
-			} else {
-				p.sendMessage("Failed to load chunk!");
+			}
+			try {
+				Block hB = p.getWorld().getHighestBlockAt(l);
+				if (hB.getBiome() != null) {
+					if (hB.getBiome().toString() != null) {
+						where = hB.getBiome().toString().toLowerCase()
+								.replace("_", " ");
+					}
+				}
+				int taskId = parent
+						.getServer()
+						.getScheduler()
+						.scheduleAsyncDelayedTask(
+								parent,
+								new SFTeleportTask(p, p, null,
+										hB.getLocation(), false, null,
+										"Teleporting you to some random "
+												+ where));
+				SFTeleportTask.teleporters.put(p.getName(), taskId);
+			} catch (Exception ex) {
+				p.sendMessage(ChatColor.AQUA
+						+ "The gods have spoken, no teleport this time!");
+				ch.unload(true);
 			}
 			return true;
 		}
 		return false;
 	}
 
-	private int randGen() {
-		int aStart = 1000;
-		int aEnd = 2000;
+	private int randGen(World w) {
+		int aStart = parent.getConfig().getInt(
+				"worlds." + w.getName() + ".randmin", 1000);
+		int aEnd = parent.getConfig().getInt(
+				"worlds." + w.getName() + ".randmax", 2000);
 		Random aRandom = new Random();
 		// get the range, casting to long to avoid overflow problems
 		long range = (long) aEnd - (long) aStart + 1;

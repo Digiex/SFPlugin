@@ -195,7 +195,7 @@ public class PListener extends PlayerListener {
 					.getInventory().getArmorContents()));
 			inv.setHealth(e.getPlayer().getHealth());
 			inv.setFood(e.getPlayer().getFoodLevel());
-			inv.setExperience(e.getPlayer().getExperience());
+			inv.setExp(e.getPlayer().getExp());
 			inv.setExhaustion(e.getPlayer().getExhaustion());
 			inv.setFireTicks(e.getPlayer().getFireTicks());
 			inv.setLevel(e.getPlayer().getLevel());
@@ -207,6 +207,12 @@ public class PListener extends PlayerListener {
 			}
 			db.save(inv);
 			db.commitTransaction();
+		} catch (Exception ex) {
+			e.getPlayer().kickPlayer(
+					ChatColor.RED + "Server error, contact admin: "
+							+ ex.getMessage());
+			ex.printStackTrace();
+			e.setCancelled(true);
 		} finally {
 			db.endTransaction();
 		}
@@ -232,7 +238,7 @@ public class PListener extends PlayerListener {
 					e.getPlayer().setHealth(inv.getHealth());
 					e.getPlayer().setFoodLevel(inv.getFood());
 				}
-				e.getPlayer().setExperience(inv.getExperience());
+				e.getPlayer().setExp(inv.getExp());
 				e.getPlayer().setExhaustion(inv.getExhaustion());
 				e.getPlayer().setFireTicks(inv.getFireTicks());
 				e.getPlayer().setLevel(inv.getLevel());
@@ -246,6 +252,7 @@ public class PListener extends PlayerListener {
 					+ e.getPlayer().getName());
 			// ex.printStackTrace();
 		}
+		e.getPlayer().saveData();
 	}
 
 	@Override
