@@ -1,6 +1,5 @@
 package net.digiex.simplefeatures;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -151,17 +150,9 @@ public class SFPlugin extends JavaPlugin {
 	public static List<OfflinePlayer> matchOfflinePlayer(String partialName,
 			SFPlugin plugin) {
 		Set<OfflinePlayer> players = new HashSet<OfflinePlayer>();
-		for (World w : plugin.getServer().getWorlds()) {
-
-			final File f = new File(plugin.getServer().getWorldContainer(),
-					w.getName() + File.separator + "players" + File.separator);
-
-			for (File playerFile : f.listFiles()) {
-				String pname = playerFile.getName().replace(".dat", "");
-				OfflinePlayer op = plugin.getServer().getOfflinePlayer(pname);
-				if (op.isWhitelisted()) {
-					players.add(op);
-				}
+		for (OfflinePlayer op : plugin.getServer().getOfflinePlayers()) {
+			if (op.isWhitelisted()) {
+				players.add(op);
 			}
 		}
 
