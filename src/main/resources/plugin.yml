@@ -142,3 +142,9 @@ commands:
         usage: |
                /<command> <player>
                Example: /<command> Snookieboy
+    compasspoint:
+        aliases: [cp]
+        description: List/remove/add compass points
+        usage: |
+               /<command> <list|remove|add> [pointname]
+               Example: /<command> add awesomemountain

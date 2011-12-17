@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
+import net.digiex.simplefeatures.SFCompassPoint;
 import net.digiex.simplefeatures.SFHome;
 import net.digiex.simplefeatures.SFInventory;
 import net.digiex.simplefeatures.SFLocation;
@@ -159,6 +160,8 @@ public class PListener extends PlayerListener {
 		}
 	}
 
+	private final HashMap<String, Integer> activeCompassPoints = new HashMap<String, Integer>();
+
 	public PListener(SFPlugin parent) {
 		plugin = parent;
 	}
@@ -260,26 +263,68 @@ public class PListener extends PlayerListener {
 		if (event.isCancelled()) {
 			return;
 		}
-		if (event.getAction() != Action.RIGHT_CLICK_BLOCK) {
+		if (event.getAction() != Action.LEFT_CLICK_AIR
+				|| event.getAction() != Action.RIGHT_CLICK_AIR
+				|| event.getAction() != Action.RIGHT_CLICK_BLOCK) {
 			return;
 		}
-
-		if (event.getClickedBlock().getType() == Material.BED_BLOCK) {
-			Player player = event.getPlayer();
-			if (player.getWorld().getName().contains("_nether")
-					|| player.getWorld().getName().contains("_the_end")) {
+		switch (event.getAction()) {
+		case LEFT_CLICK_AIR:
+		case RIGHT_CLICK_AIR:
+			List<SFCompassPoint> points = plugin.getDatabase()
+					.find(SFCompassPoint.class).where()
+					.ieq("playerName", event.getPlayer().getName()).findList();
+			if (points.isEmpty()) {
+				event.getPlayer()
+						.sendMessage(
+								"You have no compass points. Type /compasspoint for more help");
 				return;
+			} else {
+				Integer point = activeCompassPoints.get(event.getPlayer()
+						.getName());
+				if (point == null) {
+					point = 0;
+				}
+				if (event.getAction() == Action.LEFT_CLICK_AIR) {
+					point--;
+				} else if (event.getAction() == Action.RIGHT_CLICK_AIR) {
+					point++;
+				}
+				if (point < 0) {
+					point = points.size() - 1;
+				} else if (point >= points.size()) {
+					point = 0;
+				}
+				SFCompassPoint cp = points.get(point);
+				event.getPlayer().setCompassTarget(
+						new Location(event.getPlayer().getWorld(), cp.getX(),
+								cp.getY(), cp.getZ(), cp.getYaw(), cp
+										.getPitch()));
+				event.getPlayer().sendMessage(
+						ChatColor.DARK_BLUE + "Your compass points now to "
+								+ cp.getPointName());
 			}
-			if (homeTasks.containsKey(player.getName())) {
-				plugin.getServer().getScheduler()
-						.cancelTask(homeTasks.get(player.getName()));
+			break;
+		case RIGHT_CLICK_BLOCK:
+			if (event.getClickedBlock().getType() == Material.BED_BLOCK) {
+				Player player = event.getPlayer();
+				if (player.getWorld().getName().contains("_nether")
+						|| player.getWorld().getName().contains("_the_end")) {
+					return;
+				}
+				if (homeTasks.containsKey(player.getName())) {
+					plugin.getServer().getScheduler()
+							.cancelTask(homeTasks.get(player.getName()));
+				}
+				int taskId = plugin
+						.getServer()
+						.getScheduler()
+						.scheduleAsyncDelayedTask(
+								plugin,
+								new AskSetHomeTask(player, player.getLocation()));
+				homeTasks.put(player.getName(), taskId);
 			}
-			int taskId = plugin
-					.getServer()
-					.getScheduler()
-					.scheduleAsyncDelayedTask(plugin,
-							new AskSetHomeTask(player, player.getLocation()));
-			homeTasks.put(player.getName(), taskId);
+			break;
 		}
 	}
 

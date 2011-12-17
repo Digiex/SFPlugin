@@ -17,6 +17,7 @@ import net.digiex.simplefeatures.commands.CMDabort;
 import net.digiex.simplefeatures.commands.CMDadmin;
 import net.digiex.simplefeatures.commands.CMDcleanup;
 import net.digiex.simplefeatures.commands.CMDclear;
+import net.digiex.simplefeatures.commands.CMDcompasspoint;
 import net.digiex.simplefeatures.commands.CMDentities;
 import net.digiex.simplefeatures.commands.CMDhome;
 import net.digiex.simplefeatures.commands.CMDlastseen;
@@ -289,6 +290,7 @@ public class SFPlugin extends JavaPlugin {
 		list.add(SFInventory.class);
 		list.add(SFMail.class);
 		list.add(SFLocation.class);
+		list.add(SFCompassPoint.class);
 		return list;
 	}
 
@@ -437,6 +439,7 @@ public class SFPlugin extends JavaPlugin {
 		getCommand("random").setExecutor(new CMDrandom(this));
 		getCommand("admin").setExecutor(new CMDadmin(this));
 		getCommand("lastseen").setExecutor(new CMDlastseen(this));
+		getCommand("compasspoint").setExecutor(new CMDcompasspoint(this));
 		setupDatabase();
 		int interval = getConfig().getInt("autosave.interval", 300);
 		log(Level.INFO, ChatColor.AQUA
@@ -470,6 +473,7 @@ public class SFPlugin extends JavaPlugin {
 			getDatabase().find(SFInventory.class).findRowCount();
 			getDatabase().find(SFMail.class).findRowCount();
 			getDatabase().find(SFLocation.class).findRowCount();
+			getDatabase().find(SFCompassPoint.class).findRowCount();
 		} catch (PersistenceException ex) {
 			System.out.println("Installing database for "
 					+ getDescription().getName() + " due to first time usage");
