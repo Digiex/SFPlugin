@@ -136,3 +136,9 @@ commands:
         usage: |
                /<command>
                Example: /<command>
+    lastseen:
+        aliases: [seen]
+        description: Check player's last online time
+        usage: |
+               /<command> <player>
+               Example: /<command> Snookieboy

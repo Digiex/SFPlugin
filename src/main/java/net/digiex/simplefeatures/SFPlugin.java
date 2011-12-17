@@ -1,9 +1,12 @@
 package net.digiex.simplefeatures;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Filter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -39,12 +42,14 @@ import net.digiex.simplefeatures.listeners.BListener;
 import net.digiex.simplefeatures.listeners.EListener;
 import net.digiex.simplefeatures.listeners.PListener;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.WorldCreator;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
@@ -145,9 +150,23 @@ public class SFPlugin extends JavaPlugin {
 
 	public static List<OfflinePlayer> matchOfflinePlayer(String partialName,
 			SFPlugin plugin) {
+		Set<OfflinePlayer> players = new HashSet<OfflinePlayer>();
+		for (World w : plugin.getServer().getWorlds()) {
+
+			final File f = new File(plugin.getServer().getWorldContainer(),
+					w.getName() + File.separator + "players" + File.separator);
+
+			for (File playerFile : f.listFiles()) {
+				String pname = playerFile.getName().replace(".dat", "");
+				OfflinePlayer op = plugin.getServer().getOfflinePlayer(pname);
+				if (op.isWhitelisted()) {
+					players.add(op);
+				}
+			}
+		}
+
 		List<OfflinePlayer> matchedOfflinePlayers = new ArrayList<OfflinePlayer>();
 		List<String> found = new ArrayList<String>();
-		Set<OfflinePlayer> players = plugin.getServer().getWhitelistedPlayers();
 		for (OfflinePlayer player : players) {
 			if (!found.contains(player.getName())) {
 				found.add(player.getName());
@@ -223,6 +242,53 @@ public class SFPlugin extends JavaPlugin {
 	// }
 	// return false;
 	// }
+	private final ArrayList<UUID> SFWorlds = new ArrayList<UUID>();
+
+	@SuppressWarnings("unchecked")
+	private void createDefaultConfig() {
+		// Worlds
+		FileConfiguration c = getConfig();
+		for (World w : getServer().getWorlds()) {
+			String ks = "worlds." + w.getName() + ".";
+			if (SFWorlds.contains(w.getUID())) {
+				if (!c.isSet(ks + "environment")) {
+					c.set(ks + "environment", w.getEnvironment().toString());
+				}
+				if (!c.isSet(ks + "seed")) {
+					c.set(ks + "seed", w.getSeed());
+				}
+				if (!c.isSet(ks + "pvp")) {
+					c.set(ks + "pvp", w.getPVP());
+				}
+				if (!c.isSet(ks + "monsters")) {
+					c.set(ks + "monsters", w.getAllowMonsters());
+				}
+				if (!c.isSet(ks + "animals")) {
+					c.set(ks + "animals", w.getAllowAnimals());
+				}
+			}
+			if (!c.isSet(ks + "itemdrops")) {
+				c.set(ks + "itemdrops", true);
+			}
+			if (!c.isSet(ks + "explosions")) {
+				c.set(ks + "explosions", false);
+			}
+			if (!c.isSet(ks + "spawnprotect")) {
+				c.set(ks + "spawnprotect", 50);
+			}
+			if (!c.isSet(ks + "gamemode")) {
+				c.set(ks + "gamemode", getServer().getDefaultGameMode()
+						.getValue());
+			}
+		}
+		// Admins
+		if (!c.isSet("admins")) {
+			for (OfflinePlayer op : getServer().getOperators()) {
+				c.getList("admins").add(op.getName());
+			}
+		}
+		saveConfig();
+	}
 
 	@Override
 	public List<Class<?>> getDatabaseClasses() {
@@ -235,26 +301,20 @@ public class SFPlugin extends JavaPlugin {
 	}
 
 	public Environment getEnvFromString(String env) {
-		// Don't reference the enum directly as there aren't that many, and we
-		// can be more forgiving to users this way
 		if (env.equalsIgnoreCase("HELL") || env.equalsIgnoreCase("NETHER")) {
-			env = "NETHER";
+			return Environment.NETHER;
 		}
 
 		if (env.equalsIgnoreCase("SKYLANDS") || env.equalsIgnoreCase("SKYLAND")
-				|| env.equalsIgnoreCase("STARWARS")) {
-			env = "SKYLANDS";
+				|| env.equalsIgnoreCase("STARWARS")
+				|| env.equalsIgnoreCase("THE_END")) {
+			return Environment.THE_END;
 		}
 
 		if (env.equalsIgnoreCase("NORMAL") || env.equalsIgnoreCase("WORLD")) {
-			env = "NORMAL";
+			return Environment.NORMAL;
 		}
-
-		try {
-			return Environment.valueOf(env);
-		} catch (IllegalArgumentException e) {
-			return null;
-		}
+		return Environment.NORMAL;
 	}
 
 	@Override
@@ -280,38 +340,50 @@ public class SFPlugin extends JavaPlugin {
 		// Check that the list is not null.
 		if (worldKeys != null) {
 			for (String worldKey : worldKeys) {
-				// Grab the initial values from the config file.
-				String environment = getConfig().getString(
-						"worlds." + worldKey + ".environment", "NORMAL"); // Grab
-																			// the
-																			// Environment
-																			// as
-				// a String.
-				// World newworld = getServer().createWorld(worldKey,
-				// getEnvFromString(environment));
-				WorldCreator wc = new WorldCreator(worldKey);
-				wc.environment(getEnvFromString(environment));
-				World newworld = getServer().createWorld(wc);
-				// Increment the world count
-				newworld.setPVP(getConfig().getBoolean(
-						"worlds." + worldKey + ".pvp", false));
-				newworld.setSpawnFlags(
-						getConfig().getBoolean(
-								"worlds." + worldKey + ".monsters", false),
-						getConfig().getBoolean(
-								"worlds." + worldKey + ".animals", false));
-				log(Level.INFO,
-						"World " + newworld.getName() + " loaded, environment "
-								+ newworld.getEnvironment().toString()
-								+ ", pvp: " + newworld.getPVP() + ", Animals:"
-								+ newworld.getAllowAnimals() + ", Monsters: "
-								+ newworld.getAllowMonsters());
-				count++;
+				if (getServer().getWorld(worldKey) == null) {
+					// Grab the initial values from the config file.
+					String environment = getConfig().getString(
+							"worlds." + worldKey + ".environment", "NORMAL"); // Grab
+																				// the
+																				// Environment
+																				// as
+					// a String.
+					// World newworld = getServer().createWorld(worldKey,
+					// getEnvFromString(environment));
+					WorldCreator wc = new WorldCreator(worldKey);
+					wc.environment(getEnvFromString(environment));
+					long seed = getConfig().getLong(
+							"worlds." + worldKey + ".seed", 0);
+					if (seed != 0) {
+						wc.seed(seed);
+					}
+					World newworld = getServer().createWorld(wc);
+
+					// Increment the world count
+					newworld.setPVP(getConfig().getBoolean(
+							"worlds." + worldKey + ".pvp", false));
+					newworld.setSpawnFlags(
+							getConfig().getBoolean(
+									"worlds." + worldKey + ".monsters", false),
+							getConfig().getBoolean(
+									"worlds." + worldKey + ".animals", false));
+					SFWorlds.add(newworld.getUID());
+					log(Level.INFO,
+							ChatColor.GRAY + "World " + newworld.getName()
+									+ " loaded, environment "
+									+ newworld.getEnvironment().toString()
+									+ ", pvp: " + newworld.getPVP()
+									+ ", Animals:" + newworld.getAllowAnimals()
+									+ ", Monsters: "
+									+ newworld.getAllowMonsters() + ", seed: "
+									+ newworld.getSeed());
+					count++;
+				}
 			}
 		}
 
 		// Simple Output to the Console to show how many Worlds were loaded.
-		log(Level.INFO, count + " world(s) loaded.");
+		log(Level.INFO, ChatColor.YELLOW + "" + count + " world(s) loaded.");
 		PListener playerListener = new PListener(this);
 		// WListener worldListener = new WListener(this);
 		BListener blockListener = new BListener(this);
@@ -375,11 +447,13 @@ public class SFPlugin extends JavaPlugin {
 		getCommand("lastseen").setExecutor(new CMDlastseen(this));
 		setupDatabase();
 		int interval = getConfig().getInt("autosave.interval", 300);
-		log(Level.INFO, "Players and worlds will be saved every " + interval
+		log(Level.INFO, ChatColor.AQUA
+				+ "Players and worlds will be saved every " + interval
 				+ " seconds.");
 		AutoSaveTaskID = getServer().getScheduler().scheduleSyncRepeatingTask(
 				this, new AutoSaveThread(this), interval * 20, interval * 20);
 		saveConfig();
+		createDefaultConfig();
 	}
 
 	public void saveSFInventory(SFInventory inv) {
