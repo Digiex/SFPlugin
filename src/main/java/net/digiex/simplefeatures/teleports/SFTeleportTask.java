@@ -50,11 +50,12 @@ public class SFTeleportTask implements Runnable {
 					teleporters.get(what.getName()));
 			answer = SFPlugin.questioner.ask(askSubject, question, "yes", "no");
 			if (answer == "yes") {
+
 				askSubject.sendMessage("Teleport request accepted");
 				if (what != askSubject) {
 					what.sendMessage("Teleport request accepted");
 				}
-				if (who != askSubject) {
+				if (who != askSubject && who != what) {
 					who.sendMessage("Teleport request accepted");
 				}
 				startCountDown();
@@ -63,7 +64,7 @@ public class SFTeleportTask implements Runnable {
 				if (what != askSubject) {
 					what.sendMessage("Teleport request rejected");
 				}
-				if (who != askSubject) {
+				if (who != askSubject && who != what) {
 					who.sendMessage("Teleport request rejected");
 				}
 			}
