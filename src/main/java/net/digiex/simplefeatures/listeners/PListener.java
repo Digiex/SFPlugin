@@ -261,9 +261,6 @@ public class PListener extends PlayerListener {
 
 	@Override
 	public void onPlayerInteract(final PlayerInteractEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
 		if (event.getAction() != Action.LEFT_CLICK_AIR
 				&& event.getAction() != Action.RIGHT_CLICK_AIR
 				&& event.getAction() != Action.RIGHT_CLICK_BLOCK
