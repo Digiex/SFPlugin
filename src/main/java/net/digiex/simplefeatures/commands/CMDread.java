@@ -8,16 +8,17 @@ import net.digiex.simplefeatures.SFMail;
 import net.digiex.simplefeatures.SFPlugin;
 
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 public class CMDread implements CommandExecutor {
 
-	private SFPlugin plugin;
+	private final SFPlugin plugin;
 
 	public CMDread(SFPlugin parent) {
-		this.plugin = parent;
+		plugin = parent;
 	}
 
 	@Override
@@ -48,11 +49,19 @@ public class CMDread implements CommandExecutor {
 			sender.sendMessage(ChatColor.GREEN + "Page " + page + " of "
 					+ pages);
 			for (int i = start; i < msgs.size() && i < start + 5; i++) {
+				OfflinePlayer op = plugin.getServer().getOfflinePlayer(
+						msgs.get(i).getFromPlayer());
+				String dispName = ChatColor.YELLOW + op.getName()
+						+ ChatColor.WHITE;
+				if (op.isOp()) {
+					dispName = (ChatColor.AQUA + op.getName() + ChatColor.WHITE);
+				} else {
+					dispName = (ChatColor.GREEN + op.getName() + ChatColor.WHITE);
+				}
 				sender.sendMessage(ChatColor.GRAY
 						+ ((new SimpleDateFormat("dd.MM")).format(new Date(msgs
-								.get(i).getTimestamp()))) + " "
-						+ ChatColor.YELLOW + msgs.get(i).getFromPlayer()
-						+ ChatColor.WHITE + ": " + msgs.get(i).getMessage());
+								.get(i).getTimestamp()))) + " " + dispName
+						+ ": " + msgs.get(i).getMessage());
 			}
 			sender.sendMessage(ChatColor.AQUA + "Use /clear to empty mailbox");
 			return true;
