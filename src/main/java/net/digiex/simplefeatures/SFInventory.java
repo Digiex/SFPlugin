@@ -24,7 +24,7 @@ public class SFInventory {
 	private int health = 20;
 	private int food = 20;
 	private int gameMode = 0;
-	private int experience = 0;
+	private float exp = 0;
 	private float exhaustion;
 	private int fireTicks = 0;
 	private int level = 0;
@@ -40,8 +40,8 @@ public class SFInventory {
 		return exhaustion;
 	}
 
-	public int getExperience() {
-		return experience;
+	public float getExp() {
+		return exp;
 	}
 
 	public int getFireTicks() {
@@ -96,8 +96,8 @@ public class SFInventory {
 		this.exhaustion = exhaustion;
 	}
 
-	public void setExperience(int experience) {
-		this.experience = experience;
+	public void setExp(float exp) {
+		this.exp = exp;
 	}
 
 	public void setFireTicks(int fireTicks) {
