@@ -292,10 +292,9 @@ public class PListener extends PlayerListener {
 						|| event.getAction() == Action.LEFT_CLICK_BLOCK) {
 					point--;
 				} else if (event.getAction() == Action.RIGHT_CLICK_AIR
-						|| event.getAction() == Action.LEFT_CLICK_BLOCK) {
+						|| event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 					point++;
 				}
-				event.getPlayer().sendMessage(point + " ");
 				if (point < 0) {
 					point = points.size() - 1;
 				} else if (point >= points.size()) {
