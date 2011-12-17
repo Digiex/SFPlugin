@@ -57,6 +57,7 @@ public class CMDcompasspoint implements CommandExecutor {
 								+ "All compass points: " + ChatColor.AQUA
 								+ result);
 					}
+					return true;
 				} else if (args[0].equalsIgnoreCase("add")) {
 					if (args.length > 1) {
 						com.avaje.ebean.EbeanServer db = plugin.getDatabase();
@@ -86,7 +87,8 @@ public class CMDcompasspoint implements CommandExecutor {
 
 								isUpdate = true;
 							}
-
+							point.setWorldName(p.getWorld().getName());
+							point.setPointName(args[1]);
 							point.setX(p.getLocation().getX());
 							point.setY(p.getLocation().getY());
 							point.setZ(p.getLocation().getZ());
@@ -101,6 +103,7 @@ public class CMDcompasspoint implements CommandExecutor {
 						} finally {
 							db.endTransaction();
 						}
+						return true;
 					}
 				} else if (args[0].equalsIgnoreCase("remove")) {
 					if (args.length > 1) {
@@ -134,6 +137,7 @@ public class CMDcompasspoint implements CommandExecutor {
 						} finally {
 							db.endTransaction();
 						}
+						return true;
 					}
 				}
 			}
