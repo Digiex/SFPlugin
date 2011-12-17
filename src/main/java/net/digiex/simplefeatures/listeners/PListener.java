@@ -265,15 +265,16 @@ public class PListener extends PlayerListener {
 		}
 		if (event.getAction() != Action.LEFT_CLICK_AIR
 				&& event.getAction() != Action.RIGHT_CLICK_AIR
-				&& event.getAction() != Action.RIGHT_CLICK_BLOCK) {
+				&& event.getAction() != Action.RIGHT_CLICK_BLOCK
+				&& event.getAction() != Action.LEFT_CLICK_BLOCK) {
 			return;
 		}
-		switch (event.getAction()) {
-		case LEFT_CLICK_AIR:
-		case RIGHT_CLICK_AIR:
+		if (event.getMaterial() == Material.COMPASS) {
 			List<SFCompassPoint> points = plugin.getDatabase()
 					.find(SFCompassPoint.class).where()
-					.ieq("playerName", event.getPlayer().getName()).findList();
+					.ieq("playerName", event.getPlayer().getName())
+					.ieq("worldName", event.getPlayer().getWorld().getName())
+					.findList();
 			if (points.isEmpty()) {
 				event.getPlayer()
 						.sendMessage(
@@ -284,47 +285,51 @@ public class PListener extends PlayerListener {
 						.getName());
 				if (point == null) {
 					point = 0;
+				} else {
+					activeCompassPoints.remove(event.getPlayer().getName());
 				}
-				if (event.getAction() == Action.LEFT_CLICK_AIR) {
+				if (event.getAction() == Action.LEFT_CLICK_AIR
+						|| event.getAction() == Action.LEFT_CLICK_BLOCK) {
 					point--;
-				} else if (event.getAction() == Action.RIGHT_CLICK_AIR) {
+				} else if (event.getAction() == Action.RIGHT_CLICK_AIR
+						|| event.getAction() == Action.LEFT_CLICK_BLOCK) {
 					point++;
 				}
+				event.getPlayer().sendMessage(point + " ");
 				if (point < 0) {
 					point = points.size() - 1;
 				} else if (point >= points.size()) {
 					point = 0;
 				}
 				SFCompassPoint cp = points.get(point);
+				activeCompassPoints.put(event.getPlayer().getName(), point);
 				event.getPlayer().setCompassTarget(
 						new Location(event.getPlayer().getWorld(), cp.getX(),
 								cp.getY(), cp.getZ(), cp.getYaw(), cp
 										.getPitch()));
 				event.getPlayer().sendMessage(
 						ChatColor.DARK_BLUE + "Your compass points now to "
-								+ cp.getPointName());
+								+ ChatColor.AQUA + cp.getPointName());
+				event.setCancelled(true);
+				return;
 			}
-			break;
-		case RIGHT_CLICK_BLOCK:
-			if (event.getClickedBlock().getType() == Material.BED_BLOCK) {
-				Player player = event.getPlayer();
-				if (player.getWorld().getName().contains("_nether")
-						|| player.getWorld().getName().contains("_the_end")) {
-					return;
-				}
-				if (homeTasks.containsKey(player.getName())) {
-					plugin.getServer().getScheduler()
-							.cancelTask(homeTasks.get(player.getName()));
-				}
-				int taskId = plugin
-						.getServer()
-						.getScheduler()
-						.scheduleAsyncDelayedTask(
-								plugin,
-								new AskSetHomeTask(player, player.getLocation()));
-				homeTasks.put(player.getName(), taskId);
+		} else if (event.getClickedBlock().getType() == Material.BED_BLOCK
+				&& event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+			Player player = event.getPlayer();
+			if (player.getWorld().getName().contains("_nether")
+					|| player.getWorld().getName().contains("_the_end")) {
+				return;
 			}
-			break;
+			if (homeTasks.containsKey(player.getName())) {
+				plugin.getServer().getScheduler()
+						.cancelTask(homeTasks.get(player.getName()));
+			}
+			int taskId = plugin
+					.getServer()
+					.getScheduler()
+					.scheduleAsyncDelayedTask(plugin,
+							new AskSetHomeTask(player, player.getLocation()));
+			homeTasks.put(player.getName(), taskId);
 		}
 	}
 
