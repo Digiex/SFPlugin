@@ -61,7 +61,7 @@ public class CMDcompasspoint implements CommandExecutor {
 					return true;
 				} else if (args[0].equalsIgnoreCase("add")) {
 					if (p.getWorld().getEnvironment() == Environment.NETHER
-							&& p.getWorld().getEnvironment() == Environment.THE_END) {
+							|| p.getWorld().getEnvironment() == Environment.THE_END) {
 						sender.sendMessage(ChatColor.YELLOW
 								+ "Compasses do not work in the nether nor in the end");
 						return true;

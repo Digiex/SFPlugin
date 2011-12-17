@@ -272,7 +272,7 @@ public class PListener extends PlayerListener {
 		}
 		if (event.getMaterial() == Material.COMPASS) {
 			if (event.getPlayer().getWorld().getEnvironment() == Environment.NETHER
-					&& event.getPlayer().getWorld().getEnvironment() == Environment.THE_END) {
+					|| event.getPlayer().getWorld().getEnvironment() == Environment.THE_END) {
 				return;
 			}
 			List<SFCompassPoint> points = plugin.getDatabase()
