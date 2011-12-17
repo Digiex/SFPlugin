@@ -1,13 +1,10 @@
 package net.digiex.simplefeatures.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import net.digiex.simplefeatures.SFInventory;
 import net.digiex.simplefeatures.SFMail;
 import net.digiex.simplefeatures.SFPlugin;
 
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -38,21 +35,17 @@ public class CMDsendall implements CommandExecutor {
 		}
 		String message = SFPlugin.recompileMessage(args, 0, args.length - 1);
 		int i = 0;
-		List<String> sent = new ArrayList<String>();
 
-		List<SFInventory> invs;
-		invs = parent.getDatabase().find(SFInventory.class).findList();
-		for (SFInventory inv : invs) {
-			if (!sent.contains(inv.getPlayerName())) {
+		for (OfflinePlayer op : parent.getServer().getOfflinePlayers()) {
+			if (op.isWhitelisted()) {
 				SFMail save = new SFMail();
-				save.newMail(sender.getName(), inv.getPlayerName(), message);
+				save.newMail(sender.getName(), op.getName(), message);
 				parent.getDatabase().save(save);
-				Player p = parent.getServer().getPlayer(inv.getPlayerName());
+				Player p = op.getPlayer();
 				if (p != null) {
 					p.sendMessage(ChatColor.AQUA
 							+ "You have new mail! Type /read to read it!");
 				}
-				sent.add(inv.getPlayerName());
 				i++;
 			}
 		}
