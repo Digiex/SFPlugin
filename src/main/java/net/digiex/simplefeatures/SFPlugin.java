@@ -327,51 +327,58 @@ public class SFPlugin extends JavaPlugin {
 
 		// Basic Counter to count how many Worlds we are loading.
 		int count = 0;
-		// Grab all the Worlds from the Config.
-		Set<String> worldKeys = getConfig().getConfigurationSection("worlds")
-				.getKeys(false);
+		if (getConfig().getConfigurationSection("worlds") != null) {
+			// Grab all the Worlds from the Config.
+			Set<String> worldKeys = getConfig().getConfigurationSection(
+					"worlds").getKeys(false);
 
-		// Check that the list is not null.
-		if (worldKeys != null) {
-			for (String worldKey : worldKeys) {
-				if (getServer().getWorld(worldKey) == null) {
-					// Grab the initial values from the config file.
-					String environment = getConfig().getString(
-							"worlds." + worldKey + ".environment", "NORMAL"); // Grab
-																				// the
-																				// Environment
-																				// as
-					// a String.
-					// World newworld = getServer().createWorld(worldKey,
-					// getEnvFromString(environment));
-					WorldCreator wc = new WorldCreator(worldKey);
-					wc.environment(getEnvFromString(environment));
-					long seed = getConfig().getLong(
-							"worlds." + worldKey + ".seed", 0);
-					if (seed != 0) {
-						wc.seed(seed);
+			// Check that the list is not null.
+			if (worldKeys != null) {
+				for (String worldKey : worldKeys) {
+					if (getServer().getWorld(worldKey) == null) {
+						// Grab the initial values from the config file.
+						String environment = getConfig()
+								.getString(
+										"worlds." + worldKey + ".environment",
+										"NORMAL"); // Grab
+													// the
+													// Environment
+													// as
+						// a String.
+						// World newworld = getServer().createWorld(worldKey,
+						// getEnvFromString(environment));
+						WorldCreator wc = new WorldCreator(worldKey);
+						wc.environment(getEnvFromString(environment));
+						long seed = getConfig().getLong(
+								"worlds." + worldKey + ".seed", 0);
+						if (seed != 0) {
+							wc.seed(seed);
+						}
+						World newworld = getServer().createWorld(wc);
+
+						// Increment the world count
+						newworld.setPVP(getConfig().getBoolean(
+								"worlds." + worldKey + ".pvp", false));
+						newworld.setSpawnFlags(
+								getConfig().getBoolean(
+										"worlds." + worldKey + ".monsters",
+										false),
+								getConfig().getBoolean(
+										"worlds." + worldKey + ".animals",
+										false));
+						SFWorlds.add(newworld.getUID());
+						log(Level.INFO,
+								ChatColor.GRAY + "World " + newworld.getName()
+										+ " loaded, environment "
+										+ newworld.getEnvironment().toString()
+										+ ", pvp: " + newworld.getPVP()
+										+ ", Animals:"
+										+ newworld.getAllowAnimals()
+										+ ", Monsters: "
+										+ newworld.getAllowMonsters()
+										+ ", seed: " + newworld.getSeed());
+						count++;
 					}
-					World newworld = getServer().createWorld(wc);
-
-					// Increment the world count
-					newworld.setPVP(getConfig().getBoolean(
-							"worlds." + worldKey + ".pvp", false));
-					newworld.setSpawnFlags(
-							getConfig().getBoolean(
-									"worlds." + worldKey + ".monsters", false),
-							getConfig().getBoolean(
-									"worlds." + worldKey + ".animals", false));
-					SFWorlds.add(newworld.getUID());
-					log(Level.INFO,
-							ChatColor.GRAY + "World " + newworld.getName()
-									+ " loaded, environment "
-									+ newworld.getEnvironment().toString()
-									+ ", pvp: " + newworld.getPVP()
-									+ ", Animals:" + newworld.getAllowAnimals()
-									+ ", Monsters: "
-									+ newworld.getAllowMonsters() + ", seed: "
-									+ newworld.getSeed());
-					count++;
 				}
 			}
 		}
