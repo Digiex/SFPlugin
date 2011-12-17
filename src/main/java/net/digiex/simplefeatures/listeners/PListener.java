@@ -267,7 +267,7 @@ public class PListener extends PlayerListener {
 				&& event.getAction() != Action.LEFT_CLICK_BLOCK) {
 			return;
 		}
-		if (event.getMaterial() == Material.COMPASS) {
+		if (event.hasItem() && event.getMaterial() == Material.COMPASS) {
 			if (event.getPlayer().getWorld().getEnvironment() == Environment.NETHER
 					|| event.getPlayer().getWorld().getEnvironment() == Environment.THE_END) {
 				return;
@@ -313,23 +313,28 @@ public class PListener extends PlayerListener {
 				event.setCancelled(true);
 				return;
 			}
-		} else if (event.getClickedBlock().getType() == Material.BED_BLOCK
-				&& event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-			Player player = event.getPlayer();
-			if (player.getWorld().getName().contains("_nether")
-					|| player.getWorld().getName().contains("_the_end")) {
+		} else if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+			if (event.isCancelled() && !event.hasBlock()) {
 				return;
 			}
-			if (homeTasks.containsKey(player.getName())) {
-				plugin.getServer().getScheduler()
-						.cancelTask(homeTasks.get(player.getName()));
+			if (event.getClickedBlock().getType() == Material.BED_BLOCK) {
+				Player player = event.getPlayer();
+				if (player.getWorld().getName().contains("_nether")
+						|| player.getWorld().getName().contains("_the_end")) {
+					return;
+				}
+				if (homeTasks.containsKey(player.getName())) {
+					plugin.getServer().getScheduler()
+							.cancelTask(homeTasks.get(player.getName()));
+				}
+				int taskId = plugin
+						.getServer()
+						.getScheduler()
+						.scheduleAsyncDelayedTask(
+								plugin,
+								new AskSetHomeTask(player, player.getLocation()));
+				homeTasks.put(player.getName(), taskId);
 			}
-			int taskId = plugin
-					.getServer()
-					.getScheduler()
-					.scheduleAsyncDelayedTask(plugin,
-							new AskSetHomeTask(player, player.getLocation()));
-			homeTasks.put(player.getName(), taskId);
 		}
 	}
 
