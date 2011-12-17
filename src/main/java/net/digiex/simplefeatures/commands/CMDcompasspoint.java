@@ -52,7 +52,7 @@ public class CMDcompasspoint implements CommandExecutor {
 							if (result.length() > 0) {
 								result += ", ";
 							}
-							result += cp.getWorldName();
+							result += cp.getPointName();
 						}
 						sender.sendMessage(ChatColor.YELLOW
 								+ "All compass points: " + ChatColor.AQUA
@@ -114,7 +114,11 @@ public class CMDcompasspoint implements CommandExecutor {
 					}
 				} else if (args[0].equalsIgnoreCase("remove")) {
 					if (args.length > 1) {
-
+						p.sendMessage("Could not remove.");
+						boolean sharks = true;
+						if (sharks) {
+							return true;
+						}
 						com.avaje.ebean.EbeanServer db = plugin.getDatabase();
 						db.beginTransaction();
 
@@ -134,12 +138,10 @@ public class CMDcompasspoint implements CommandExecutor {
 										+ " exists!");
 								return true;
 							} else {
-
 								p.sendMessage(ChatColor.YELLOW
 										+ "Compass point removed!");
 								db.delete(point);
 							}
-							db.save(point);
 							db.commitTransaction();
 						} finally {
 							db.endTransaction();
