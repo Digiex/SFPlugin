@@ -40,7 +40,7 @@ class Question {
 	}
 
 	synchronized boolean isExpired() {
-		if (System.currentTimeMillis() - start > 300000) {
+		if (System.currentTimeMillis() - start > 60000) {
 			answer = "timed out";
 			notify();
 			return true;
