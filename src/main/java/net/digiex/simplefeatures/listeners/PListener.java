@@ -387,6 +387,9 @@ public class PListener extends PlayerListener {
 					plugin.permissionAttachements.get(e.getPlayer().getName()));
 			plugin.permissionAttachements.remove(e.getPlayer().getName());
 		}
+		if (SFPlugin.clientAddons.contains((e.getPlayer().getName()))) {
+			SFPlugin.clientAddons.remove(e.getPlayer().getName());
+		}
 	}
 
 	@Override
@@ -449,6 +452,9 @@ public class PListener extends PlayerListener {
 			e.getPlayer().removeAttachment(
 					plugin.permissionAttachements.get(e.getPlayer().getName()));
 			plugin.permissionAttachements.remove(e.getPlayer().getName());
+		}
+		if (SFPlugin.clientAddons.contains((e.getPlayer().getName()))) {
+			SFPlugin.clientAddons.remove(e.getPlayer().getName());
 		}
 	}
 

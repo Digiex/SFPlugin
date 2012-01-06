@@ -148,3 +148,9 @@ commands:
         usage: |
                /<command> <list|remove|add> [pointname]
                Example: /<command> add awesomemountain
+    enablesfclientaddon:
+        aliases:
+        description: Command autoused if you have the addon
+        usage: |
+               /<command>
+               Example: /<command>

@@ -16,12 +16,12 @@ public class SFQuestionerPlayerListener extends PlayerListener {
 	public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
 		if (!event.isCancelled() && !questions.isEmpty()) {
 			final int playerHash = event.getPlayer().getName().hashCode();
-			final int answerHash = event.getMessage().substring(1)
-					.toLowerCase().hashCode();
 			for (final Question question : questions) {
 				if (question.isPlayerQuestioned(playerHash)
-						&& question.isRightAnswer(answerHash)) {
-					question.returnAnswer(answerHash);
+						&& question.isRightAnswer(event.getMessage()
+								.substring(1).toLowerCase())) {
+					question.returnAnswer(event.getMessage().substring(1)
+							.toLowerCase());
 					questions.remove(question);
 					event.setCancelled(true);
 					break;

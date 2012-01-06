@@ -8,9 +8,9 @@ public class SFQuestioner {
 	public final Vector<Question> questions = new Vector<Question>();
 
 	public String ask(Player respondent, String questionMessage,
-			String... answers) {
+			String answer1, String answer2) {
 		final Question question = new Question(respondent, questionMessage,
-				answers);
+				answer1, answer2);
 		questions.add(question);
 		return question.ask();
 	}

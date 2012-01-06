@@ -18,6 +18,7 @@ import net.digiex.simplefeatures.commands.CMDadmin;
 import net.digiex.simplefeatures.commands.CMDcleanup;
 import net.digiex.simplefeatures.commands.CMDclear;
 import net.digiex.simplefeatures.commands.CMDcompasspoint;
+import net.digiex.simplefeatures.commands.CMDenablesfclientaddon;
 import net.digiex.simplefeatures.commands.CMDentities;
 import net.digiex.simplefeatures.commands.CMDhome;
 import net.digiex.simplefeatures.commands.CMDlastseen;
@@ -238,6 +239,8 @@ public class SFPlugin extends JavaPlugin {
 	// }
 	private final ArrayList<UUID> SFWorlds = new ArrayList<UUID>();
 
+	public static ArrayList<String> clientAddons = new ArrayList<String>();
+
 	private void createDefaultConfig() {
 		// Worlds
 		FileConfiguration c = getConfig();
@@ -455,6 +458,8 @@ public class SFPlugin extends JavaPlugin {
 		getCommand("admin").setExecutor(new CMDadmin(this));
 		getCommand("lastseen").setExecutor(new CMDlastseen(this));
 		getCommand("compasspoint").setExecutor(new CMDcompasspoint(this));
+		getCommand("enablesfclientaddon").setExecutor(
+				new CMDenablesfclientaddon(this));
 		setupDatabase();
 		int interval = getConfig().getInt("autosave.interval", 300);
 		log(Level.INFO, ChatColor.AQUA
