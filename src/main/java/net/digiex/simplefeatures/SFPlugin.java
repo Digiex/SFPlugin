@@ -41,6 +41,9 @@ import net.digiex.simplefeatures.commands.CMDworld;
 import net.digiex.simplefeatures.listeners.BListener;
 import net.digiex.simplefeatures.listeners.EListener;
 import net.digiex.simplefeatures.listeners.PListener;
+import net.digiex.simplefeatures.questioner.QuestionsReaper;
+import net.digiex.simplefeatures.questioner.SFQuestioner;
+import net.digiex.simplefeatures.questioner.SFQuestionerPlayerListener;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -53,6 +56,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
+import org.bukkit.event.Event.Type;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
 import org.bukkit.permissions.PermissionAttachment;
@@ -62,11 +66,9 @@ import org.bukkit.util.Vector;
 
 import com.wimbli.WorldBorder.WorldBorder;
 
-import de.diddiz.LogBlockQuestioner.LogBlockQuestioner;
-
 public class SFPlugin extends JavaPlugin {
 
-	public static LogBlockQuestioner questioner;
+	public static SFQuestioner questioner;
 	static final Logger log = Logger.getLogger("Minecraft");
 	public static String pluginName = "SimpleFeatures";
 	public static WorldBorder worldBorderPlugin;
@@ -321,7 +323,7 @@ public class SFPlugin extends JavaPlugin {
 	public void onEnable() {
 		setFilter();
 		PluginManager pm = getServer().getPluginManager();
-		questioner = (LogBlockQuestioner) pm.getPlugin("LogBlockQuestioner");
+		questioner = new SFQuestioner();
 		worldBorderPlugin = (WorldBorder) pm.getPlugin("WorldBorder");
 		// Worlds
 
@@ -422,6 +424,12 @@ public class SFPlugin extends JavaPlugin {
 				Priority.Highest, this);
 		pm.registerEvent(Event.Type.ITEM_SPAWN, entityListener,
 				Priority.Highest, this);
+		getServer().getPluginManager().registerEvent(
+				Type.PLAYER_COMMAND_PREPROCESS,
+				new SFQuestionerPlayerListener(questioner.questions),
+				Priority.Normal, this);
+		getServer().getScheduler().scheduleSyncRepeatingTask(this,
+				new QuestionsReaper(questioner.questions), 15000, 15000);
 		getCommand("home").setExecutor(new CMDhome(this));
 		getCommand("sethome").setExecutor(new CMDsethome(this));
 		getCommand("setspawn").setExecutor(new CMDsetspawn(this));
