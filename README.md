@@ -5,7 +5,7 @@ A Minecraft Server Mod.
 
 Links:
 Bukkit Dev: [http://dev.bukkit.org/server-mods/sfplugin/](http://dev.bukkit.org/server-mods/sfplugin/)
-Source code: [https://github.com/jessenic/SFPlugin](https://github.com/jessenic/SFPlugin) 
+Source code: [https://github.com/jessenic/SFPlugin](https://github.com/jessenic/SFPlugin)
 Bugs/Suggestions: [https://github.com/jessenic/SFPlugin/issues](https://github.com/jessenic/SFPlugin/issues)
 Downloads: [https://github.com/jessenic/SFPlugin/downloads](https://github.com/jessenic/SFPlugin/downloads)
 
