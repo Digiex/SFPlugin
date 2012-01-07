@@ -416,14 +416,23 @@ public class PListener extends PlayerListener {
 
 	@Override
 	public void onPlayerPreLogin(PlayerPreLoginEvent e) {
-		if (!plugin.getServer().getOfflinePlayer(e.getName()).isWhitelisted()) {
-			plugin.getServer().broadcastMessage(
-					ChatColor.YELLOW + e.getName()
-							+ " tried to join, but is not on whitelist!");
-			e.disallow(Result.KICK_WHITELIST, ChatColor.RED
-					+ "Not on whitelist, " + ChatColor.WHITE + " see "
-					+ ChatColor.AQUA + "http://digiex.net/minecraft");
-			return;
+		if (plugin.getConfig().getBoolean("whitelist.enabled", false)) {
+			if (!plugin.getServer().getOfflinePlayer(e.getName())
+					.isWhitelisted()) {
+				plugin.getServer().broadcastMessage(
+						ChatColor.YELLOW + e.getName()
+								+ " tried to join, but is not on whitelist!");
+				e.disallow(
+						Result.KICK_WHITELIST,
+						plugin.getConfig().getString(
+								"whitelist.kickmsg",
+								ChatColor.RED + "Not on whitelist, "
+										+ ChatColor.WHITE + " please ask an "
+										+ ChatColor.AQUA + "admin"
+										+ ChatColor.WHITE
+										+ " to whitelist you."));
+				return;
+			}
 		}
 	}
 

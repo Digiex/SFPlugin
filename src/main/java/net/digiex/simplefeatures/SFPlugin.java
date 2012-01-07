@@ -285,6 +285,14 @@ public class SFPlugin extends JavaPlugin {
 			}
 			c.set("admins", admlist);
 		}
+		if (!c.isSet("whitelist.enabled")) {
+			c.set("whitelist.enabled", false);
+		}
+		if (!c.isSet("whitelist.kickmsg")) {
+			c.set("whitelist.kickmsg", ChatColor.RED + "Not on whitelist, "
+					+ ChatColor.WHITE + " please ask an " + ChatColor.AQUA
+					+ "admin" + ChatColor.WHITE + " to whitelist you.");
+		}
 		saveConfig();
 	}
 
