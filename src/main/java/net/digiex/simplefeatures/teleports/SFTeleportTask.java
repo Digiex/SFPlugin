@@ -138,10 +138,10 @@ public class SFTeleportTask implements Runnable {
 				Thread.sleep(1000);
 				what.sendMessage("1...");
 				if (what != askSubject && askSubject != null) {
-					askSubject.sendMessage("2...");
+					askSubject.sendMessage("1...");
 				}
 				if (who != askSubject && who != what && who != null) {
-					who.sendMessage("2...");
+					who.sendMessage("1...");
 				}
 				Thread.sleep(1000);
 				what.sendMessage("Poof!");
