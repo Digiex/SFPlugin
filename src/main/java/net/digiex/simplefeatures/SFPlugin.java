@@ -465,6 +465,10 @@ public class SFPlugin extends JavaPlugin {
 				Priority.Normal, this);
 		getServer().getScheduler().scheduleSyncRepeatingTask(this,
 				new QuestionsReaper(questioner.questions), 15000, 15000);
+
+		saveConfig();
+		createDefaultConfig();
+
 		setCMDexecutor("home", new CMDhome(this));
 		setCMDexecutor("sethome", new CMDsethome(this));
 		setCMDexecutor("setspawn", new CMDsetspawn(this));
@@ -498,8 +502,6 @@ public class SFPlugin extends JavaPlugin {
 				+ " seconds.");
 		AutoSaveTaskID = getServer().getScheduler().scheduleSyncRepeatingTask(
 				this, new AutoSaveThread(this), interval * 20, interval * 20);
-		saveConfig();
-		createDefaultConfig();
 	}
 
 	public void saveSFInventory(SFInventory inv) {
@@ -515,6 +517,8 @@ public class SFPlugin extends JavaPlugin {
 			} else {
 				getCommand(cmd).setExecutor(new unknownCMDexecutor());
 			}
+		} else {
+			getCommand(cmd).setExecutor(exc);
 		}
 	}
 
