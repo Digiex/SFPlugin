@@ -27,4 +27,5 @@ Links:
 * Source Code: [https://github.com/jessenic/SFClientMod](https://github.com/jessenic/SFClientMod)
 * Bugs/Suggestions: [https://github.com/jessenic/SFClientMod/issues](https://github.com/jessenic/SFClientMod/issues)
 * Downloads: [https://github.com/jessenic/SFClientMod/downloads](https://github.com/jessenic/SFClientMod/downloads)
-* You need Minecraft Coder pack to compile it!
+
+You need Minecraft Coder pack to compile it!
