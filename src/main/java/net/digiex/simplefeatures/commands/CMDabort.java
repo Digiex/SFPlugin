@@ -27,11 +27,13 @@ public class CMDabort implements CommandExecutor {
 		for (BukkitWorker worker : parent.getServer().getScheduler()
 				.getActiveWorkers()) {
 			if (worker.getOwner() instanceof SFPlugin) {
-				if (SFTeleportTask.teleporters.get(cs.getName()).equals(
-						worker.getTaskId())) {
-					found = true;
-					parent.getServer().getScheduler()
-							.cancelTask(worker.getTaskId());
+				if (SFTeleportTask.teleporters.get(cs.getName()) != null) {
+					if (SFTeleportTask.teleporters.get(cs.getName()).equals(
+							worker.getTaskId())) {
+						found = true;
+						parent.getServer().getScheduler()
+								.cancelTask(worker.getTaskId());
+					}
 				}
 			}
 		}

@@ -367,12 +367,15 @@ public class PListener extends PlayerListener {
 			for (BukkitWorker worker : plugin.getServer().getScheduler()
 					.getActiveWorkers()) {
 				if (worker.getOwner() instanceof SFPlugin) {
-					if (SFTeleportTask.teleporters.get(e.getPlayer().getName())
-							.equals(worker.getTaskId())) {
+					if (SFTeleportTask.teleporters.get(e.getPlayer().getName()) != null) {
+						if (SFTeleportTask.teleporters.get(
+								e.getPlayer().getName()).equals(
+								worker.getTaskId())) {
 
-						plugin.getServer().getScheduler()
-								.cancelTask(worker.getTaskId());
+							plugin.getServer().getScheduler()
+									.cancelTask(worker.getTaskId());
 
+						}
 					}
 				}
 			}
@@ -442,12 +445,15 @@ public class PListener extends PlayerListener {
 			for (BukkitWorker worker : plugin.getServer().getScheduler()
 					.getActiveWorkers()) {
 				if (worker.getOwner() instanceof SFPlugin) {
-					if (SFTeleportTask.teleporters.get(e.getPlayer().getName())
-							.equals(worker.getTaskId())) {
+					if (SFTeleportTask.teleporters.get(e.getPlayer().getName()) != null) {
+						if (SFTeleportTask.teleporters.get(
+								e.getPlayer().getName()).equals(
+								worker.getTaskId())) {
 
-						plugin.getServer().getScheduler()
-								.cancelTask(worker.getTaskId());
+							plugin.getServer().getScheduler()
+									.cancelTask(worker.getTaskId());
 
+						}
 					}
 				}
 			}
