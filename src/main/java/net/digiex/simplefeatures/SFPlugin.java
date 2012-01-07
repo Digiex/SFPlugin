@@ -52,6 +52,8 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.WorldCreator;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -69,9 +71,22 @@ import com.wimbli.WorldBorder.WorldBorder;
 
 public class SFPlugin extends JavaPlugin {
 
+	public class unknownCMDexecutor implements CommandExecutor {
+
+		@Override
+		public boolean onCommand(CommandSender sender, Command command,
+				String label, String[] args) {
+			sender.sendMessage(ChatColor.RED
+					+ "This command has been disabled by admin.");
+			return true;
+		}
+
+	}
+
 	public static SFQuestioner questioner;
 	static final Logger log = Logger.getLogger("Minecraft");
 	public static String pluginName = "SimpleFeatures";
+
 	public static WorldBorder worldBorderPlugin;
 
 	public static OfflinePlayer getOfflinePlayer(CommandSender sender,
@@ -144,12 +159,12 @@ public class SFPlugin extends JavaPlugin {
 		return invString;
 	}
 
+	// 2 = loaded with errors int shares =
+	// 0;
+
 	public static void log(Level level, String msg) {
 		log.log(level, "[" + pluginName + "] " + msg);
 	}
-
-	// 2 = loaded with errors int shares =
-	// 0;
 
 	public static List<OfflinePlayer> matchOfflinePlayer(String partialName,
 			SFPlugin plugin) {
@@ -292,6 +307,15 @@ public class SFPlugin extends JavaPlugin {
 			c.set("whitelist.kickmsg", ChatColor.RED + "Not on whitelist, "
 					+ ChatColor.WHITE + " please ask an " + ChatColor.AQUA
 					+ "admin" + ChatColor.WHITE + " to whitelist you.");
+		}
+		if (!c.isSet("commands.disabled")) {
+			List<String> cmdlist = new ArrayList<String>();
+			cmdlist.add("entities");
+			cmdlist.add("random");
+			c.set("commands.disabled", cmdlist);
+		}
+		if (!c.isSet("autosave.interval")) {
+			c.set("autosave.interval", 300);
 		}
 		saveConfig();
 	}
@@ -441,33 +465,32 @@ public class SFPlugin extends JavaPlugin {
 				Priority.Normal, this);
 		getServer().getScheduler().scheduleSyncRepeatingTask(this,
 				new QuestionsReaper(questioner.questions), 15000, 15000);
-		getCommand("home").setExecutor(new CMDhome(this));
-		getCommand("sethome").setExecutor(new CMDsethome(this));
-		getCommand("setspawn").setExecutor(new CMDsetspawn(this));
-		getCommand("listhomes").setExecutor(new CMDlisthomes(this));
-		getCommand("spawn").setExecutor(new CMDspawn(this));
-		getCommand("tpa").setExecutor(new CMDtpa(this));
-		getCommand("tpahere").setExecutor(new CMDtpahere(this));
-		getCommand("tp").setExecutor(new CMDtp(this));
-		getCommand("tphere").setExecutor(new CMDtphere(this));
-		getCommand("world").setExecutor(new CMDworld(this));
-		getCommand("who").setExecutor(new CMDwho(this));
-		getCommand("msg").setExecutor(new CMDmsg(this));
-		getCommand("reply").setExecutor(new CMDreply(this));
-		getCommand("me").setExecutor(new CMDme(this));
-		getCommand("entities").setExecutor(new CMDentities(this));
-		getCommand("abort").setExecutor(new CMDabort(this));
-		getCommand("read").setExecutor(new CMDread(this));
-		getCommand("send").setExecutor(new CMDsend(this));
-		getCommand("sendall").setExecutor(new CMDsendall(this));
-		getCommand("clear").setExecutor(new CMDclear(this));
-		getCommand("cleanup").setExecutor(new CMDcleanup(this));
-		getCommand("random").setExecutor(new CMDrandom(this));
-		getCommand("admin").setExecutor(new CMDadmin(this));
-		getCommand("lastseen").setExecutor(new CMDlastseen(this));
-		getCommand("compasspoint").setExecutor(new CMDcompasspoint(this));
-		getCommand("enablesfclientaddon").setExecutor(
-				new CMDenablesfclientaddon(this));
+		setCMDexecutor("home", new CMDhome(this));
+		setCMDexecutor("sethome", new CMDsethome(this));
+		setCMDexecutor("setspawn", new CMDsetspawn(this));
+		setCMDexecutor("listhomes", new CMDlisthomes(this));
+		setCMDexecutor("spawn", new CMDspawn(this));
+		setCMDexecutor("tpa", new CMDtpa(this));
+		setCMDexecutor("tpahere", new CMDtpahere(this));
+		setCMDexecutor("tp", new CMDtp(this));
+		setCMDexecutor("tphere", new CMDtphere(this));
+		setCMDexecutor("world", new CMDworld(this));
+		setCMDexecutor("who", new CMDwho(this));
+		setCMDexecutor("msg", new CMDmsg(this));
+		setCMDexecutor("reply", new CMDreply(this));
+		setCMDexecutor("me", new CMDme(this));
+		setCMDexecutor("entities", new CMDentities(this));
+		setCMDexecutor("abort", new CMDabort(this));
+		setCMDexecutor("read", new CMDread(this));
+		setCMDexecutor("send", new CMDsend(this));
+		setCMDexecutor("sendall", new CMDsendall(this));
+		setCMDexecutor("clear", new CMDclear(this));
+		setCMDexecutor("cleanup", new CMDcleanup(this));
+		setCMDexecutor("random", new CMDrandom(this));
+		setCMDexecutor("admin", new CMDadmin(this));
+		setCMDexecutor("lastseen", new CMDlastseen(this));
+		setCMDexecutor("compasspoint", new CMDcompasspoint(this));
+		setCMDexecutor("enablesfclientaddon", new CMDenablesfclientaddon(this));
 		setupDatabase();
 		int interval = getConfig().getInt("autosave.interval", 300);
 		log(Level.INFO, ChatColor.AQUA
@@ -481,6 +504,18 @@ public class SFPlugin extends JavaPlugin {
 
 	public void saveSFInventory(SFInventory inv) {
 		getDatabase().save(inv);
+	}
+
+	@SuppressWarnings("unchecked")
+	private void setCMDexecutor(String cmd, CommandExecutor exc) {
+		List<String> disabled = getConfig().getList("commands.disabled");
+		if (disabled != null) {
+			if (!disabled.contains(cmd)) {
+				getCommand(cmd).setExecutor(exc);
+			} else {
+				getCommand(cmd).setExecutor(new unknownCMDexecutor());
+			}
+		}
 	}
 
 	public void setFilter() {
