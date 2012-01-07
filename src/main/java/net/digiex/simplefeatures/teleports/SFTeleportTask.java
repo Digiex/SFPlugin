@@ -52,19 +52,19 @@ public class SFTeleportTask implements Runnable {
 			if (answer == "yes") {
 
 				askSubject.sendMessage("Teleport request accepted");
-				if (what != askSubject) {
+				if (what != askSubject && what != null) {
 					what.sendMessage("Teleport request accepted");
 				}
-				if (who != askSubject && who != what) {
+				if (who != askSubject && who != what && who != null) {
 					who.sendMessage("Teleport request accepted");
 				}
 				startCountDown();
 			} else {
 				askSubject.sendMessage("Teleport request rejected");
-				if (what != askSubject) {
+				if (what != askSubject && what != null) {
 					what.sendMessage("Teleport request rejected");
 				}
-				if (who != askSubject && who != what) {
+				if (who != askSubject && who != what && who != null) {
 					who.sendMessage("Teleport request rejected");
 				}
 			}
@@ -80,84 +80,84 @@ public class SFTeleportTask implements Runnable {
 		if (timer) {
 			try {
 				what.sendMessage(infoMsg + " in 30 seconds.");
-				if (what != askSubject) {
+				if (what != askSubject && askSubject != null) {
 					askSubject
 							.sendMessage("Teleport will happen in 30 seconds.");
 				}
-				if (who != askSubject && who != what) {
+				if (who != askSubject && who != what && who != null) {
 					who.sendMessage("Teleport will happen in 30 seconds.");
 				}
 				Thread.sleep(10000);
 				what.sendMessage("20...");
-				if (what != askSubject) {
+				if (what != askSubject && askSubject != null) {
 					askSubject.sendMessage("20...");
 				}
-				if (who != askSubject && who != what) {
+				if (who != askSubject && who != what && who != null) {
 					who.sendMessage("20...");
 				}
 				Thread.sleep(10000);
 				what.sendMessage("10...");
-				if (what != askSubject) {
+				if (what != askSubject && askSubject != null) {
 					askSubject.sendMessage("10...");
 				}
-				if (who != askSubject && who != what) {
+				if (who != askSubject && who != what && who != null) {
 					who.sendMessage("10...");
 				}
 				Thread.sleep(5000);
 				what.sendMessage("5...");
-				if (what != askSubject) {
+				if (what != askSubject && askSubject != null) {
 					askSubject.sendMessage("5...");
 				}
-				if (who != askSubject && who != what) {
+				if (who != askSubject && who != what && who != null) {
 					who.sendMessage("5...");
 				}
 				Thread.sleep(1000);
 				what.sendMessage("4...");
-				if (what != askSubject) {
+				if (what != askSubject && askSubject != null) {
 					askSubject.sendMessage("4...");
 				}
-				if (who != askSubject && who != what) {
+				if (who != askSubject && who != what && who != null) {
 					who.sendMessage("4...");
 				}
 				Thread.sleep(1000);
 				what.sendMessage("3...");
-				if (what != askSubject) {
+				if (what != askSubject && askSubject != null) {
 					askSubject.sendMessage("3...");
 				}
-				if (who != askSubject && who != what) {
+				if (who != askSubject && who != what && who != null) {
 					who.sendMessage("3...");
 				}
 				Thread.sleep(1000);
 				what.sendMessage("2...");
-				if (what != askSubject) {
+				if (what != askSubject && askSubject != null) {
 					askSubject.sendMessage("2...");
 				}
-				if (who != askSubject && who != what) {
+				if (who != askSubject && who != what && who != null) {
 					who.sendMessage("2...");
 				}
 				Thread.sleep(1000);
 				what.sendMessage("1...");
-				if (what != askSubject) {
+				if (what != askSubject && askSubject != null) {
 					askSubject.sendMessage("2...");
 				}
-				if (who != askSubject && who != what) {
+				if (who != askSubject && who != what && who != null) {
 					who.sendMessage("2...");
 				}
 				Thread.sleep(1000);
 				what.sendMessage("Poof!");
-				if (what != askSubject) {
+				if (what != askSubject && askSubject != null) {
 					askSubject.sendMessage("Poof!");
 				}
-				if (who != askSubject && who != what) {
+				if (who != askSubject && who != what && who != null) {
 					who.sendMessage("Poof!");
 				}
 			} catch (InterruptedException e) {
 				what.sendMessage(infoMsg + ChatColor.RED + " aborted!");
-				if (what != askSubject) {
+				if (what != askSubject && askSubject != null) {
 					askSubject.sendMessage(ChatColor.RED
 							+ "Teleportation aborted!");
 				}
-				if (who != askSubject && who != what) {
+				if (who != askSubject && who != what && who != null) {
 					who.sendMessage(ChatColor.RED + "Teleportation aborted!");
 				}
 				return;
