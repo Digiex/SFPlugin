@@ -87,9 +87,8 @@ commands:
     entities:
         description: Debugging
         usage: |
-               /<command> [world] [clear]
+               /<command> [world]
                Example: /<command> Survival
-               Example: /<command> Survival clear
     abort:
         description: Aborts a teleport
         usage: |
