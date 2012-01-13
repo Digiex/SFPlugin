@@ -1,14 +1,16 @@
 package net.digiex.simplefeatures;
 
-import com.avaje.ebean.validation.NotEmpty;
-import com.avaje.ebean.validation.NotNull;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+
+import com.avaje.ebean.validation.NotEmpty;
+import com.avaje.ebean.validation.NotNull;
 
 @Entity()
 @Table(name = "sf_home")

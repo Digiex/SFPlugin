@@ -10,8 +10,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-public class CMDclear  implements CommandExecutor {
-
+public class CMDclear implements CommandExecutor {
 
 	private SFPlugin plugin;
 
@@ -19,13 +18,12 @@ public class CMDclear  implements CommandExecutor {
 		this.plugin = parent;
 	}
 
-
 	@Override
 	public boolean onCommand(CommandSender sender, Command command,
 			String label, String[] args) {
 		List<SFMail> msgs;
-			msgs = plugin.getDatabase().find(SFMail.class).where()
-					.ieq("toPlayer", sender.getName()).findList();
+		msgs = plugin.getDatabase().find(SFMail.class).where()
+				.ieq("toPlayer", sender.getName()).findList();
 		if (msgs.isEmpty()) {
 			sender.sendMessage(ChatColor.RED + "Nothing to clear!");
 			return true;
@@ -35,10 +33,10 @@ public class CMDclear  implements CommandExecutor {
 				plugin.getDatabase().delete(msg);
 				i++;
 			}
-			sender.sendMessage(ChatColor.YELLOW+"Successfully cleared "+i+" messages.");
+			sender.sendMessage(ChatColor.YELLOW + "Successfully cleared " + i
+					+ " messages.");
 			return true;
 		}
 	}
-
 
 }

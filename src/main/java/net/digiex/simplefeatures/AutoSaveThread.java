@@ -2,7 +2,6 @@ package net.digiex.simplefeatures;
 
 import java.util.logging.Level;
 
-
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 

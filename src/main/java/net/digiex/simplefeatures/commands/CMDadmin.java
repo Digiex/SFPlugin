@@ -24,8 +24,7 @@ public class CMDadmin implements CommandExecutor {
 		if (sender instanceof Player) {
 			Player p = (Player) sender;
 
-			@SuppressWarnings("unchecked")
-			List<String> admins = plugin.getConfig().getList("admins");
+			List<Object> admins = plugin.getConfig().getList("admins");
 			if (admins != null) {
 				if (admins.contains(p.getName())) {
 					p.setOp(!p.isOp());

@@ -508,9 +508,8 @@ public class SFPlugin extends JavaPlugin {
 		getDatabase().save(inv);
 	}
 
-	@SuppressWarnings("unchecked")
 	private void setCMDexecutor(String cmd, CommandExecutor exc) {
-		List<String> disabled = getConfig().getList("commands.disabled");
+		List<Object> disabled = getConfig().getList("commands.disabled");
 		if (disabled != null) {
 			if (!disabled.contains(cmd)) {
 				getCommand(cmd).setExecutor(exc);

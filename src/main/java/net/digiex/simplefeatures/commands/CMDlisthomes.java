@@ -20,7 +20,7 @@ public class CMDlisthomes implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command command,
 			String label, String[] args) {
 		String name = null;
-		if(args.length > 0){
+		if (args.length > 0) {
 			name = args[0];
 		}
 		Player player = SFPlugin.getPlayer(sender, name);
@@ -43,7 +43,7 @@ public class CMDlisthomes implements CommandExecutor {
 				}
 				result += home.getWorldName();
 			}
-			if(player.getBedSpawnLocation() != null){
+			if (player.getBedSpawnLocation() != null) {
 				if (result.length() > 0) {
 					result += ", ";
 				}

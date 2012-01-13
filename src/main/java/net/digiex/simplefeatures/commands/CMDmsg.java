@@ -28,7 +28,8 @@ public class CMDmsg implements CommandExecutor {
 			return false;
 		}
 
-		if (!sender.hasPermission(new Permission("sfp.msg",PermissionDefault.TRUE))) {
+		if (!sender.hasPermission(new Permission("sfp.msg",
+				PermissionDefault.TRUE))) {
 			sender.sendMessage(ChatColor.RED
 					+ "You do not have permission to send private messages");
 			return true;

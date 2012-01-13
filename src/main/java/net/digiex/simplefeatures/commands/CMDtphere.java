@@ -9,32 +9,32 @@ import org.bukkit.entity.Player;
 
 public class CMDtphere implements CommandExecutor {
 
-    SFPlugin plugin;
+	SFPlugin plugin;
 
-    public CMDtphere(SFPlugin parent) {
-        this.plugin = parent;
-    }
+	public CMDtphere(SFPlugin parent) {
+		this.plugin = parent;
+	}
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command,
 			String label, String[] args) {
-		if(sender instanceof Player){
+		if (sender instanceof Player) {
 			Player p = (Player) sender;
 			Player from = null;
 			Player to = p;
-			if(p.isOp()){
-				if(args.length == 1){
+			if (p.isOp()) {
+				if (args.length == 1) {
 					from = SFPlugin.getPlayer(sender, args[0]);
 				}
-				if(from != null && to != null){
+				if (from != null && to != null) {
 					from.teleport(to);
 					sender.sendMessage("Teleported ;)");
 					return true;
 				}
 			} else {
-                            p.sendMessage("Please use /TPAHERE to Teleport players to you");
-                            return true;
-                        }
+				p.sendMessage("Please use /TPAHERE to Teleport players to you");
+				return true;
+			}
 		}
 		return false;
 	}
