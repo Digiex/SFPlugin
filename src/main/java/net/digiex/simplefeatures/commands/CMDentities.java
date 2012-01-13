@@ -7,11 +7,9 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Creature;
-import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.Item;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
@@ -21,7 +19,7 @@ public class CMDentities implements CommandExecutor {
 	SFPlugin plugin;
 
 	public CMDentities(SFPlugin parent) {
-		this.plugin = parent;
+		plugin = parent;
 	}
 
 	@Override
@@ -36,34 +34,12 @@ public class CMDentities implements CommandExecutor {
 					return false;
 				}
 			} else {
-				if (args[0].equalsIgnoreCase("sharks")
-						&& sender instanceof Player) {
-					Player pla = (Player) sender;
-					LivingEntity le = pla.getWorld().spawnCreature(
-							pla.getLocation(), CreatureType.ENDER_DRAGON);
-					if (args.length > 1) {
-						le.setPassenger(SFPlugin.getPlayer(sender, args[1]));
-					}
-					return true;
-				}
 				w = plugin.getServer().getWorld(args[0]);
 			}
 			if (w != null) {
 				if (args.length > 1) {
 					if (args[1].equalsIgnoreCase("clear")) {
-						sender.sendMessage("Clearing "
-								+ w.getEntities().size()
-								+ " in "
-								+ w.getName()
-								+ " (excluding Players and Paintings and Minecarts)");
-						for (Entity e : w.getEntities()) {
-							if (!(e instanceof Player)
-									&& !(e instanceof Painting)
-									&& !(e instanceof Minecart)) {
-								e.remove();
-							}
-						}
-						return true;
+						sender.sendMessage("Clearing has been disabled since it causes too much trouble for players");
 					}
 				}
 				sender.sendMessage("Entities for " + w.getName());

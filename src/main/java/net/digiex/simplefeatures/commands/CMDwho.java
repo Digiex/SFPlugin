@@ -37,6 +37,12 @@ public class CMDwho implements CommandExecutor {
 			PerformPlayerList(sender, args);
 			return true;
 		} else if (args.length == 1) {
+			if (args[0].equals("me")
+					&& sender.hasPermission(new Permission("sfp.whois.self",
+							PermissionDefault.TRUE))) {
+				PerformWhois(sender, new String[] { sender.getName() });
+				return true;
+			}
 			if (!sender.hasPermission(new Permission("sfp.whois",
 					PermissionDefault.OP))) {
 				sender.sendMessage(ChatColor.RED
