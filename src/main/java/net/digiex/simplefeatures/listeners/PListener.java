@@ -7,10 +7,9 @@ import java.util.Set;
 import java.util.logging.Level;
 
 import net.digiex.simplefeatures.SFCompassPoint;
-import net.digiex.simplefeatures.SFHome;
 import net.digiex.simplefeatures.SFInventory;
-import net.digiex.simplefeatures.SFLocation;
 import net.digiex.simplefeatures.SFMail;
+import net.digiex.simplefeatures.SFPlayer;
 import net.digiex.simplefeatures.SFPlugin;
 import net.digiex.simplefeatures.teleports.SFTeleportTask;
 
@@ -58,43 +57,8 @@ public class PListener extends PlayerListener {
 					+ "Do you want to set your home to this bed?", "set",
 					"cancel");
 			if (answer == "set") {
-
-				com.avaje.ebean.EbeanServer db = plugin.getDatabase();
-				db.beginTransaction();
-
-				try {
-					SFHome home = db
-							.find(SFHome.class)
-							.where()
-							.ieq("worldName",
-									player.getLocation().getWorld().getName())
-							.ieq("playerName", player.getName()).findUnique();
-					boolean isUpdate = false;
-
-					if (home == null) {
-						player.sendMessage(ChatColor.YELLOW
-								+ "Home for this world created!");
-
-						home = new SFHome();
-						home.setPlayer(player);
-					} else {
-
-						player.sendMessage(ChatColor.YELLOW
-								+ "Home for this world updated!");
-
-						isUpdate = true;
-					}
-
-					home.setLocation(homeLoc);
-					player.setCompassTarget(homeLoc);
-					if (isUpdate) {
-						db.update(home, homeUpdateProps);
-					}
-					db.save(home);
-					db.commitTransaction();
-				} finally {
-					db.endTransaction();
-				}
+				SFPlayer sfp = new SFPlayer(player, plugin);
+				sfp.setHome(homeLoc);
 			} else {
 				player.sendMessage(ChatColor.GRAY
 						+ "Setting home here cancelled.");
@@ -109,16 +73,6 @@ public class PListener extends PlayerListener {
 
 	public static HashMap<String, Integer> homeTasks = new HashMap<String, Integer>();
 
-	private static final Set<String> homeUpdateProps;
-	static {
-		homeUpdateProps = new HashSet<String>();
-		homeUpdateProps.add("x");
-		homeUpdateProps.add("y");
-		homeUpdateProps.add("z");
-		homeUpdateProps.add("yaw");
-		homeUpdateProps.add("pitch");
-		homeUpdateProps.add("world_name");
-	}
 	private static final Set<String> invUpdateProps;
 	static {
 		invUpdateProps = new HashSet<String>();
@@ -475,19 +429,11 @@ public class PListener extends PlayerListener {
 
 	@Override
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
-		String wname = event.getPlayer().getLocation().getWorld().getName();
-		if (wname.contains("_nether") || wname.contains("_the_end")) {
-			wname = "Survival";
-		}
-		SFHome home = plugin.getDatabase().find(SFHome.class).where()
-				.ieq("worldName", wname)
-				.ieq("playerName", event.getPlayer().getName()).findUnique();
-		if (home != null) {
-			event.setRespawnLocation(home.getLocation());
-		} else {
-			event.setRespawnLocation(plugin.getServer().getWorld(wname)
-					.getSpawnLocation());
-		}
+		SFPlayer sfp = new SFPlayer(event.getPlayer(), plugin);
+		Location homeLoc = sfp.getHomeLoc(event.getPlayer().getWorld());
+		if (homeLoc != null) {
+			event.setRespawnLocation(homeLoc);
+		} // Let vanilla handle setting the location if no home
 		Teleported(event.getPlayer().getWorld(), event.getRespawnLocation()
 				.getWorld(), event.getPlayer(), event);
 	}
@@ -557,36 +503,8 @@ public class PListener extends PlayerListener {
 			if (player.getHealth() > 0
 					&& !(caller instanceof PlayerRespawnEvent)
 					&& player.getLocation().getY() > 1) {
-				com.avaje.ebean.EbeanServer db = plugin.getDatabase();
-				db.beginTransaction();
-
-				try {
-					SFLocation lastLoc = db.find(SFLocation.class).where()
-							.ieq("worldName", from.getName())
-							.ieq("playerName", player.getName()).findUnique();
-					boolean isUpdate = false;
-
-					if (lastLoc == null) {
-						lastLoc = new SFLocation();
-						lastLoc.setPlayerName(player.getName());
-					} else {
-						isUpdate = true;
-					}
-					Location loc = player.getLocation();
-					lastLoc.setX(loc.getX());
-					lastLoc.setY(loc.getY());
-					lastLoc.setZ(loc.getZ());
-					lastLoc.setYaw(loc.getYaw());
-					lastLoc.setPitch(loc.getPitch());
-					lastLoc.setWorldName(loc.getWorld().getName());
-					if (isUpdate) {
-						db.update(lastLoc, homeUpdateProps);
-					}
-					db.save(lastLoc);
-					db.commitTransaction();
-				} finally {
-					db.endTransaction();
-				}
+				SFPlayer sfp = new SFPlayer(player, plugin);
+				sfp.setLastLocation(player.getLocation());
 			}
 			setGameMode(player, to);
 			// updateCompass(player, to);
@@ -594,11 +512,11 @@ public class PListener extends PlayerListener {
 	}
 
 	public void updateCompass(Player p, World toWorld) {
-		SFHome home = plugin.getDatabase().find(SFHome.class).where()
-				.ieq("worldName", toWorld.getName())
-				.ieq("playerName", p.getName()).findUnique();
-		if (home != null) {
-			p.setCompassTarget(home.getLocation());
+
+		SFPlayer sfp = new SFPlayer(p, plugin);
+		Location homeLoc = sfp.getHomeLoc(p.getWorld());
+		if (homeLoc != null) {
+			p.setCompassTarget(homeLoc);
 		} else {
 			p.setCompassTarget(toWorld.getSpawnLocation());
 		}

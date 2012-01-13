@@ -1,8 +1,7 @@
 package net.digiex.simplefeatures.commands;
 
-import net.digiex.simplefeatures.SFLocation;
+import net.digiex.simplefeatures.SFPlayer;
 import net.digiex.simplefeatures.SFPlugin;
-import net.digiex.simplefeatures.teleports.SFTeleportTask;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -60,7 +59,8 @@ public class CMDworld implements CommandExecutor {
 			String label, String[] args) {
 		if (sender instanceof Player) {
 			Player player = (Player) sender;
-			if (SFTeleportTask.teleporters.containsKey(player.getName())) {
+			SFPlayer sfp = new SFPlayer(player, plugin);
+			if (sfp.isTeleporting()) {
 				player.sendMessage(ChatColor.GRAY
 						+ "Teleport already in progress, use /abort to cancel.");
 				return true;
@@ -101,16 +101,9 @@ public class CMDworld implements CommandExecutor {
 							sender.sendMessage("Wait! You need to use Enderportals!!! Oh you're an OP... Sorry, my mistake.");
 						}
 					}
-					SFLocation lastLoc = plugin.getDatabase()
-							.find(SFLocation.class).where()
-							.ieq("worldName", world.getName())
-							.ieq("playerName", player.getName()).findUnique();
-					Location loc = world.getSpawnLocation();
-					if (lastLoc != null) {
-						loc = new Location(plugin.getServer().getWorld(
-								lastLoc.getWorldName()), lastLoc.getX(),
-								lastLoc.getY(), lastLoc.getZ(),
-								lastLoc.getYaw(), lastLoc.getPitch());
+					Location loc = sfp.getLastLocation(world);
+					if (loc == null) {
+						loc = world.getSpawnLocation();
 					}
 					if (SFPlugin.worldBorderPlugin != null) {
 						BorderData bData = SFPlugin.worldBorderPlugin
@@ -123,15 +116,8 @@ public class CMDworld implements CommandExecutor {
 							}
 						}
 					}
-					int taskId = plugin
-							.getServer()
-							.getScheduler()
-							.scheduleAsyncDelayedTask(
-									plugin,
-									new SFTeleportTask(player, player, null,
-											loc, false, null, "Teleporting to "
-													+ world.getName()));
-					SFTeleportTask.teleporters.put(player.getName(), taskId);
+					sfp.teleport(player, null, loc, false, null,
+							"Teleporting to " + world.getName());
 					return true;
 
 				} else if (world == player.getWorld()) {

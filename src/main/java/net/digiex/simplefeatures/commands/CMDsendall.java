@@ -37,17 +37,15 @@ public class CMDsendall implements CommandExecutor {
 		int i = 0;
 
 		for (OfflinePlayer op : parent.getServer().getOfflinePlayers()) {
-			if (op.isWhitelisted()) {
-				SFMail save = new SFMail();
-				save.newMail(sender.getName(), op.getName(), message);
-				parent.getDatabase().save(save);
-				Player p = op.getPlayer();
-				if (p != null) {
-					p.sendMessage(ChatColor.AQUA
-							+ "You have new mail! Type /read to read it!");
-				}
-				i++;
+			SFMail save = new SFMail();
+			save.newMail(sender.getName(), op.getName(), message);
+			parent.getDatabase().save(save);
+			Player p = op.getPlayer();
+			if (p != null) {
+				p.sendMessage(ChatColor.AQUA
+						+ "You have new mail! Type /read to read it!");
 			}
+			i++;
 		}
 		sender.sendMessage("Message sent for " + i + " players.");
 		return true;

@@ -1,7 +1,6 @@
 package net.digiex.simplefeatures.commands;
 
-import java.util.List;
-
+import net.digiex.simplefeatures.SFPlayer;
 import net.digiex.simplefeatures.SFPlugin;
 import net.digiex.simplefeatures.listeners.PListener;
 
@@ -23,38 +22,30 @@ public class CMDadmin implements CommandExecutor {
 			String label, String[] args) {
 		if (sender instanceof Player) {
 			Player p = (Player) sender;
+			SFPlayer sfp = new SFPlayer(p, plugin);
 
-			List<Object> admins = plugin.getConfig().getList("admins");
-			if (admins != null) {
-				if (admins.contains(p.getName())) {
-					p.setOp(!p.isOp());
-					PListener.updatePlayerNameColour(p, plugin);
-					if (p.isOp()) {
-						p.sendMessage(ChatColor.YELLOW
-								+ "Admin mode turned on!");
-						plugin.getServer().broadcastMessage(
-								p.getDisplayName() + ChatColor.GRAY
-										+ " has enabled operator privileges!");
-						p.getWorld().strikeLightningEffect(p.getLocation());
-					} else {
-						p.sendMessage(ChatColor.YELLOW
-								+ "Admin mode turned off!");
-						plugin.getServer().broadcastMessage(
-								p.getDisplayName() + ChatColor.GRAY
-										+ " has disabled operator privileges!");
-						p.getWorld().strikeLightningEffect(p.getLocation());
-					}
-					return true;
+			if (sfp.isAdmin()) {
+				p.setOp(!p.isOp());
+				PListener.updatePlayerNameColour(p, plugin);
+				if (p.isOp()) {
+					p.sendMessage(ChatColor.YELLOW + "Admin mode turned on!");
+					plugin.getServer().broadcastMessage(
+							p.getDisplayName() + ChatColor.GRAY
+									+ " has enabled operator privileges!");
+					p.getWorld().strikeLightningEffect(p.getLocation());
 				} else {
-					sender.sendMessage(ChatColor.RED
-							+ "You are not allowed to do that, sir!");
-					return true;
+					p.sendMessage(ChatColor.YELLOW + "Admin mode turned off!");
+					plugin.getServer().broadcastMessage(
+							p.getDisplayName() + ChatColor.GRAY
+									+ " has disabled operator privileges!");
+					p.getWorld().strikeLightningEffect(p.getLocation());
 				}
+				return true;
 			} else {
-				p.sendMessage(ChatColor.RED + "No admins in config.yml set");
+				sender.sendMessage(ChatColor.RED
+						+ "You are not allowed to do that, sir!");
 				return true;
 			}
-
 		}
 		return false;
 	}

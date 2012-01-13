@@ -1,7 +1,7 @@
 package net.digiex.simplefeatures.commands;
 
+import net.digiex.simplefeatures.SFPlayer;
 import net.digiex.simplefeatures.SFPlugin;
-import net.digiex.simplefeatures.teleports.SFTeleportTask;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -26,7 +26,8 @@ public class CMDspawn implements CommandExecutor {
 			String label, String[] args) {
 		if (sender instanceof Player) {
 			Player player = (Player) sender;
-			if (SFTeleportTask.teleporters.containsKey(player.getName())) {
+			SFPlayer sfp = new SFPlayer(player, plugin);
+			if (sfp.isTeleporting()) {
 				player.sendMessage(ChatColor.GRAY
 						+ "Teleport already in progress, use /abort to Cancel");
 				return true;
@@ -34,7 +35,7 @@ public class CMDspawn implements CommandExecutor {
 			Location spawnLoc = player.getWorld().getSpawnLocation();
 			if (player.getWorld().getName().contains("_nether")
 					|| player.getWorld().getName().contains("_the_end")) {
-				spawnLoc = plugin.getServer().getWorld("Survival")
+				spawnLoc = plugin.getServer().getWorlds().get(0)
 						.getSpawnLocation();
 			}
 			if (args.length > 0) {
@@ -87,15 +88,8 @@ public class CMDspawn implements CommandExecutor {
 					}
 				}
 			}
-			int taskId = plugin
-					.getServer()
-					.getScheduler()
-					.scheduleAsyncDelayedTask(
-							plugin,
-							new SFTeleportTask(player, player, null, spawnLoc,
-									false, null, "Teleporting to spawn of "
-											+ spawnLoc.getWorld().getName()));
-			SFTeleportTask.teleporters.put(player.getName(), taskId);
+			sfp.teleport(player, null, spawnLoc, false, null,
+					"Teleporting to spawn of " + spawnLoc.getWorld().getName());
 
 			return true;
 		}

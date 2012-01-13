@@ -1,7 +1,7 @@
 package net.digiex.simplefeatures.commands;
 
+import net.digiex.simplefeatures.SFPlayer;
 import net.digiex.simplefeatures.SFPlugin;
-import net.digiex.simplefeatures.teleports.SFTeleportTask;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -24,8 +24,9 @@ public class CMDtpa implements CommandExecutor {
 			String label, String[] args) {
 		if (sender instanceof Player) {
 			Player player = (Player) sender;
+			SFPlayer sfp = new SFPlayer(player, plugin);
 			if (args.length > 0) {
-				if (SFTeleportTask.teleporters.containsKey(player.getName())) {
+				if (sfp.isTeleporting()) {
 					player.sendMessage(ChatColor.GRAY
 							+ "Teleport already in progress, use /abort to Cancel");
 					return true;
@@ -49,18 +50,10 @@ public class CMDtpa implements CommandExecutor {
 							}
 						}
 					}
-					int taskId = plugin
-							.getServer()
-							.getScheduler()
-							.scheduleAsyncDelayedTask(
-									plugin,
-									new SFTeleportTask(player, player, to, to
-											.getLocation(), true, player
-											.getDisplayName()
-											+ " wants to teleport to you",
-											"Teleporting to "
-													+ to.getDisplayName()));
-					SFTeleportTask.teleporters.put(player.getName(), taskId);
+					sfp.teleport(player, to, to.getLocation(), true,
+							player.getDisplayName()
+									+ " wants to teleport to you",
+							"Teleporting to " + to.getDisplayName());
 
 					return true;
 				}

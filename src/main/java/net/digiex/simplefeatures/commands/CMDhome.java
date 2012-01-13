@@ -1,10 +1,11 @@
 package net.digiex.simplefeatures.commands;
 
-import net.digiex.simplefeatures.SFHome;
+import net.digiex.simplefeatures.SFPlayer;
 import net.digiex.simplefeatures.SFPlugin;
-import net.digiex.simplefeatures.teleports.SFTeleportTask;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -29,47 +30,34 @@ public class CMDhome implements CommandExecutor {
 		} else {
 			return true;
 		}
-		String homename = player.getLocation().getWorld().getName();
-		if (player.getWorld().getName().contains("_nether")
-				|| player.getWorld().getName().contains("_the_end")) {
-			homename = "Survival";
-		}
+		World homeworld = player.getLocation().getWorld();
 		if (args.length > 0) {
-			homename = args[0];
+			homeworld = plugin.getServer().getWorld(args[0]);
 		}
-		if (SFTeleportTask.teleporters.containsKey(player.getName())) {
+		SFPlayer sfp = new SFPlayer(player, plugin);
+		if (sfp.isTeleporting()) {
 			player.sendMessage(ChatColor.GRAY
 					+ "Teleport already in progress, use /abort to Cancel");
 			return true;
 		}
-		SFHome home = plugin.getDatabase().find(SFHome.class).where()
-				.ieq("worldName", homename).ieq("playerName", player.getName())
-				.findUnique();
-		if (home == null) {
-			sender.sendMessage(ChatColor.RED + "No home for world called "
-					+ homename + "!");
+		Location homeLoc = sfp.getHomeLoc(homeworld);
+		if (homeLoc == null) {
+			sender.sendMessage(ChatColor.RED
+					+ "No home set for this world! Sleep in a bed to set a home.");
 			return true;
 		}
 		if (SFPlugin.worldBorderPlugin != null) {
-			BorderData bData = SFPlugin.worldBorderPlugin.GetWorldBorder(home
-					.getWorldName());
+			BorderData bData = SFPlugin.worldBorderPlugin
+					.GetWorldBorder(homeLoc.getWorld().getName());
 			if (bData != null) {
-				if (!bData.insideBorder(home.getLocation())) {
+				if (!bData.insideBorder(homeLoc)) {
 					player.sendMessage(ChatColor.RED
 							+ "You seem to want to go somewhere, but sadly it's outside of the border.");
 					return true;
 				}
 			}
 		}
-		int taskId = plugin
-				.getServer()
-				.getScheduler()
-				.scheduleAsyncDelayedTask(
-						plugin,
-						new SFTeleportTask(player, player, null, home
-								.getLocation(), false, null,
-								"Teleporting to home"));
-		SFTeleportTask.teleporters.put(player.getName(), taskId);
+		sfp.teleport(homeLoc, "Teleporting to home!");
 		return true;
 	}
 }

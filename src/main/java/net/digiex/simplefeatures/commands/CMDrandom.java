@@ -2,8 +2,8 @@ package net.digiex.simplefeatures.commands;
 
 import java.util.Random;
 
+import net.digiex.simplefeatures.SFPlayer;
 import net.digiex.simplefeatures.SFPlugin;
-import net.digiex.simplefeatures.teleports.SFTeleportTask;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -35,6 +35,7 @@ public class CMDrandom implements CommandExecutor {
 		}
 		if (sender instanceof Player) {
 			final Player p = (Player) sender;
+			SFPlayer sfp = new SFPlayer(p, parent);
 			p.sendMessage(ChatColor.YELLOW
 					+ "Calculating the meaning of life...");
 			final Location l = new Location(p.getWorld(),
@@ -66,16 +67,8 @@ public class CMDrandom implements CommandExecutor {
 								.replace("_", " ");
 					}
 				}
-				int taskId = parent
-						.getServer()
-						.getScheduler()
-						.scheduleAsyncDelayedTask(
-								parent,
-								new SFTeleportTask(p, p, null,
-										hB.getLocation(), false, null,
-										"Teleporting you to some random "
-												+ where));
-				SFTeleportTask.teleporters.put(p.getName(), taskId);
+				sfp.teleport(p, null, hB.getLocation(), false, null,
+						"Teleporting you to some random " + where);
 			} catch (Exception ex) {
 				p.sendMessage(ChatColor.AQUA
 						+ "The gods have spoken, no teleport this time!");
