@@ -40,12 +40,14 @@ import net.digiex.simplefeatures.commands.CMDtphere;
 import net.digiex.simplefeatures.commands.CMDwho;
 import net.digiex.simplefeatures.commands.CMDworld;
 import net.digiex.simplefeatures.listeners.BListener;
+import net.digiex.simplefeatures.listeners.ClientModListener;
 import net.digiex.simplefeatures.listeners.EListener;
 import net.digiex.simplefeatures.listeners.PListener;
 import net.digiex.simplefeatures.questioner.QuestionsReaper;
 import net.digiex.simplefeatures.questioner.SFQuestioner;
 import net.digiex.simplefeatures.questioner.SFQuestionerPlayerListener;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -502,6 +504,10 @@ public class SFPlugin extends JavaPlugin {
 				+ " seconds.");
 		AutoSaveTaskID = getServer().getScheduler().scheduleSyncRepeatingTask(
 				this, new AutoSaveThread(this), interval * 20, interval * 20);
+		Bukkit.getMessenger().registerOutgoingPluginChannel(this,
+				"simplefeatures");
+		Bukkit.getMessenger().registerIncomingPluginChannel(this,
+				"simplefeatures", new ClientModListener(this));
 	}
 
 	public void saveSFInventory(SFInventory inv) {
