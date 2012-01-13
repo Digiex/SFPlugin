@@ -118,12 +118,6 @@ commands:
         usage: |
                /<command> <message>
                Example: /<command> I smell sharks!
-    cleanup:
-        aliases: [clean]
-        description: Remove files for players that are not whitelisted.
-        usage: |
-               /<command>
-               Example: /<command>
     random:
         aliases: [rnd]
         description: Teleports you to a random location.
@@ -148,9 +142,3 @@ commands:
         usage: |
                /<command> <list|remove|add> [pointname]
                Example: /<command> add awesomemountain
-    enablesfclientaddon:
-        aliases:
-        description: Command autoused if you have the addon
-        usage: |
-               /<command>
-               Example: /<command>

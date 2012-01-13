@@ -15,10 +15,8 @@ import javax.persistence.PersistenceException;
 
 import net.digiex.simplefeatures.commands.CMDabort;
 import net.digiex.simplefeatures.commands.CMDadmin;
-import net.digiex.simplefeatures.commands.CMDcleanup;
 import net.digiex.simplefeatures.commands.CMDclear;
 import net.digiex.simplefeatures.commands.CMDcompasspoint;
-import net.digiex.simplefeatures.commands.CMDenablesfclientaddon;
 import net.digiex.simplefeatures.commands.CMDentities;
 import net.digiex.simplefeatures.commands.CMDhome;
 import net.digiex.simplefeatures.commands.CMDlastseen;
@@ -491,12 +489,10 @@ public class SFPlugin extends JavaPlugin {
 		setCMDexecutor("send", new CMDsend(this));
 		setCMDexecutor("sendall", new CMDsendall(this));
 		setCMDexecutor("clear", new CMDclear(this));
-		setCMDexecutor("cleanup", new CMDcleanup(this));
 		setCMDexecutor("random", new CMDrandom(this));
 		setCMDexecutor("admin", new CMDadmin(this));
 		setCMDexecutor("lastseen", new CMDlastseen(this));
 		setCMDexecutor("compasspoint", new CMDcompasspoint(this));
-		setCMDexecutor("enablesfclientaddon", new CMDenablesfclientaddon(this));
 		setupDatabase();
 		int interval = getConfig().getInt("autosave.interval", 300);
 		log(Level.INFO, ChatColor.AQUA
