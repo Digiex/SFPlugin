@@ -26,7 +26,7 @@ public class CMDtpahere implements CommandExecutor {
 			Player player = (Player) sender;
 			if (args.length > 0) {
 				Player to = SFPlugin.getPlayer(sender, args[0]);
-				SFPlayer sfp = new SFPlayer(to, plugin);
+				SFPlayer sfp = new SFPlayer(to);
 				if (to != null) {
 					if (sfp.isTeleporting()) {
 						player.sendMessage(ChatColor.GRAY + to.getDisplayName()

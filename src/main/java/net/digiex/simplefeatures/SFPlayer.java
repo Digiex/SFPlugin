@@ -10,6 +10,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.json.simple.JSONObject;
 
 public class SFPlayer {
 	Player player;
@@ -27,9 +28,10 @@ public class SFPlayer {
 		homeUpdateProps.add("world_name");
 	}
 
-	public SFPlayer(Player player, SFPlugin plugin) {
+	public SFPlayer(Player player) {
 		this.player = player;
-		this.plugin = plugin;
+		plugin = ((SFPlugin) player.getServer().getPluginManager()
+				.getPlugin("SimpleFeatures"));
 	}
 
 	public SFHome getHome(World world) {
@@ -153,6 +155,21 @@ public class SFPlayer {
 		} finally {
 			db.endTransaction();
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public void showYesNoGui(String line1, String line2, String button1text,
+			String button2text, String button1command, String button2command) {
+		JSONObject msg = new JSONObject();
+		msg.put("id", "yesno");
+		msg.put("l1", line1);
+		msg.put("l2", line2);
+		msg.put("b1", button1text);
+		msg.put("b2", button2text);
+		msg.put("b1c", button1command);
+		msg.put("b2c", button2command);
+		player.sendPluginMessage(plugin, "simplefeatures", msg.toJSONString()
+				.getBytes());
 	}
 
 	public void teleport(Location to) {

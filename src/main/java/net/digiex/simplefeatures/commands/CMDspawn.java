@@ -26,7 +26,7 @@ public class CMDspawn implements CommandExecutor {
 			String label, String[] args) {
 		if (sender instanceof Player) {
 			Player player = (Player) sender;
-			SFPlayer sfp = new SFPlayer(player, plugin);
+			SFPlayer sfp = new SFPlayer(player);
 			if (sfp.isTeleporting()) {
 				player.sendMessage(ChatColor.GRAY
 						+ "Teleport already in progress, use /abort to Cancel");

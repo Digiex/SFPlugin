@@ -22,7 +22,7 @@ public class CMDadmin implements CommandExecutor {
 			String label, String[] args) {
 		if (sender instanceof Player) {
 			Player p = (Player) sender;
-			SFPlayer sfp = new SFPlayer(p, plugin);
+			SFPlayer sfp = new SFPlayer(p);
 
 			if (sfp.isAdmin()) {
 				p.setOp(!p.isOp());

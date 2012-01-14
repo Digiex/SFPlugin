@@ -57,7 +57,7 @@ public class PListener extends PlayerListener {
 					+ "Do you want to set your home to this bed?", "set",
 					"cancel");
 			if (answer == "set") {
-				SFPlayer sfp = new SFPlayer(player, plugin);
+				SFPlayer sfp = new SFPlayer(player);
 				sfp.setHome(homeLoc);
 			} else {
 				player.sendMessage(ChatColor.GRAY
@@ -429,7 +429,7 @@ public class PListener extends PlayerListener {
 
 	@Override
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
-		SFPlayer sfp = new SFPlayer(event.getPlayer(), plugin);
+		SFPlayer sfp = new SFPlayer(event.getPlayer());
 		Location homeLoc = sfp.getHomeLoc(event.getPlayer().getWorld());
 		if (homeLoc != null) {
 			event.setRespawnLocation(homeLoc);
@@ -503,7 +503,7 @@ public class PListener extends PlayerListener {
 			if (player.getHealth() > 0
 					&& !(caller instanceof PlayerRespawnEvent)
 					&& player.getLocation().getY() > 1) {
-				SFPlayer sfp = new SFPlayer(player, plugin);
+				SFPlayer sfp = new SFPlayer(player);
 				sfp.setLastLocation(player.getLocation());
 			}
 			setGameMode(player, to);
@@ -513,7 +513,7 @@ public class PListener extends PlayerListener {
 
 	public void updateCompass(Player p, World toWorld) {
 
-		SFPlayer sfp = new SFPlayer(p, plugin);
+		SFPlayer sfp = new SFPlayer(p);
 		Location homeLoc = sfp.getHomeLoc(p.getWorld());
 		if (homeLoc != null) {
 			p.setCompassTarget(homeLoc);

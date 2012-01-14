@@ -28,7 +28,7 @@ public class CMDsethome implements CommandExecutor {
 				player.sendMessage(ChatColor.RED + "Use a bed to set a home!");
 				return true;
 			}
-			SFPlayer sfp = new SFPlayer(player, plugin);
+			SFPlayer sfp = new SFPlayer(player);
 			sfp.setHome(player.getLocation());
 			return true;
 		}

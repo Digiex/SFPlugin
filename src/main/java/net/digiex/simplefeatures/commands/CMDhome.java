@@ -34,7 +34,7 @@ public class CMDhome implements CommandExecutor {
 		if (args.length > 0) {
 			homeworld = plugin.getServer().getWorld(args[0]);
 		}
-		SFPlayer sfp = new SFPlayer(player, plugin);
+		SFPlayer sfp = new SFPlayer(player);
 		if (sfp.isTeleporting()) {
 			player.sendMessage(ChatColor.GRAY
 					+ "Teleport already in progress, use /abort to Cancel");

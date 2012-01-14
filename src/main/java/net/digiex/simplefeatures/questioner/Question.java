@@ -1,6 +1,6 @@
 package net.digiex.simplefeatures.questioner;
 
-import net.digiex.simplefeatures.SFPlugin;
+import net.digiex.simplefeatures.SFPlayer;
 
 import org.bukkit.entity.Player;
 
@@ -24,16 +24,10 @@ class Question {
 	}
 
 	synchronized String ask() {
-		if (SFPlugin.clientAddons.contains(respondent.getName())) {
-			respondent.sendRawMessage("§1§1§2/askgui");
-			respondent.sendRawMessage("§1§1§2/msg1=" + questionMessage);
-			respondent
-					.sendRawMessage("§1§1§2/msg2=Please click one of the buttons below.");
-			respondent.sendRawMessage("§1§1§2/btn1=" + answer1.toUpperCase());
-			respondent.sendRawMessage("§1§1§2/btn1cmd=" + answer1);
-			respondent.sendRawMessage("§1§1§2/btn2=" + answer2.toUpperCase());
-			respondent.sendRawMessage("§1§1§2/btn2cmd=" + answer2);
-		}
+		SFPlayer sfp = new SFPlayer(respondent);
+		sfp.showYesNoGui(questionMessage,
+				"Please click one of the buttons below", answer1.toUpperCase(),
+				answer2.toUpperCase(), answer1, answer2);
 		final StringBuilder options = new StringBuilder();
 		options.append("/" + answer1 + ", ");
 		options.append("/" + answer2 + ", ");

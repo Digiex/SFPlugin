@@ -24,7 +24,7 @@ public class CMDtpa implements CommandExecutor {
 			String label, String[] args) {
 		if (sender instanceof Player) {
 			Player player = (Player) sender;
-			SFPlayer sfp = new SFPlayer(player, plugin);
+			SFPlayer sfp = new SFPlayer(player);
 			if (args.length > 0) {
 				if (sfp.isTeleporting()) {
 					player.sendMessage(ChatColor.GRAY
