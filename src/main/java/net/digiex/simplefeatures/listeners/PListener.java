@@ -110,7 +110,7 @@ public class PListener extends PlayerListener {
 			p.setDisplayName(ChatColor.GREEN + p.getName() + ChatColor.WHITE);
 		}
 		String plistname = p.getDisplayName();
-		if (plistname.length() < 17) {
+		if (ChatColor.stripColor(plistname).length() < 17) {
 			p.setPlayerListName(plistname);
 		}
 	}
