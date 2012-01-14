@@ -254,7 +254,7 @@ public class SFPlugin extends JavaPlugin {
 	// }
 	private final ArrayList<UUID> SFWorlds = new ArrayList<UUID>();
 
-	public static ArrayList<String> clientAddons = new ArrayList<String>();
+	public static HashMap<String, Double> clientAddons = new HashMap<String, Double>();
 
 	private void createDefaultConfig() {
 		// Worlds
