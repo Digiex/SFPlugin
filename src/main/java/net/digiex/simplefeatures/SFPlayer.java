@@ -1,5 +1,6 @@
 package net.digiex.simplefeatures;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -32,6 +33,13 @@ public class SFPlayer {
 		this.player = player;
 		plugin = ((SFPlugin) player.getServer().getPluginManager()
 				.getPlugin("SimpleFeatures"));
+	}
+
+	public double getClientModVersion() {
+		if (!hasClientMod()) {
+			return 0;
+		}
+		return SFPlugin.clientAddons.get(player.getName());
 	}
 
 	public SFHome getHome(World world) {
@@ -69,6 +77,10 @@ public class SFPlayer {
 
 	public Player getPlayer() {
 		return player;
+	}
+
+	public boolean hasClientMod() {
+		return SFPlugin.clientAddons.containsKey(player.getName());
 	}
 
 	public boolean isAdmin() {
@@ -155,6 +167,25 @@ public class SFPlayer {
 		} finally {
 			db.endTransaction();
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public void showMailboxGui(List<SFMail> maillist) {
+		JSONObject msg = new JSONObject();
+		msg.put("id", "mailbox");
+		List<JSONObject> mails = new ArrayList<JSONObject>();
+
+		for (SFMail mail : maillist) {
+			JSONObject mailobj = new JSONObject();
+			mailobj.put("id", mail.getId());
+			mailobj.put("from", mail.getFromPlayer());
+			mailobj.put("message", mail.getMessage());
+			mailobj.put("timestamp", mail.getTimestamp());
+			mails.add(mailobj);
+		}
+		msg.put("mails", mails);
+		player.sendPluginMessage(plugin, "simplefeatures", msg.toJSONString()
+				.getBytes());
 	}
 
 	@SuppressWarnings("unchecked")

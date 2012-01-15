@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import net.digiex.simplefeatures.SFMail;
+import net.digiex.simplefeatures.SFPlayer;
 import net.digiex.simplefeatures.SFPlugin;
 
 import org.bukkit.ChatColor;
@@ -12,6 +13,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 public class CMDread implements CommandExecutor {
 
@@ -38,7 +40,13 @@ public class CMDread implements CommandExecutor {
 		msgs = plugin.getDatabase().find(SFMail.class).where()
 				.ieq("toPlayer", sender.getName()).orderBy("timestamp DESC")
 				.findList();
-
+		if (sender instanceof Player) {
+			SFPlayer sfp = new SFPlayer((Player) sender);
+			if (sfp.hasClientMod() && sfp.getClientModVersion() > 0.2) {
+				sfp.showMailboxGui(msgs);
+				return true;
+			}
+		}
 		if (msgs.isEmpty()) {
 			sender.sendMessage(ChatColor.RED + "Your mailbox is empty.");
 			return true;

@@ -170,9 +170,7 @@ public class SFPlugin extends JavaPlugin {
 			SFPlugin plugin) {
 		Set<OfflinePlayer> players = new HashSet<OfflinePlayer>();
 		for (OfflinePlayer op : plugin.getServer().getOfflinePlayers()) {
-			if (op.isWhitelisted()) {
-				players.add(op);
-			}
+			players.add(op);
 		}
 
 		List<OfflinePlayer> matchedOfflinePlayers = new ArrayList<OfflinePlayer>();
