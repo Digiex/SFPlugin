@@ -30,9 +30,15 @@ public class ClientModListener implements PluginMessageListener {
 			String id = ((String) json.get("id"));
 			if (id.equalsIgnoreCase("login")) {
 				double version = (Double) json.get("version");
+				String lang = (String) json.get("lang");
+				if (lang == null) {
+					lang = "en_US";
+				}
 				SFPlugin.clientAddons.put(player.getName(), version);
+				SFPlugin.playerLangs.put(player.getName(), lang);
 				SFPlugin.log(Level.INFO, player.getName()
-						+ " has the SFClientMod version " + version);
+						+ " has the SFClientMod version " + version
+						+ ", using language " + lang);
 			} else if (id.equalsIgnoreCase("sendmail")) {
 				if (!player.hasPermission(new Permission("sfp.msg",
 						PermissionDefault.TRUE))) {

@@ -62,6 +62,14 @@ public class SFPlayer {
 		return null;
 	}
 
+	public String getLanguage() {
+		String lang = SFPlugin.playerLangs.get(player.getName());
+		if (lang != null) {
+			return lang;
+		}
+		return "en_US";
+	}
+
 	public Location getLastLocation(World world) {
 		SFLocation lastLoc = plugin.getDatabase().find(SFLocation.class)
 				.where().ieq("worldName", world.getName())

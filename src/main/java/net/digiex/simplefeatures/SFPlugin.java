@@ -1,5 +1,8 @@
 package net.digiex.simplefeatures;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -55,7 +58,9 @@ import org.bukkit.WorldCreator;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
@@ -253,6 +258,9 @@ public class SFPlugin extends JavaPlugin {
 	private final ArrayList<UUID> SFWorlds = new ArrayList<UUID>();
 
 	public static HashMap<String, Double> clientAddons = new HashMap<String, Double>();
+	public static HashMap<String, String> playerLangs = new HashMap<String, String>();
+
+	YamlConfiguration permsConfig;
 
 	private void createDefaultConfig() {
 		// Worlds
@@ -316,6 +324,30 @@ public class SFPlugin extends JavaPlugin {
 			c.set("autosave.interval", 300);
 		}
 		saveConfig();
+		if (permsConfig == null) {
+			permsConfig = new YamlConfiguration();
+		}
+		try {
+			permsConfig.load(new File(getDataFolder(), "permissions.yml"));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			// e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			// e.printStackTrace();
+		} catch (InvalidConfigurationException e) {
+			// TODO Auto-generated catch block
+			// e.printStackTrace();
+		}
+		permsConfig
+				.options()
+				.header("This file is not used yet, but it will be for handling permissions");
+		try {
+			permsConfig.save(new File(getDataFolder(), "permissions.yml"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			// e.printStackTrace();
+		}
 	}
 
 	@Override

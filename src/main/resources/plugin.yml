@@ -1,6 +1,6 @@
 name: SimpleFeatures
 main: net.digiex.simplefeatures.SFPlugin
-version: 1.0.3
+version: 1.0.4
 description: Basic commands and features
 author: jessenic
 website: http://digiex.net/
