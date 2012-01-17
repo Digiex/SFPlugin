@@ -230,4 +230,13 @@ public class SFPlayer {
 								question, infoMsg));
 		SFTeleportTask.teleporters.put(player.getName(), taskId);
 	}
+
+	public String translateString(String node) {
+		return SFTranslation.getInstance().translateKey(node, getLanguage());
+	}
+
+	public String translateStringFormat(String node, Object... args) {
+		return SFTranslation.getInstance().translateKeyFormat(node,
+				getLanguage(), args);
+	}
 }

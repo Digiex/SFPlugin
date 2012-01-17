@@ -6,7 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.digiex.simplefeatures.SFPlayer;
 import net.digiex.simplefeatures.SFPlugin;
+import net.digiex.simplefeatures.SFTranslation;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -26,47 +28,53 @@ public class CMDwho implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command command,
 			String label, String[] args) {
+		String langid = "en_US";
+		if (sender instanceof Player) {
+			langid = new SFPlayer((Player) sender).getLanguage();
+		}
+		SFTranslation t = SFTranslation.getInstance();
 		if (args.length == 0) {
 			if (!sender.hasPermission(new Permission("sfp.who",
 					PermissionDefault.TRUE))) {
 				sender.sendMessage(ChatColor.RED
-						+ "You do not have permission to view the online players");
+						+ t.translateKey("general.nopermission", langid));
 				return true;
 			}
 
-			PerformPlayerList(sender, args);
+			PerformPlayerList(sender, args, langid);
 			return true;
 		} else if (args.length == 1) {
 			if (args[0].equals("me")
 					&& sender.hasPermission(new Permission("sfp.whois.self",
 							PermissionDefault.TRUE))) {
-				PerformWhois(sender, new String[] { sender.getName() });
+				PerformWhois(sender, new String[] { sender.getName() }, langid);
 				return true;
 			}
 			if (!sender.hasPermission(new Permission("sfp.whois",
 					PermissionDefault.OP))) {
 				sender.sendMessage(ChatColor.RED
-						+ "You do not have permission to view their details");
+						+ t.translateKey("general.nopermission", langid));
 				return true;
 			}
 
-			PerformWhois(sender, args);
+			PerformWhois(sender, args, langid);
 			return true;
 		}
 
 		return false;
 	}
 
-	private void PerformPlayerList(CommandSender sender, String[] args) {
-		StringBuilder online = new StringBuilder();
-		online.append(ChatColor.BLUE).append("There are ")
-				.append(ChatColor.RED)
-				.append(plugin.getServer().getOnlinePlayers().length);
-		online.append(ChatColor.BLUE).append(" out of a maximum ")
-				.append(ChatColor.RED)
-				.append(plugin.getServer().getMaxPlayers());
-		online.append(ChatColor.BLUE).append(" players online.");
-		sender.sendMessage(online.toString());
+	private void PerformPlayerList(CommandSender sender, String[] args,
+			String langid) {
+		SFTranslation t = SFTranslation.getInstance();
+		sender.sendMessage(ChatColor.BLUE
+				+ t.translateKeyFormat(
+						"who.header",
+						langid,
+						(ChatColor.RED + ""
+								+ plugin.getServer().getOnlinePlayers().length + ChatColor.BLUE),
+						ChatColor.RED + "" + plugin.getServer().getMaxPlayers()
+								+ ChatColor.BLUE));
 
 		Map<String, List<Player>> sort = new HashMap<String, List<Player>>();
 		for (Player p : plugin.getServer().getOnlinePlayers()) {
@@ -97,10 +105,12 @@ public class CMDwho implements CommandExecutor {
 					first = false;
 				}
 				if (player.isSleeping()) {
-					groupString.append(ChatColor.GRAY + "[SLEEPING]");
+					groupString.append(ChatColor.GRAY + "["
+							+ t.translateKey("who.sleeping", langid) + "]");
 				}
 				if (player.isSleepingIgnored()) {
-					groupString.append(ChatColor.GRAY + "[AFK]");
+					groupString.append(ChatColor.GRAY + "["
+							+ t.translateKey("who.afk", langid) + "]");
 				}
 				groupString.append(ChatColor.WHITE + player.getDisplayName());
 				groupString.append(ChatColor.WHITE);
@@ -110,7 +120,8 @@ public class CMDwho implements CommandExecutor {
 
 	}
 
-	private void PerformWhois(CommandSender sender, String[] args) {
+	private void PerformWhois(CommandSender sender, String[] args, String langid) {
+		SFTranslation t = SFTranslation.getInstance();
 		String name = null;
 		if (args.length > 0) {
 			name = args[0];
@@ -119,19 +130,25 @@ public class CMDwho implements CommandExecutor {
 
 		if (player != null) {
 
-			sender.sendMessage("------ WHOIS report ------");
+			sender.sendMessage("------ " + t.translateKey("who.whois", langid)
+					+ " ------");
 			if (!ChatColor.stripColor(player.getDisplayName())
 					.equalsIgnoreCase(player.getName())) {
-				sender.sendMessage("Username: " + player.getName());
+				sender.sendMessage(t.translateKey("who.username", langid) + " "
+						+ player.getName());
 			}
-			sender.sendMessage("Display Name: " + player.getDisplayName());
-			sender.sendMessage("World: " + player.getWorld().getName());
+			sender.sendMessage(t.translateKey("who.displayname", langid) + " "
+					+ player.getDisplayName());
+			sender.sendMessage(t.translateKey("who.world", langid) + " "
+					+ player.getWorld().getName());
 			sender.sendMessage("IP: "
 					+ player.getAddress().getAddress().getHostAddress());
-			sender.sendMessage("Health: " + player.getHealth() + "/20");
-			sender.sendMessage("Food: " + player.getFoodLevel() + "/20");
-			sender.sendMessage("Location: " + "x"
-					+ player.getLocation().getBlockX() + ", y"
+			sender.sendMessage(t.translateKey("who.health", langid) + ": "
+					+ player.getHealth() + "/20");
+			sender.sendMessage(t.translateKey("who.food", langid) + ": "
+					+ player.getFoodLevel() + "/20");
+			sender.sendMessage(t.translateKey("who.location", langid) + ": "
+					+ "x" + player.getLocation().getBlockX() + ", y"
 					+ player.getLocation().getBlockY() + ", z"
 					+ player.getLocation().getBlockZ());
 

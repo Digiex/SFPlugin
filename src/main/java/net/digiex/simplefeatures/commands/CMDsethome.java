@@ -23,12 +23,13 @@ public class CMDsethome implements CommandExecutor {
 			String label, String[] args) {
 		if (sender instanceof Player) {
 			Player player = (Player) sender;
+			SFPlayer sfp = new SFPlayer(player);
 			if (!player.hasPermission(new Permission("sf.sethome",
 					PermissionDefault.OP))) {
-				player.sendMessage(ChatColor.RED + "Use a bed to set a home!");
+				player.sendMessage(ChatColor.RED
+						+ sfp.translateString("sethome.usebed"));
 				return true;
 			}
-			SFPlayer sfp = new SFPlayer(player);
 			sfp.setHome(player.getLocation());
 			return true;
 		}

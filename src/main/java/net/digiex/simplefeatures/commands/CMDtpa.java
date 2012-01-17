@@ -28,32 +28,34 @@ public class CMDtpa implements CommandExecutor {
 			if (args.length > 0) {
 				if (sfp.isTeleporting()) {
 					player.sendMessage(ChatColor.GRAY
-							+ "Teleport already in progress, use /abort to Cancel");
+							+ sfp.translateString("teleport.inprogress"));
 					return true;
 				}
 				Player to = plugin.getServer().getPlayer(args[0]);
 				if (to != null) {
 					if (player.getName().equals(to.getName())) {
 						player.sendMessage(ChatColor.GRAY
-								+ "You cannot teleport to yourself, silly.");
+								+ sfp.translateString("teleport.cannottptoself"));
 						return true;
 					}
-					player.sendMessage(ChatColor.GRAY + "Requesting!");
+					player.sendMessage(ChatColor.GRAY
+							+ sfp.translateString("teleport.requesting"));
 					if (SFPlugin.worldBorderPlugin != null) {
 						BorderData bData = SFPlugin.worldBorderPlugin
 								.GetWorldBorder(to.getWorld().getName());
 						if (bData != null) {
 							if (!bData.insideBorder(to.getLocation())) {
 								player.sendMessage(ChatColor.RED
-										+ "You seem to want to go somewhere, but sadly it's outside of the border.");
+										+ sfp.translateString("teleport.outsideofborder"));
 								return true;
 							}
 						}
 					}
 					sfp.teleport(player, to, to.getLocation(), true,
-							player.getDisplayName()
-									+ " wants to teleport to you",
-							"Teleporting to " + to.getDisplayName());
+							new SFPlayer(to).translateStringFormat(
+									"teleport.tpa", player.getDisplayName()),
+							sfp.translateStringFormat("teleport.tpingto",
+									to.getDisplayName()));
 
 					return true;
 				}

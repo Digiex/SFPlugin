@@ -37,13 +37,13 @@ public class CMDhome implements CommandExecutor {
 		SFPlayer sfp = new SFPlayer(player);
 		if (sfp.isTeleporting()) {
 			player.sendMessage(ChatColor.GRAY
-					+ "Teleport already in progress, use /abort to Cancel");
+					+ sfp.translateString("teleport.inprogress"));
 			return true;
 		}
 		Location homeLoc = sfp.getHomeLoc(homeworld);
 		if (homeLoc == null) {
 			sender.sendMessage(ChatColor.RED
-					+ "No home set for this world! Sleep in a bed to set a home.");
+					+ sfp.translateString("home.nohome"));
 			return true;
 		}
 		if (SFPlugin.worldBorderPlugin != null) {
@@ -52,12 +52,13 @@ public class CMDhome implements CommandExecutor {
 			if (bData != null) {
 				if (!bData.insideBorder(homeLoc)) {
 					player.sendMessage(ChatColor.RED
-							+ "You seem to want to go somewhere, but sadly it's outside of the border.");
+							+ sfp.translateString("teleport.outsideofborder"));
 					return true;
 				}
 			}
 		}
-		sfp.teleport(homeLoc, "Teleporting to home!");
+		sfp.teleport(homeLoc,
+				ChatColor.YELLOW + sfp.translateString("home.tpingto"));
 		return true;
 	}
 }

@@ -2,9 +2,10 @@ package net.digiex.simplefeatures.teleports;
 
 import java.util.HashMap;
 
+import net.digiex.simplefeatures.SFPlayer;
 import net.digiex.simplefeatures.SFPlugin;
+import net.digiex.simplefeatures.SFTranslation;
 
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -17,11 +18,15 @@ public class SFTeleportTask implements Runnable {
 	private final Player what;
 	// to
 	private final Location where;
+	private final Player askSubject;
+	private final String whoLang;
+	private final String whatLang;
+	private final String askSubjectLang;
+	private final SFTranslation t = SFTranslation.getInstance();
 	private final boolean ask;
 	private final String question;
 	private final String infoMsg;
 	private boolean timer;
-	private final Player askSubject;
 	public static HashMap<String, Integer> teleporters = new HashMap<String, Integer>();
 
 	public SFTeleportTask(Player who, Player what, Player askSubject,
@@ -40,6 +45,21 @@ public class SFTeleportTask implements Runnable {
 		} else {
 			timer = true;
 		}
+		if (who != null) {
+			whoLang = new SFPlayer(who).getLanguage();
+		} else {
+			whoLang = "en_US";
+		}
+		if (what != null) {
+			whatLang = new SFPlayer(what).getLanguage();
+		} else {
+			whatLang = "en_US";
+		}
+		if (askSubject != null) {
+			askSubjectLang = new SFPlayer(askSubject).getLanguage();
+		} else {
+			askSubjectLang = "en_US";
+		}
 	}
 
 	@Override
@@ -50,23 +70,10 @@ public class SFTeleportTask implements Runnable {
 					teleporters.get(what.getName()));
 			answer = SFPlugin.questioner.ask(askSubject, question, "yes", "no");
 			if (answer == "yes") {
-
-				askSubject.sendMessage("Teleport request accepted");
-				if (what != askSubject && what != null) {
-					what.sendMessage("Teleport request accepted");
-				}
-				if (who != askSubject && who != what && who != null) {
-					who.sendMessage("Teleport request accepted");
-				}
+				sendLocMsgto3("teleport.accepted");
 				startCountDown();
 			} else {
-				askSubject.sendMessage("Teleport request rejected");
-				if (what != askSubject && what != null) {
-					what.sendMessage("Teleport request rejected");
-				}
-				if (who != askSubject && who != what && who != null) {
-					who.sendMessage("Teleport request rejected");
-				}
+				sendLocMsgto3("teleport.rejected");
 			}
 			teleporters.remove(askSubject.getName());
 		} else {
@@ -76,16 +83,28 @@ public class SFTeleportTask implements Runnable {
 		teleporters.remove(what.getName());
 	}
 
+	public void sendLocMsgto3(String node) {
+		what.sendMessage(t.translateKey(node, whatLang));
+		if (what != askSubject && askSubject != null) {
+			askSubject.sendMessage(t.translateKey(node, askSubjectLang));
+		}
+		if (who != askSubject && who != what && who != null) {
+			who.sendMessage(t.translateKey(node, whoLang));
+		}
+	}
+
 	private void startCountDown() {
 		if (timer) {
 			try {
-				what.sendMessage(infoMsg + " in 30 seconds.");
+				what.sendMessage(infoMsg + " "
+						+ t.translateKeyFormat("teleport.intime", whatLang, 30));
 				if (what != askSubject && askSubject != null) {
-					askSubject
-							.sendMessage("Teleport will happen in 30 seconds.");
+					askSubject.sendMessage(t.translateKeyFormat(
+							"teleport.counterstart", askSubjectLang, 30));
 				}
 				if (who != askSubject && who != what && who != null) {
-					who.sendMessage("Teleport will happen in 30 seconds.");
+					who.sendMessage(t.translateKeyFormat(
+							"teleport.counterstart", whoLang, 30));
 				}
 				Thread.sleep(10000);
 				what.sendMessage("20...");
@@ -144,22 +163,9 @@ public class SFTeleportTask implements Runnable {
 					who.sendMessage("1...");
 				}
 				Thread.sleep(1000);
-				what.sendMessage("Poof!");
-				if (what != askSubject && askSubject != null) {
-					askSubject.sendMessage("Poof!");
-				}
-				if (who != askSubject && who != what && who != null) {
-					who.sendMessage("Poof!");
-				}
+				sendLocMsgto3("teleport.poof");
 			} catch (InterruptedException e) {
-				what.sendMessage(infoMsg + ChatColor.RED + " aborted!");
-				if (what != askSubject && askSubject != null) {
-					askSubject.sendMessage(ChatColor.RED
-							+ "Teleportation aborted!");
-				}
-				if (who != askSubject && who != what && who != null) {
-					who.sendMessage(ChatColor.RED + "Teleportation aborted!");
-				}
+				sendLocMsgto3("teleport.aborted");
 				return;
 			}
 		} else {

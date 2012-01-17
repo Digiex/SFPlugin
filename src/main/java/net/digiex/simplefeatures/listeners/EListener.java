@@ -31,18 +31,23 @@ public class EListener extends EntityListener {
 		if (e.getCause() == DamageCause.VOID) {
 			if (ent.getLocation().getBlock().getBiome() == Biome.SKY) {
 				Location l = ent.getLocation();
-				l.setWorld(plugin.getServer().getWorld(
-						l.getWorld().getName().replace("_the_end", "")));
+				String mainWorld = l.getWorld().getName()
+						.replace("_the_end", "");
+				l.setWorld(plugin.getServer().getWorld(mainWorld));
 				l.setY(200);
 				if (SFPlugin.worldBorderPlugin != null) {
-					if (SFPlugin.worldBorderPlugin.GetWorldBorder("Survival") != null) {
+					if (SFPlugin.worldBorderPlugin.GetWorldBorder(mainWorld) != null) {
 						if (!SFPlugin.worldBorderPlugin.GetWorldBorder(
-								"Survival").insideBorder(l)) {
+								mainWorld).insideBorder(l)) {
 							return;
 						}
 					}
 				}
-				ent.teleport(l);
+				if (l.getWorld() != null) {
+					ent.teleport(l);
+				} else {
+					return;
+				}
 			} else {
 				ent.setFallDistance(0);
 				Location tpLoc = null;

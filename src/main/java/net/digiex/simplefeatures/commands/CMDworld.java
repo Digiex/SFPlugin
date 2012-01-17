@@ -2,6 +2,7 @@ package net.digiex.simplefeatures.commands;
 
 import net.digiex.simplefeatures.SFPlayer;
 import net.digiex.simplefeatures.SFPlugin;
+import net.digiex.simplefeatures.SFTranslation;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -21,12 +22,14 @@ public class CMDworld implements CommandExecutor {
 		plugin = parent;
 	}
 
-	private void ListWorlds(CommandSender sender, String tried) {
+	private void ListWorlds(CommandSender sender, String tried, String langid) {
+		SFTranslation t = SFTranslation.getInstance();
 		if (tried.length() > 0) {
-			sender.sendMessage(ChatColor.RED + "World \"" + tried
-					+ "\" was not found. Check Spelling.");
+			sender.sendMessage(ChatColor.RED
+					+ t.translateKeyFormat("world.notfound", langid, tried));
 		}
-		sender.sendMessage(ChatColor.GREEN + "Available worlds:");
+		sender.sendMessage(ChatColor.GREEN
+				+ t.translateKey("world.available", langid));
 		for (World w : plugin.getServer().getWorlds()) {
 			if (w.getName().contains("_nether")) {
 				boolean allownether = false;
@@ -62,7 +65,7 @@ public class CMDworld implements CommandExecutor {
 			SFPlayer sfp = new SFPlayer(player);
 			if (sfp.isTeleporting()) {
 				player.sendMessage(ChatColor.GRAY
-						+ "Teleport already in progress, use /abort to cancel.");
+						+ sfp.translateString("teleport.inprogress"));
 				return true;
 			}
 			if (args.length > 0) {
@@ -111,24 +114,30 @@ public class CMDworld implements CommandExecutor {
 						if (bData != null) {
 							if (!bData.insideBorder(loc)) {
 								player.sendMessage(ChatColor.RED
-										+ "You seem to want to go somewhere, but sadly it's outside of the border.");
+										+ sfp.translateString("teleport.outsideofborder"));
 								return true;
 							}
 						}
 					}
-					sfp.teleport(player, null, loc, false, null,
-							"Teleporting to " + world.getName());
+					sfp.teleport(
+							player,
+							null,
+							loc,
+							false,
+							null,
+							sfp.translateStringFormat("world.tpingto",
+									world.getName()));
 					return true;
 
 				} else if (world == player.getWorld()) {
 					sender.sendMessage(ChatColor.RED
-							+ "You are in this world already! Use /spawn");
+							+ sfp.translateString("world.inthisworld"));
 					return true;
 				}
-				ListWorlds(sender, args[0]);
+				ListWorlds(sender, args[0], sfp.getLanguage());
 				return true;
 			}
-			ListWorlds(sender, "");
+			ListWorlds(sender, "", sfp.getLanguage());
 			return true;
 		}
 		return false;

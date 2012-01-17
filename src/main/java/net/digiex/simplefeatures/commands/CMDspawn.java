@@ -29,7 +29,7 @@ public class CMDspawn implements CommandExecutor {
 			SFPlayer sfp = new SFPlayer(player);
 			if (sfp.isTeleporting()) {
 				player.sendMessage(ChatColor.GRAY
-						+ "Teleport already in progress, use /abort to Cancel");
+						+ sfp.translateString("teleport.inprogress"));
 				return true;
 			}
 			Location spawnLoc = player.getWorld().getSpawnLocation();
@@ -83,13 +83,14 @@ public class CMDspawn implements CommandExecutor {
 				if (bData != null) {
 					if (!bData.insideBorder(spawnLoc)) {
 						player.sendMessage(ChatColor.RED
-								+ "You seem to want to go somewhere, but sadly it's outside of the border.");
+								+ sfp.translateString("teleport.outsideofborder"));
 						return true;
 					}
 				}
 			}
-			sfp.teleport(player, null, spawnLoc, false, null,
-					"Teleporting to spawn of " + spawnLoc.getWorld().getName());
+			sfp.teleport(player, null, spawnLoc, false, null, sfp
+					.translateStringFormat("spawn.teleport", spawnLoc
+							.getWorld().getName()));
 
 			return true;
 		}

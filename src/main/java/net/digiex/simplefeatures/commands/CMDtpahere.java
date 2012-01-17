@@ -29,13 +29,15 @@ public class CMDtpahere implements CommandExecutor {
 				SFPlayer sfp = new SFPlayer(to);
 				if (to != null) {
 					if (sfp.isTeleporting()) {
-						player.sendMessage(ChatColor.GRAY + to.getDisplayName()
-								+ " is already teleporting, try again later.");
+						player.sendMessage(ChatColor.GRAY
+								+ sfp.translateStringFormat(
+										"teleport.playertping",
+										to.getDisplayName()));
 						return true;
 					}
 					if (player.getName().equals(to.getName())) {
 						player.sendMessage(ChatColor.GRAY
-								+ "You cannot teleport to yourself, silly.");
+								+ sfp.translateString("teleport.cannottptoself"));
 						return true;
 					}
 					if (SFPlugin.worldBorderPlugin != null) {
@@ -44,16 +46,22 @@ public class CMDtpahere implements CommandExecutor {
 						if (bData != null) {
 							if (!bData.insideBorder(to.getLocation())) {
 								player.sendMessage(ChatColor.RED
-										+ "You seem to want to go somewhere, but sadly it's outside of the border.");
+										+ sfp.translateString("teleport.outsideofborder"));
 								return true;
 							}
 						}
 					}
-					player.sendMessage(ChatColor.GRAY + "Requesting!");
-					sfp.teleport(player, to, player.getLocation(), true,
-							player.getDisplayName()
-									+ " wants to teleport you to them",
-							"Teleporting to " + player.getDisplayName());
+					player.sendMessage(ChatColor.GRAY
+							+ sfp.translateString("teleport.requesting"));
+					sfp.teleport(
+							player,
+							to,
+							player.getLocation(),
+							true,
+							new SFPlayer(to).translateStringFormat(
+									"teleport.tpahere", player.getDisplayName()),
+							sfp.translateStringFormat("teleport.tpingto",
+									player.getDisplayName()));
 
 					return true;
 				}

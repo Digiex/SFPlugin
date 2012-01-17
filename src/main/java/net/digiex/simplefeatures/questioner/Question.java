@@ -26,8 +26,8 @@ class Question {
 	synchronized String ask() {
 		SFPlayer sfp = new SFPlayer(respondent);
 		sfp.showYesNoGui(questionMessage,
-				"Please click one of the buttons below", answer1.toUpperCase(),
-				answer2.toUpperCase(), answer1, answer2);
+				sfp.translateString("gui.pleaseclickbuttons"),
+				answer1.toUpperCase(), answer2.toUpperCase(), answer1, answer2);
 		final StringBuilder options = new StringBuilder();
 		options.append("/" + answer1 + ", ");
 		options.append("/" + answer2 + ", ");

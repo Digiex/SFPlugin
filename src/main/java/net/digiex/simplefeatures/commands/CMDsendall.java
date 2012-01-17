@@ -1,7 +1,9 @@
 package net.digiex.simplefeatures.commands;
 
 import net.digiex.simplefeatures.SFMail;
+import net.digiex.simplefeatures.SFPlayer;
 import net.digiex.simplefeatures.SFPlugin;
+import net.digiex.simplefeatures.SFTranslation;
 
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -23,11 +25,15 @@ public class CMDsendall implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmnd, String string,
 			String[] args) {
-		if (!sender.hasPermission(new Permission("sf.sendall",
+		String langid = "en_US";
+		if (sender instanceof Player) {
+			langid = new SFPlayer((Player) sender).getLanguage();
+		}
+		SFTranslation t = SFTranslation.getInstance();
+		if (!sender.hasPermission(new Permission("sfp.sendall",
 				PermissionDefault.OP))) {
-			sender.sendMessage(ChatColor.RED + "Don't do that again or "
-					+ ChatColor.AQUA + "sharks" + ChatColor.RED
-					+ " will eat you! Seriously, no permission to do that.");
+			sender.sendMessage(ChatColor.RED
+					+ t.translateKey("general.nopermission", langid));
 			return true;
 		}
 		if (args.length < 1) {
@@ -43,11 +49,11 @@ public class CMDsendall implements CommandExecutor {
 			Player p = op.getPlayer();
 			if (p != null) {
 				p.sendMessage(ChatColor.AQUA
-						+ "You have new mail! Type /read to read it!");
+						+ new SFPlayer(p).translateString("mail.newmailnotify"));
 			}
 			i++;
 		}
-		sender.sendMessage("Message sent for " + i + " players.");
+		sender.sendMessage(t.translateKeyFormat("mailall.sent", langid, i));
 		return true;
 	}
 

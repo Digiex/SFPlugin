@@ -81,8 +81,13 @@ public class SFPlugin extends JavaPlugin {
 		@Override
 		public boolean onCommand(CommandSender sender, Command command,
 				String label, String[] args) {
+			String langid = "en_US";
+			if (sender instanceof Player) {
+				langid = new SFPlayer((Player) sender).getLanguage();
+			}
 			sender.sendMessage(ChatColor.RED
-					+ "This command has been disabled by admin.");
+					+ SFTranslation.getInstance().translateKey(
+							"general.commanddisabled", langid));
 			return true;
 		}
 
@@ -94,12 +99,33 @@ public class SFPlugin extends JavaPlugin {
 
 	public static WorldBorder worldBorderPlugin;
 
+	public static void broadcastLocalizedFormattedMessage(String node,
+			Object... args) {
+		for (Player p : Bukkit.getServer().getOnlinePlayers()) {
+			SFPlayer sfp = new SFPlayer(p);
+			p.sendMessage(sfp.translateStringFormat(node, args));
+		}
+	}
+
+	public static void broadcastLocalizedMessage(String node) {
+		for (Player p : Bukkit.getServer().getOnlinePlayers()) {
+			SFPlayer sfp = new SFPlayer(p);
+			p.sendMessage(sfp.translateString(node));
+		}
+	}
+
 	public static OfflinePlayer getOfflinePlayer(CommandSender sender,
 			String name, SFPlugin plugin) {
+		String langid = "en_US";
+		if (sender instanceof Player) {
+			langid = new SFPlayer((Player) sender).getLanguage();
+		}
 		if (name != null) {
 			List<OfflinePlayer> players = matchOfflinePlayer(name, plugin);
 			if (players.isEmpty()) {
-				sender.sendMessage("I don't know who '" + name + "' is!");
+				sender.sendMessage(SFTranslation.getInstance()
+						.translateKeyFormat("general.unknownplayer", langid,
+								name));
 				return null;
 			} else {
 				return players.get(0);
@@ -114,11 +140,17 @@ public class SFPlugin extends JavaPlugin {
 	}
 
 	public static Player getPlayer(CommandSender sender, String name) {
+		String langid = "en_US";
+		if (sender instanceof Player) {
+			langid = new SFPlayer((Player) sender).getLanguage();
+		}
 		if (name != null) {
 			List<Player> players = sender.getServer().matchPlayer(name);
 
 			if (players.isEmpty()) {
-				sender.sendMessage("I don't know who '" + name + "' is!");
+				sender.sendMessage(SFTranslation.getInstance()
+						.translateKeyFormat("general.unknownplayer", langid,
+								name));
 				return null;
 			} else {
 				return players.get(0);
@@ -143,6 +175,9 @@ public class SFPlugin extends JavaPlugin {
 		return false;
 	}
 
+	// 2 = loaded with errors int shares =
+	// 0;
+
 	public static String itemStackToString(ItemStack[] itemStacks) {
 		String invString = "";
 		for (ItemStack itemStack : itemStacks) {
@@ -163,9 +198,6 @@ public class SFPlugin extends JavaPlugin {
 		}
 		return invString;
 	}
-
-	// 2 = loaded with errors int shares =
-	// 0;
 
 	public static void log(Level level, String msg) {
 		log.log(level, "[" + pluginName + "] " + msg);
@@ -256,8 +288,8 @@ public class SFPlugin extends JavaPlugin {
 	// return false;
 	// }
 	private final ArrayList<UUID> SFWorlds = new ArrayList<UUID>();
-
 	public static HashMap<String, Double> clientAddons = new HashMap<String, Double>();
+
 	public static HashMap<String, String> playerLangs = new HashMap<String, String>();
 
 	YamlConfiguration permsConfig;

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.logging.Level;
 
 import net.digiex.simplefeatures.SFMail;
+import net.digiex.simplefeatures.SFPlayer;
 import net.digiex.simplefeatures.SFPlugin;
 
 import org.bukkit.ChatColor;
@@ -25,6 +26,7 @@ public class ClientModListener implements PluginMessageListener {
 	@Override
 	public void onPluginMessageReceived(String channel, Player player,
 			byte[] message) {
+		SFPlayer sfp = new SFPlayer(player);
 		if (channel.equalsIgnoreCase("simplefeatures")) {
 			JSONObject json = (JSONObject) JSONValue.parse(new String(message));
 			String id = ((String) json.get("id"));
@@ -43,7 +45,7 @@ public class ClientModListener implements PluginMessageListener {
 				if (!player.hasPermission(new Permission("sfp.msg",
 						PermissionDefault.TRUE))) {
 					player.sendMessage(ChatColor.RED
-							+ "You do not have permission to send private messages");
+							+ sfp.translateString("general.nopermission"));
 					return;
 				}
 				String pname = ((String) json.get("to"));
@@ -51,8 +53,9 @@ public class ClientModListener implements PluginMessageListener {
 						plugin);
 
 				if (target != null) {
-					player.sendMessage(String.format("Mail sent to %s: %s",
-							target.getName(), json.get("mail")));
+					player.sendMessage(sfp.translateStringFormat(
+							"Mail sent to %s: %s", target.getName(),
+							json.get("mail")));
 					SFMail save = new SFMail();
 					save.newMail(player.getName(), target.getName(),
 							((String) json.get("mail")));
@@ -60,7 +63,8 @@ public class ClientModListener implements PluginMessageListener {
 					Player p = plugin.getServer().getPlayer(target.getName());
 					if (p != null) {
 						p.sendMessage(ChatColor.AQUA
-								+ "You have new mail! Type /read to read it!");
+								+ new SFPlayer(p)
+										.translateString("mail.newmailnotify"));
 					}
 					return;
 				}
@@ -69,7 +73,8 @@ public class ClientModListener implements PluginMessageListener {
 				msgs = plugin.getDatabase().find(SFMail.class).where()
 						.ieq("toPlayer", player.getName()).findList();
 				if (msgs.isEmpty()) {
-					player.sendMessage(ChatColor.RED + "Nothing to clear!");
+					player.sendMessage(ChatColor.RED
+							+ sfp.translateString("clear.nothingtoclear"));
 					return;
 				} else {
 					int i = 0;
@@ -78,7 +83,7 @@ public class ClientModListener implements PluginMessageListener {
 						i++;
 					}
 					player.sendMessage(ChatColor.YELLOW
-							+ "Successfully cleared " + i + " messages.");
+							+ sfp.translateStringFormat("clear.success", i));
 					return;
 				}
 			} else if (id.equalsIgnoreCase("deletemail")) {
@@ -86,11 +91,13 @@ public class ClientModListener implements PluginMessageListener {
 						.ieq("toPlayer", player.getName())
 						.ieq("id", json.get("mailid").toString()).findUnique();
 				if (msg == null) {
-					player.sendMessage(ChatColor.RED + "Nothing to delete!");
+					player.sendMessage(ChatColor.RED
+							+ sfp.translateString("delete.nothingtodelete"));
 					return;
 				} else {
 					player.sendMessage(ChatColor.YELLOW
-							+ "Deleting 1 mail from " + msg.getFromPlayer());
+							+ sfp.translateStringFormat("delete.success",
+									msg.getFromPlayer()));
 					plugin.getDatabase().delete(msg);
 					return;
 				}
@@ -103,5 +110,4 @@ public class ClientModListener implements PluginMessageListener {
 
 		}
 	}
-
 }

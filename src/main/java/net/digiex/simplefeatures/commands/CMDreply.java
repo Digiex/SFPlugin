@@ -1,6 +1,8 @@
 package net.digiex.simplefeatures.commands;
 
+import net.digiex.simplefeatures.SFPlayer;
 import net.digiex.simplefeatures.SFPlugin;
+import net.digiex.simplefeatures.SFTranslation;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -34,11 +36,15 @@ public class CMDreply implements CommandExecutor {
 		if (!(sender instanceof Player) || (args.length < 1)) {
 			return false;
 		}
-
+		String langid = "en_US";
+		if (sender instanceof Player) {
+			langid = new SFPlayer((Player) sender).getLanguage();
+		}
+		SFTranslation t = SFTranslation.getInstance();
 		if (!sender.hasPermission(new Permission("sfp.msg",
 				PermissionDefault.TRUE))) {
 			sender.sendMessage(ChatColor.RED
-					+ "You do not have permission to send private messages");
+					+ t.translateKey("general.nopermission", langid));
 			return true;
 		}
 
@@ -46,7 +52,8 @@ public class CMDreply implements CommandExecutor {
 		CommandSender target = getTarget(player);
 
 		if (target == null) {
-			sender.sendMessage(ChatColor.RED + "There is nobody to reply to!");
+			sender.sendMessage(ChatColor.RED
+					+ t.translateKey("reply.nobodytoreply", langid));
 		} else {
 			String message = SFPlugin
 					.recompileMessage(args, 0, args.length - 1);
@@ -56,9 +63,11 @@ public class CMDreply implements CommandExecutor {
 				name = ((Player) target).getDisplayName();
 			}
 
-			target.sendMessage(String.format("[%s]->[you]: %s",
-					player.getDisplayName(), message));
-			sender.sendMessage(String.format("[you]->[%s]: %s", name, message));
+			target.sendMessage(String.format("[%s]->[%s]: %s",
+					player.getDisplayName(),
+					t.translateKey("general.you", langid), message));
+			sender.sendMessage(String.format("[%s]->[%s]: %s",
+					t.translateKey("general.you", langid), name, message));
 		}
 
 		return true;

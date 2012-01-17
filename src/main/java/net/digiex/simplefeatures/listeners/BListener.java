@@ -1,5 +1,6 @@
 package net.digiex.simplefeatures.listeners;
 
+import net.digiex.simplefeatures.SFPlayer;
 import net.digiex.simplefeatures.SFPlugin;
 
 import org.bukkit.ChatColor;
@@ -21,13 +22,14 @@ public class BListener extends BlockListener {
 	@Override
 	public void onBlockBreak(BlockBreakEvent event) {
 		Player p = event.getPlayer();
+		SFPlayer sfp = new SFPlayer(p);
 		if (!p.isOp()) {
 			boolean inspawn = SFPlugin.isInSpawnProtect(event.getBlock()
 					.getLocation(), plugin);
 			if (inspawn) {
 				event.setCancelled(true);
 				p.sendMessage(ChatColor.RED
-						+ "You are in a spawn protection area. Please walk further.");
+						+ sfp.translateString("general.inspawnprotect"));
 			}
 			if (p.getGameMode().equals(GameMode.CREATIVE)) {
 				if (!event.isCancelled()) {
@@ -36,7 +38,7 @@ public class BListener extends BlockListener {
 									.equals(Material.BEDROCK)) {
 						event.setCancelled(true);
 						p.sendMessage(ChatColor.RED
-								+ "Removal of bedrock is not allowed here.");
+								+ sfp.translateString("general.bedrockblocked.removal"));
 					}
 				}
 			}
@@ -46,13 +48,14 @@ public class BListener extends BlockListener {
 	@Override
 	public void onBlockPlace(BlockPlaceEvent event) {
 		Player p = event.getPlayer();
+		SFPlayer sfp = new SFPlayer(p);
 		if (!p.isOp()) {
 			boolean inspawn = SFPlugin.isInSpawnProtect(event.getBlock()
 					.getLocation(), plugin);
 			if (inspawn) {
 				event.setCancelled(true);
 				p.sendMessage(ChatColor.RED
-						+ "You are in a spawn protection area. Please walk further.");
+						+ sfp.translateString("general.inspawnprotect"));
 			}
 			if (p.getGameMode().equals(GameMode.CREATIVE)) {
 				if (!event.isCancelled()) {
@@ -61,7 +64,7 @@ public class BListener extends BlockListener {
 									.equals(Material.BEDROCK)) {
 						event.setCancelled(true);
 						p.sendMessage(ChatColor.RED
-								+ "Placement of bedrock is not allowed here.");
+								+ sfp.translateString("general.bedrockblocked.placement"));
 					}
 				}
 			}

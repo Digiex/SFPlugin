@@ -4,6 +4,7 @@ import net.digiex.simplefeatures.SFPlayer;
 import net.digiex.simplefeatures.SFPlugin;
 import net.digiex.simplefeatures.listeners.PListener;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -27,23 +28,27 @@ public class CMDadmin implements CommandExecutor {
 			if (sfp.isAdmin()) {
 				p.setOp(!p.isOp());
 				PListener.updatePlayerNameColour(p, plugin);
+				String node;
 				if (p.isOp()) {
-					p.sendMessage(ChatColor.YELLOW + "Admin mode turned on!");
-					plugin.getServer().broadcastMessage(
-							p.getDisplayName() + ChatColor.GRAY
-									+ " has enabled operator privileges!");
-					p.getWorld().strikeLightningEffect(p.getLocation());
+					p.sendMessage(ChatColor.YELLOW
+							+ sfp.translateString("admin.turnedon"));
+					node = "admin.playerenabled";
 				} else {
-					p.sendMessage(ChatColor.YELLOW + "Admin mode turned off!");
-					plugin.getServer().broadcastMessage(
-							p.getDisplayName() + ChatColor.GRAY
-									+ " has disabled operator privileges!");
-					p.getWorld().strikeLightningEffect(p.getLocation());
+					p.sendMessage(ChatColor.YELLOW
+							+ sfp.translateString("admin.turnedoff"));
+					node = "admin.playerdisabled";
+				}
+				p.getWorld().strikeLightningEffect(p.getLocation());
+				for (Player pl : Bukkit.getServer().getOnlinePlayers()) {
+					SFPlayer sfp1 = new SFPlayer(pl);
+					pl.sendMessage(ChatColor.GRAY
+							+ sfp1.translateStringFormat(node,
+									p.getDisplayName() + ChatColor.GRAY));
 				}
 				return true;
 			} else {
 				sender.sendMessage(ChatColor.RED
-						+ "You are not allowed to do that, sir!");
+						+ sfp.translateString("general.nopermission"));
 				return true;
 			}
 		}

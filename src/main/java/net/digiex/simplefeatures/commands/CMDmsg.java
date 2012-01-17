@@ -3,7 +3,9 @@ package net.digiex.simplefeatures.commands;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.digiex.simplefeatures.SFPlayer;
 import net.digiex.simplefeatures.SFPlugin;
+import net.digiex.simplefeatures.SFTranslation;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -15,10 +17,14 @@ import org.bukkit.permissions.PermissionDefault;
 
 public class CMDmsg implements CommandExecutor {
 	SFPlugin plugin;
-	private Map<Player, CommandSender> lastMessages = new HashMap<Player, CommandSender>();
+	private final Map<Player, CommandSender> lastMessages = new HashMap<Player, CommandSender>();
 
 	public CMDmsg(SFPlugin parent) {
-		this.plugin = parent;
+		plugin = parent;
+	}
+
+	public CommandSender getLastSender(Player player) {
+		return lastMessages.get(player);
 	}
 
 	@Override
@@ -27,11 +33,15 @@ public class CMDmsg implements CommandExecutor {
 		if (args.length < 2) {
 			return false;
 		}
-
+		String langid = "en_US";
+		if (sender instanceof Player) {
+			langid = new SFPlayer((Player) sender).getLanguage();
+		}
+		SFTranslation t = SFTranslation.getInstance();
 		if (!sender.hasPermission(new Permission("sfp.msg",
 				PermissionDefault.TRUE))) {
 			sender.sendMessage(ChatColor.RED
-					+ "You do not have permission to send private messages");
+					+ t.translateKey("general.nopermission", langid));
 			return true;
 		}
 		String pname = null;
@@ -49,18 +59,16 @@ public class CMDmsg implements CommandExecutor {
 				name = ((Player) sender).getDisplayName();
 			}
 
-			target.sendMessage(String.format("[%s]->[you]: %s", name, message));
-			sender.sendMessage(String.format("[you]->[%s]: %s",
+			target.sendMessage(String.format("[%s]->[%s]: %s", name,
+					t.translateKey("general.you", langid), message));
+			sender.sendMessage(String.format("[%s]->[%s]: %s",
+					t.translateKey("general.you", langid),
 					target.getDisplayName(), message));
 
 			lastMessages.put(target, sender);
 		}
 
 		return true;
-	}
-
-	public CommandSender getLastSender(Player player) {
-		return lastMessages.get(player);
 	}
 
 }

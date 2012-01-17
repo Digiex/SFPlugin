@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import net.digiex.simplefeatures.SFCompassPoint;
+import net.digiex.simplefeatures.SFPlayer;
 import net.digiex.simplefeatures.SFPlugin;
 
 import org.bukkit.ChatColor;
@@ -39,13 +40,15 @@ public class CMDcompasspoint implements CommandExecutor {
 			String label, String[] args) {
 		if (sender instanceof Player) {
 			Player p = (Player) sender;
+			SFPlayer sfp = new SFPlayer(p);
 			if (args.length > 0) {
 				if (args[0].equalsIgnoreCase("list")) {
 					List<SFCompassPoint> points = plugin.getDatabase()
 							.find(SFCompassPoint.class).where()
 							.ieq("playerName", p.getName()).findList();
 					if (points.isEmpty()) {
-						sender.sendMessage("You have no compass points.");
+						sender.sendMessage(ChatColor.RED
+								+ sfp.translateString("compasspoints.empty"));
 					} else {
 						String result = "";
 						for (SFCompassPoint cp : points) {
@@ -55,15 +58,15 @@ public class CMDcompasspoint implements CommandExecutor {
 							result += cp.getPointName();
 						}
 						sender.sendMessage(ChatColor.YELLOW
-								+ "All compass points: " + ChatColor.AQUA
-								+ result);
+								+ sfp.translateString("compasspoints.all")
+								+ " " + ChatColor.AQUA + result);
 					}
 					return true;
 				} else if (args[0].equalsIgnoreCase("add")) {
 					if (p.getWorld().getEnvironment() == Environment.NETHER
 							|| p.getWorld().getEnvironment() == Environment.THE_END) {
 						sender.sendMessage(ChatColor.YELLOW
-								+ "Compasses do not work in the nether nor in the end");
+								+ sfp.translateString("compasspoints.notinnether"));
 						return true;
 					}
 					if (args.length > 1) {
@@ -83,14 +86,14 @@ public class CMDcompasspoint implements CommandExecutor {
 
 							if (point == null) {
 								p.sendMessage(ChatColor.YELLOW
-										+ "A new compass point for this world created!");
+										+ sfp.translateString("compasspoints.newcreated"));
 
 								point = new SFCompassPoint();
 								point.setPlayerName(p.getName());
 							} else {
 
 								p.sendMessage(ChatColor.YELLOW
-										+ "Compass point updated!");
+										+ sfp.translateString("compasspoints.updated"));
 
 								isUpdate = true;
 							}
@@ -114,45 +117,32 @@ public class CMDcompasspoint implements CommandExecutor {
 					}
 				} else if (args[0].equalsIgnoreCase("remove")) {
 					if (args.length > 1) {
-						p.sendMessage("Could not remove.");
-						boolean sharks = true;
-						if (sharks) {
-							return true;
-						}
 						com.avaje.ebean.EbeanServer db = plugin.getDatabase();
-						db.beginTransaction();
+						SFCompassPoint point = db
+								.find(SFCompassPoint.class)
+								.where()
+								.ieq("worldName",
+										p.getLocation().getWorld().getName())
+								.ieq("playerName", p.getName())
+								.ieq("pointName", args[1]).findUnique();
 
-						try {
-							SFCompassPoint point = db
-									.find(SFCompassPoint.class)
-									.where()
-									.ieq("worldName",
-											p.getLocation().getWorld()
-													.getName())
-									.ieq("playerName", p.getName())
-									.ieq("pointName", args[1]).findUnique();
-
-							if (point == null) {
-								p.sendMessage(ChatColor.RED
-										+ "No compass point named " + args[1]
-										+ " exists!");
-								return true;
-							} else {
-								p.sendMessage(ChatColor.YELLOW
-										+ "Compass point removed!");
-								db.delete(point);
-							}
-							db.commitTransaction();
-						} finally {
-							db.endTransaction();
+						if (point == null) {
+							p.sendMessage(ChatColor.RED
+									+ sfp.translateStringFormat(
+											"compasspoints.notfound", args[1]));
+							return true;
+						} else {
+							p.sendMessage(ChatColor.YELLOW
+									+ sfp.translateString("compasspoints.removed"));
+							db.delete(point);
 						}
 						return true;
 					}
 				}
 			}
+			sender.sendMessage(ChatColor.YELLOW
+					+ sfp.translateString("compasspoints.toggle"));
 		}
-		sender.sendMessage(ChatColor.YELLOW
-				+ "Left/right click with a compass to toggle active compass points");
 		return false;
 	}
 

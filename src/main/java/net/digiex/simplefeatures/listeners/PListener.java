@@ -53,15 +53,15 @@ public class PListener extends PlayerListener {
 
 		@Override
 		public void run() {
+			SFPlayer sfp = new SFPlayer(player);
 			String answer = SFPlugin.questioner.ask(player, ChatColor.YELLOW
-					+ "Do you want to set your home to this bed?", "set",
+					+ sfp.translateString("sethome.bedquestion"), "set",
 					"cancel");
 			if (answer == "set") {
-				SFPlayer sfp = new SFPlayer(player);
 				sfp.setHome(homeLoc);
 			} else {
 				player.sendMessage(ChatColor.GRAY
-						+ "Setting home here cancelled.");
+						+ sfp.translateString("sethome.bedcancelled"));
 			}
 			homeTasks.remove(player.getName());
 		}
@@ -167,8 +167,10 @@ public class PListener extends PlayerListener {
 			db.commitTransaction();
 		} catch (Exception ex) {
 			e.getPlayer().kickPlayer(
-					ChatColor.RED + "Server error, contact admin: "
-							+ ex.getMessage());
+					ChatColor.RED
+							+ new SFPlayer(e.getPlayer())
+									.translateString("general.servererror")
+							+ " " + ex.getMessage());
 			ex.printStackTrace();
 			e.setCancelled(true);
 		} finally {
@@ -233,7 +235,8 @@ public class PListener extends PlayerListener {
 					.findList();
 			if (points.isEmpty()) {
 				event.getPlayer().sendMessage(
-						"You have no compass points. Type /cp for more help");
+						new SFPlayer(event.getPlayer())
+								.translateString("compasspoints.nopoints"));
 				return;
 			} else {
 				Integer point = activeCompassPoints.get(event.getPlayer()
@@ -262,8 +265,13 @@ public class PListener extends PlayerListener {
 								cp.getY(), cp.getZ(), cp.getYaw(), cp
 										.getPitch()));
 				event.getPlayer().sendMessage(
-						ChatColor.YELLOW + "Your compass points now to "
-								+ ChatColor.AQUA + cp.getPointName());
+						ChatColor.YELLOW
+								+ new SFPlayer(event.getPlayer())
+										.translateStringFormat(
+												"compasspoints.pointchanged",
+												ChatColor.AQUA
+														+ cp.getPointName()
+														+ ChatColor.WHITE));
 				event.setCancelled(true);
 				return;
 			}
@@ -305,8 +313,11 @@ public class PListener extends PlayerListener {
 				.ieq("toPlayer", e.getPlayer().getName()).findList();
 		if (!msgs.isEmpty()) {
 			e.getPlayer().sendMessage(
-					ChatColor.AQUA + "You have " + msgs.size()
-							+ " new mail! Type /read to view.");
+					ChatColor.AQUA
+							+ new SFPlayer(e.getPlayer())
+									.translateStringFormat(
+											"mail.newmailnotifynum",
+											msgs.size()));
 		}
 	}
 
@@ -360,7 +371,8 @@ public class PListener extends PlayerListener {
 						e.getPlayer()
 								.sendMessage(
 										ChatColor.RED
-												+ "You seem to want to go somewhere, but sadly it's outside of the border.");
+												+ new SFPlayer(e.getPlayer())
+														.translateString("teleport.outsideofborder"));
 						e.setCancelled(true);
 						return;
 					}
@@ -449,7 +461,8 @@ public class PListener extends PlayerListener {
 						e.getPlayer()
 								.sendMessage(
 										ChatColor.RED
-												+ "You seem to want to go somewhere, but sadly it's outside of the border.");
+												+ new SFPlayer(e.getPlayer())
+														.translateString("teleport.outsideofborder"));
 						e.setCancelled(true);
 						return;
 					}
