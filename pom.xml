@@ -6,13 +6,13 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>SimpleFeatures</name>
 	<description>Provides simple commands and features for CraftBukkit servers.</description>
-        <properties>
-                <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        </properties>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
 	<repositories>
 		<repository>
-			<id>DigiexMaven</id>
-			<url>http://xzkingzxburnzx.tk/artifactory/repo/</url>
+			<id>digiex-repo</id>
+			<url>http://jessenic.viuhka.fi/nexus/content/groups/public/</url>
 		</repository>
 	</repositories>
 	<!-- Dependencies -->
@@ -21,12 +21,12 @@
 		<dependency>
 			<groupId>org.bukkit</groupId>
 			<artifactId>bukkit</artifactId>
-			<version>1.0.1-R1</version>
+			<version>1.1-R1-SNAPSHOT</version>
 		</dependency>
-                <dependency>
-			<groupId>WorldBorder</groupId>
+		<dependency>
+			<groupId>com.wimbli</groupId>
 			<artifactId>WorldBorder</artifactId>
-			<version>WorldBorder</version>
+			<version>1.5.0</version>
 		</dependency>
 	</dependencies>
 	<build>
