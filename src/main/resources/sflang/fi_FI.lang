@@ -88,3 +88,4 @@ teleport.rejected=Teleport-pyyntö hylättiin
 teleport.counterstart=Teleporttaus tapahtuu %1$d sekunnissa.
 teleport.intime=%1$d sekunnissa.
 teleport.poof=PUFF!
+teleport.aborted=Teleporttaus peruttu!

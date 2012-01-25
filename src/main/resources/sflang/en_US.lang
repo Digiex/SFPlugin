@@ -92,3 +92,4 @@ teleport.rejected=Teleport request rejected
 teleport.counterstart=Teleport will happen in %1$d seconds.
 teleport.intime=in %1$d seconds.
 teleport.poof=Poof!
+teleport.aborted=Teleportation aborted!
