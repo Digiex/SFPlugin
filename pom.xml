@@ -14,6 +14,10 @@
 			<id>digiex-repo</id>
 			<url>http://jessenic.viuhka.fi/nexus/content/groups/public/</url>
 		</repository>
+		<repository>
+			<id>bukkit-repo</id>
+			<url>http://repo.bukkit.org/artifactory/repo</url>
+		</repository>
 	</repositories>
 	<!-- Dependencies -->
 	<dependencies>

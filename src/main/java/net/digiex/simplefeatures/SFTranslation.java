@@ -25,7 +25,7 @@ public class SFTranslation {
 
 	private SFTranslation() {
 		allowedLangs.add("en_US");
-		allowedLangs.add("fi_FI");
+		// allowedLangs.add("fi_FI");
 		loadLang("en_US");
 	}
 
