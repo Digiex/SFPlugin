@@ -2,7 +2,6 @@ package net.digiex.simplefeatures.commands;
 
 import net.digiex.simplefeatures.SFPlayer;
 import net.digiex.simplefeatures.SFPlugin;
-import net.digiex.simplefeatures.listeners.PListener;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -27,7 +26,7 @@ public class CMDadmin implements CommandExecutor {
 
 			if (sfp.isAdmin()) {
 				p.setOp(!p.isOp());
-				PListener.updatePlayerNameColour(p, plugin);
+				sfp.updateNameColour();
 				String node;
 				if (p.isOp()) {
 					p.sendMessage(ChatColor.YELLOW

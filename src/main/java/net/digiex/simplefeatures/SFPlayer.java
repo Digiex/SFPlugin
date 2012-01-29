@@ -4,13 +4,16 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 
 import net.digiex.simplefeatures.teleports.SFTeleportTask;
 
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.json.simple.JSONObject;
 
 public class SFPlayer {
@@ -27,6 +30,25 @@ public class SFPlayer {
 		homeUpdateProps.add("yaw");
 		homeUpdateProps.add("pitch");
 		homeUpdateProps.add("world_name");
+	}
+
+	private static final Set<String> invUpdateProps;
+
+	static {
+		invUpdateProps = new HashSet<String>();
+		invUpdateProps.add("player_name");
+		invUpdateProps.add("inventory");
+		invUpdateProps.add("armor");
+		invUpdateProps.add("health");
+		invUpdateProps.add("food");
+		invUpdateProps.add("game_mode");
+		invUpdateProps.add("experience");
+		invUpdateProps.add("exhaustion");
+		invUpdateProps.add("fire_ticks");
+		invUpdateProps.add("level");
+		invUpdateProps.add("remaining_air");
+		invUpdateProps.add("saturation");
+		invUpdateProps.add("total_experience");
 	}
 
 	public SFPlayer(Player player) {
@@ -103,6 +125,102 @@ public class SFPlayer {
 
 	public boolean isTeleporting() {
 		return SFTeleportTask.teleporters.containsKey(player.getName());
+	}
+
+	public boolean loadInventory() {
+		return loadInventory(player.getGameMode());
+	}
+
+	public boolean loadInventory(GameMode gamemode) {
+		com.avaje.ebean.EbeanServer db = plugin.getDatabase();
+		boolean retval = true;
+		try {
+			SFInventory inv = db.find(SFInventory.class).where()
+					.eq("gameMode", gamemode.getValue())
+					.ieq("playerName", player.getName()).findUnique();
+			if (inv != null) {
+				ItemStack[] contents = SFPlugin.stringToItemStack(inv
+						.getInventory());
+				if (contents != null) {
+					player.getInventory().setContents(contents);
+				}
+				ItemStack[] armor = SFPlugin.stringToItemStack(inv.getArmor());
+				if (armor != null) {
+					player.getInventory().setArmorContents(armor);
+				}
+				if (!(inv.getHealth() > 0)) {
+					player.setHealth(20);
+					player.setFoodLevel(20);
+				} else {
+					player.setHealth(inv.getHealth());
+					player.setFoodLevel(inv.getFood());
+				}
+				player.setExp(inv.getExp());
+				player.setExhaustion(inv.getExhaustion());
+				player.setFireTicks(inv.getFireTicks());
+				player.setLevel(inv.getLevel());
+				player.setRemainingAir(inv.getRemainingAir());
+				player.setSaturation(inv.getSaturation());
+				player.setTotalExperience(inv.getTotalExperience());
+			}
+
+		} catch (NullPointerException ex) {
+			SFPlugin.log(Level.INFO, "Some inventory contents were null for "
+					+ player.getName());
+			// ex.printStackTrace();
+		}
+		return retval;
+	}
+
+	public boolean saveInventory() {
+		com.avaje.ebean.EbeanServer db = plugin.getDatabase();
+		boolean retval = true;
+		if (!(player.getHealth() > 0)) {
+			player.getInventory().clear();
+			player.setHealth(20);
+			player.setFoodLevel(20);
+		}
+		db.beginTransaction();
+		boolean isUpdate = false;
+		try {
+			SFInventory inv = db.find(SFInventory.class).where()
+					.eq("gameMode", player.getGameMode().getValue())
+					.ieq("playerName", player.getName()).findUnique();
+			if (inv == null) {
+				inv = new SFInventory();
+			} else {
+				isUpdate = true;
+			}
+			inv.setGameMode(player.getGameMode().getValue());
+			inv.setPlayerName(player.getName());
+			inv.setInventory(SFPlugin.itemStackToString(player.getInventory()
+					.getContents()));
+			inv.setArmor(SFPlugin.itemStackToString(player.getInventory()
+					.getArmorContents()));
+			inv.setHealth(player.getHealth());
+			inv.setFood(player.getFoodLevel());
+			inv.setExp(player.getExp());
+			inv.setExhaustion(player.getExhaustion());
+			inv.setFireTicks(player.getFireTicks());
+			inv.setLevel(player.getLevel());
+			inv.setRemainingAir(player.getRemainingAir());
+			inv.setSaturation(player.getSaturation());
+			inv.setTotalExperience(player.getTotalExperience());
+			if (isUpdate) {
+				db.update(inv, invUpdateProps);
+			}
+			db.save(inv);
+			db.commitTransaction();
+		} catch (Exception ex) {
+			player.kickPlayer(ChatColor.RED
+					+ translateString("general.servererror") + " "
+					+ ex.getMessage());
+			ex.printStackTrace();
+			retval = false;
+		} finally {
+			db.endTransaction();
+		}
+		return retval;
 	}
 
 	public void setHome(Location loc) {
@@ -238,5 +356,30 @@ public class SFPlayer {
 	public String translateStringFormat(String node, Object... args) {
 		return SFTranslation.getInstance().translateKeyFormat(node,
 				getLanguage(), args);
+	}
+
+	public void updateNameColour() {
+		if (!player.isOp()) {
+			plugin.permissionAttachements.get(player.getName()).setPermission(
+					"bukkit.command.plugins", false);
+			plugin.permissionAttachements.get(player.getName()).setPermission(
+					"bukkit.command.version", false);
+		} else {
+
+			plugin.permissionAttachements.get(player.getName()).setPermission(
+					"bukkit.command.plugins", true);
+			plugin.permissionAttachements.get(player.getName()).setPermission(
+					"bukkit.command.version", true);
+		}
+		String pname;
+		if (player.isOp()) {
+			pname = ChatColor.AQUA + player.getName();
+		} else {
+			pname = ChatColor.GREEN + player.getName();
+		}
+		player.setDisplayName(pname + ChatColor.WHITE);
+		if (pname.length() < 17) {
+			player.setPlayerListName(pname);
+		}
 	}
 }

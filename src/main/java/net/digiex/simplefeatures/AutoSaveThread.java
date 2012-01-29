@@ -18,6 +18,7 @@ public class AutoSaveThread implements Runnable {
 		int worlds = 0;
 		for (Player p : plugin.getServer().getOnlinePlayers()) {
 			p.saveData();
+			new SFPlayer(p).saveInventory();
 			players++;
 
 		}

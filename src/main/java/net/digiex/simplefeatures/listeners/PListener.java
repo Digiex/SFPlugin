@@ -1,13 +1,10 @@
 package net.digiex.simplefeatures.listeners;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Level;
 
 import net.digiex.simplefeatures.SFCompassPoint;
-import net.digiex.simplefeatures.SFInventory;
 import net.digiex.simplefeatures.SFMail;
 import net.digiex.simplefeatures.SFPlayer;
 import net.digiex.simplefeatures.SFPlugin;
@@ -35,7 +32,6 @@ import org.bukkit.event.player.PlayerPreLoginEvent.Result;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitWorker;
@@ -75,48 +71,6 @@ public class PListener implements Listener {
 
 	public static HashMap<String, Integer> homeTasks = new HashMap<String, Integer>();
 
-	private static final Set<String> invUpdateProps;
-	static {
-		invUpdateProps = new HashSet<String>();
-		invUpdateProps.add("player_name");
-		invUpdateProps.add("inventory");
-		invUpdateProps.add("armor");
-		invUpdateProps.add("health");
-		invUpdateProps.add("food");
-		invUpdateProps.add("game_mode");
-		invUpdateProps.add("experience");
-		invUpdateProps.add("exhaustion");
-		invUpdateProps.add("fire_ticks");
-		invUpdateProps.add("level");
-		invUpdateProps.add("remaining_air");
-		invUpdateProps.add("saturation");
-		invUpdateProps.add("total_experience");
-	}
-
-	public static void updatePlayerNameColour(Player p, SFPlugin plugin) {
-		if (!p.isOp()) {
-			plugin.permissionAttachements.get(p.getName()).setPermission(
-					"bukkit.command.plugins", false);
-			plugin.permissionAttachements.get(p.getName()).setPermission(
-					"bukkit.command.version", false);
-		} else {
-
-			plugin.permissionAttachements.get(p.getName()).setPermission(
-					"bukkit.command.plugins", true);
-			plugin.permissionAttachements.get(p.getName()).setPermission(
-					"bukkit.command.version", true);
-		}
-		if (p.isOp()) {
-			p.setDisplayName(ChatColor.AQUA + p.getName() + ChatColor.WHITE);
-		} else {
-			p.setDisplayName(ChatColor.GREEN + p.getName() + ChatColor.WHITE);
-		}
-		String plistname = p.getDisplayName();
-		if (plistname.length() < 17) {
-			p.setPlayerListName(plistname);
-		}
-	}
-
 	private final HashMap<String, Integer> activeCompassPoints = new HashMap<String, Integer>();
 
 	public PListener(SFPlugin parent) {
@@ -124,97 +78,20 @@ public class PListener implements Listener {
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPlayerGameModeChange(PlayerGameModeChangeEvent e) {
 		if (e.isCancelled()) {
 			return;
 		}
+		SFPlayer sfp = new SFPlayer(e.getPlayer());
 		SFPlugin.log(Level.INFO, e.getPlayer().getName()
 				+ "'s gamemode changed to " + e.getNewGameMode().toString());
-		if (!(e.getPlayer().getHealth() > 0)) {
-			e.getPlayer().getInventory().clear();
-			e.getPlayer().setHealth(20);
-			e.getPlayer().setFoodLevel(20);
-		}
-		com.avaje.ebean.EbeanServer db = plugin.getDatabase();
-		db.beginTransaction();
-		boolean isUpdate = false;
-		try {
-			SFInventory inv = db.find(SFInventory.class).where()
-					.eq("gameMode", e.getPlayer().getGameMode().getValue())
-					.ieq("playerName", e.getPlayer().getName()).findUnique();
-			if (inv == null) {
-				inv = new SFInventory();
-			} else {
-				isUpdate = true;
-			}
-			inv.setGameMode(e.getPlayer().getGameMode().getValue());
-			inv.setPlayerName(e.getPlayer().getName());
-			inv.setInventory(SFPlugin.itemStackToString(e.getPlayer()
-					.getInventory().getContents()));
-			inv.setArmor(SFPlugin.itemStackToString(e.getPlayer()
-					.getInventory().getArmorContents()));
-			inv.setHealth(e.getPlayer().getHealth());
-			inv.setFood(e.getPlayer().getFoodLevel());
-			inv.setExp(e.getPlayer().getExp());
-			inv.setExhaustion(e.getPlayer().getExhaustion());
-			inv.setFireTicks(e.getPlayer().getFireTicks());
-			inv.setLevel(e.getPlayer().getLevel());
-			inv.setRemainingAir(e.getPlayer().getRemainingAir());
-			inv.setSaturation(e.getPlayer().getSaturation());
-			inv.setTotalExperience(e.getPlayer().getTotalExperience());
-			if (isUpdate) {
-				db.update(inv, invUpdateProps);
-			}
-			db.save(inv);
-			db.commitTransaction();
-		} catch (Exception ex) {
-			e.getPlayer().kickPlayer(
-					ChatColor.RED
-							+ new SFPlayer(e.getPlayer())
-									.translateString("general.servererror")
-							+ " " + ex.getMessage());
-			ex.printStackTrace();
+		if (!sfp.saveInventory()) {
 			e.setCancelled(true);
-		} finally {
-			db.endTransaction();
+			return;
 		}
 		e.getPlayer().getInventory().clear();
-		try {
-			SFInventory inv = db.find(SFInventory.class).where()
-					.eq("gameMode", e.getNewGameMode().getValue())
-					.ieq("playerName", e.getPlayer().getName()).findUnique();
-			if (inv != null) {
-				ItemStack[] contents = SFPlugin.stringToItemStack(inv
-						.getInventory());
-				if (contents != null) {
-					e.getPlayer().getInventory().setContents(contents);
-				}
-				ItemStack[] armor = SFPlugin.stringToItemStack(inv.getArmor());
-				if (armor != null) {
-					e.getPlayer().getInventory().setArmorContents(armor);
-				}
-				if (!(inv.getHealth() > 0)) {
-					e.getPlayer().setHealth(20);
-					e.getPlayer().setFoodLevel(20);
-				} else {
-					e.getPlayer().setHealth(inv.getHealth());
-					e.getPlayer().setFoodLevel(inv.getFood());
-				}
-				e.getPlayer().setExp(inv.getExp());
-				e.getPlayer().setExhaustion(inv.getExhaustion());
-				e.getPlayer().setFireTicks(inv.getFireTicks());
-				e.getPlayer().setLevel(inv.getLevel());
-				e.getPlayer().setRemainingAir(inv.getRemainingAir());
-				e.getPlayer().setSaturation(inv.getSaturation());
-				e.getPlayer().setTotalExperience(inv.getTotalExperience());
-			}
-
-		} catch (NullPointerException ex) {
-			SFPlugin.log(Level.INFO, "Some inventory contents were null for "
-					+ e.getPlayer().getName());
-			// ex.printStackTrace();
-		}
+		sfp.loadInventory(e.getNewGameMode());
 		e.getPlayer().saveData();
 	}
 
@@ -305,10 +182,10 @@ public class PListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPlayerJoin(PlayerJoinEvent e) {
-
+		SFPlayer sfp = new SFPlayer(e.getPlayer());
 		PermissionAttachment attachment = e.getPlayer().addAttachment(plugin);
 		plugin.permissionAttachements.put(e.getPlayer().getName(), attachment);
-		updatePlayerNameColour(e.getPlayer(), plugin);
+		sfp.updateNameColour();
 		// updateCompass(e.getPlayer(), e.getPlayer().getWorld());
 		setGameMode(e.getPlayer(), e.getPlayer().getWorld());
 		List<SFMail> msgs;
@@ -471,7 +348,10 @@ public class PListener implements Listener {
 					}
 				}
 			}
-			e.getPlayer().setNoDamageTicks(200);
+			// I need to disable this, entering bed and vehicles etc are
+			// teleports too.
+			// e.getPlayer().setNoDamageTicks(200);
+
 			// if (e.getPlayer().getVehicle() != null) {
 			// if (e.getFrom().distance(e.getTo()) > 30) {
 			// if (e.getPlayer().getVehicle().eject()) {
@@ -524,17 +404,6 @@ public class PListener implements Listener {
 			}
 			setGameMode(player, to);
 			// updateCompass(player, to);
-		}
-	}
-
-	public void updateCompass(Player p, World toWorld) {
-
-		SFPlayer sfp = new SFPlayer(p);
-		Location homeLoc = sfp.getHomeLoc(p.getWorld());
-		if (homeLoc != null) {
-			p.setCompassTarget(homeLoc);
-		} else {
-			p.setCompassTarget(toWorld.getSpawnLocation());
 		}
 	}
 }
