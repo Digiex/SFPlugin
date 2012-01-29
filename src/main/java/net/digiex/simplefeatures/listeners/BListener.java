@@ -7,19 +7,22 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPlaceEvent;
 
-public class BListener extends BlockListener {
+public class BListener implements Listener {
 
 	SFPlugin plugin;
 
 	public BListener(SFPlugin parent) {
 		plugin = parent;
+		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
 
-	@Override
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onBlockBreak(BlockBreakEvent event) {
 		Player p = event.getPlayer();
 		SFPlayer sfp = new SFPlayer(p);
@@ -45,7 +48,7 @@ public class BListener extends BlockListener {
 		}
 	}
 
-	@Override
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onBlockPlace(BlockPlaceEvent event) {
 		Player p = event.getPlayer();
 		SFPlayer sfp = new SFPlayer(p);

@@ -7,22 +7,25 @@ import org.bukkit.Material;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.entity.EntityListener;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.inventory.ItemStack;
 
-public class EListener extends EntityListener {
+public class EListener implements Listener {
 
 	private final SFPlugin plugin;
 
 	public EListener(SFPlugin plugin) {
 		this.plugin = plugin;
+		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
 
-	@Override
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onEntityDamage(EntityDamageEvent e) {
 		if (e.isCancelled()) {
 			return;
@@ -83,7 +86,7 @@ public class EListener extends EntityListener {
 
 	}
 
-	@Override
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onEntityExplode(EntityExplodeEvent e) {
 		if (e.isCancelled()) {
 			return;
@@ -102,7 +105,7 @@ public class EListener extends EntityListener {
 		}
 	}
 
-	@Override
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onItemSpawn(ItemSpawnEvent e) {
 		if (e.isCancelled()) {
 			return;

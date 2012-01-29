@@ -62,9 +62,6 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
-import org.bukkit.event.Event.Priority;
-import org.bukkit.event.Event.Type;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
 import org.bukkit.permissions.PermissionAttachment;
@@ -94,9 +91,11 @@ public class SFPlugin extends JavaPlugin {
 	}
 
 	public static SFQuestioner questioner;
-	static final Logger log = Logger.getLogger("Minecraft");
 	public static String pluginName = "SimpleFeatures";
-
+	public BListener blockListener;
+	public EListener entityListener;
+	public PListener playerListener;
+	public SFQuestionerPlayerListener questionerPlayerListener;
 	public static WorldBorder worldBorderPlugin;
 
 	public static void broadcastLocalizedFormattedMessage(String node,
@@ -200,7 +199,8 @@ public class SFPlugin extends JavaPlugin {
 	}
 
 	public static void log(Level level, String msg) {
-		log.log(level, "[" + pluginName + "] " + msg);
+		Bukkit.getPluginManager().getPlugin("SimpleFeatures").getLogger()
+				.log(level, msg);
 	}
 
 	public static List<OfflinePlayer> matchOfflinePlayer(String partialName,
@@ -466,16 +466,13 @@ public class SFPlugin extends JavaPlugin {
 										"worlds." + worldKey + ".animals",
 										false));
 						SFWorlds.add(newworld.getUID());
-						log(Level.INFO,
-								ChatColor.GRAY + "World " + newworld.getName()
-										+ " loaded, environment "
-										+ newworld.getEnvironment().toString()
-										+ ", pvp: " + newworld.getPVP()
-										+ ", Animals:"
-										+ newworld.getAllowAnimals()
-										+ ", Monsters: "
-										+ newworld.getAllowMonsters()
-										+ ", seed: " + newworld.getSeed());
+						log(Level.INFO, "World " + newworld.getName()
+								+ " loaded, environment "
+								+ newworld.getEnvironment().toString()
+								+ ", pvp: " + newworld.getPVP() + ", Animals:"
+								+ newworld.getAllowAnimals() + ", Monsters: "
+								+ newworld.getAllowMonsters() + ", seed: "
+								+ newworld.getSeed());
 						count++;
 					}
 				}
@@ -483,48 +480,12 @@ public class SFPlugin extends JavaPlugin {
 		}
 
 		// Simple Output to the Console to show how many Worlds were loaded.
-		log(Level.INFO, ChatColor.YELLOW + "" + count + " world(s) loaded.");
-		PListener playerListener = new PListener(this);
-		// WListener worldListener = new WListener(this);
-		BListener blockListener = new BListener(this);
-		EListener entityListener = new EListener(this);
-		// Listeners
-		pm.registerEvent(Event.Type.PLAYER_TELEPORT, playerListener,
-				Event.Priority.Highest, this);
-		// pm.registerEvent(Event.Type.WORLD_SAVE, worldListener,
-		// Priority.Monitor, this); TODO: Save stuff when world saves.
-		// pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener,
-		// Priority.Monitor, this);
-		pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener,
-				Priority.Highest, this);
-		pm.registerEvent(Event.Type.PLAYER_RESPAWN, playerListener,
-				Priority.Monitor, this);
-		pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener,
-				Priority.Highest, this);
-		pm.registerEvent(Event.Type.PLAYER_PRELOGIN, playerListener,
-				Priority.Highest, this);
-		pm.registerEvent(Event.Type.PLAYER_KICK, playerListener,
-				Priority.Highest, this);
-		pm.registerEvent(Event.Type.PLAYER_GAME_MODE_CHANGE, playerListener,
-				Priority.Monitor, this);
-		pm.registerEvent(Event.Type.PLAYER_PORTAL, playerListener,
-				Priority.Highest, this);
-		pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener,
-				Priority.Normal, this);
-		pm.registerEvent(Event.Type.BLOCK_PLACE, blockListener,
-				Priority.Highest, this);
-		pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener,
-				Priority.Highest, this);
-		pm.registerEvent(Event.Type.ENTITY_EXPLODE, entityListener,
-				Priority.Highest, this);
-		pm.registerEvent(Event.Type.ENTITY_DAMAGE, entityListener,
-				Priority.Highest, this);
-		pm.registerEvent(Event.Type.ITEM_SPAWN, entityListener,
-				Priority.Highest, this);
-		getServer().getPluginManager().registerEvent(
-				Type.PLAYER_COMMAND_PREPROCESS,
-				new SFQuestionerPlayerListener(questioner.questions),
-				Priority.Normal, this);
+		log(Level.INFO, count + " world(s) loaded.");
+		playerListener = new PListener(this);
+		blockListener = new BListener(this);
+		entityListener = new EListener(this);
+		questionerPlayerListener = new SFQuestionerPlayerListener(
+				questioner.questions, this);
 		getServer().getScheduler().scheduleSyncRepeatingTask(this,
 				new QuestionsReaper(questioner.questions), 15000, 15000);
 
@@ -586,7 +547,7 @@ public class SFPlugin extends JavaPlugin {
 	}
 
 	public void setFilter() {
-		log.setFilter(new Filter() {
+		Logger.getLogger("Minecraft").setFilter(new Filter() {
 
 			@Override
 			public boolean isLoggable(LogRecord record) {

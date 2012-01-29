@@ -21,12 +21,14 @@ import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
-import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerPreLoginEvent.Result;
@@ -40,7 +42,7 @@ import org.bukkit.scheduler.BukkitWorker;
 
 import com.wimbli.WorldBorder.BorderData;
 
-public class PListener extends PlayerListener {
+public class PListener implements Listener {
 
 	private class AskSetHomeTask implements Runnable {
 		private final Player player;
@@ -119,9 +121,10 @@ public class PListener extends PlayerListener {
 
 	public PListener(SFPlugin parent) {
 		plugin = parent;
+		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
 
-	@Override
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerGameModeChange(PlayerGameModeChangeEvent e) {
 		if (e.isCancelled()) {
 			return;
@@ -215,7 +218,7 @@ public class PListener extends PlayerListener {
 		e.getPlayer().saveData();
 	}
 
-	@Override
+	@EventHandler
 	public void onPlayerInteract(final PlayerInteractEvent event) {
 		if (event.getAction() != Action.LEFT_CLICK_AIR
 				&& event.getAction() != Action.RIGHT_CLICK_AIR
@@ -300,7 +303,7 @@ public class PListener extends PlayerListener {
 		}
 	}
 
-	@Override
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPlayerJoin(PlayerJoinEvent e) {
 
 		PermissionAttachment attachment = e.getPlayer().addAttachment(plugin);
@@ -321,7 +324,7 @@ public class PListener extends PlayerListener {
 		}
 	}
 
-	@Override
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPlayerKick(PlayerKickEvent e) {
 		System.out
 				.println(e.getPlayer().getName() + " lost connection: kicked");
@@ -360,7 +363,7 @@ public class PListener extends PlayerListener {
 		}
 	}
 
-	@Override
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPlayerPortal(PlayerPortalEvent e) {
 		if (!(e.isCancelled()) && e.getTo() != null) {
 			if (SFPlugin.worldBorderPlugin != null) {
@@ -383,7 +386,7 @@ public class PListener extends PlayerListener {
 		}
 	}
 
-	@Override
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPlayerPreLogin(PlayerPreLoginEvent e) {
 		if (plugin.getConfig().getBoolean("whitelist.enabled", false)) {
 			if (!plugin.getServer().getOfflinePlayer(e.getName())
@@ -405,7 +408,7 @@ public class PListener extends PlayerListener {
 		}
 	}
 
-	@Override
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPlayerQuit(PlayerQuitEvent e) {
 		try {
 			for (BukkitWorker worker : plugin.getServer().getScheduler()
@@ -439,7 +442,7 @@ public class PListener extends PlayerListener {
 		}
 	}
 
-	@Override
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
 		SFPlayer sfp = new SFPlayer(event.getPlayer());
 		Location homeLoc = sfp.getHomeLoc(event.getPlayer().getWorld());
@@ -450,7 +453,7 @@ public class PListener extends PlayerListener {
 				.getWorld(), event.getPlayer(), event);
 	}
 
-	@Override
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPlayerTeleport(PlayerTeleportEvent e) {
 		if (!(e.isCancelled()) && e.getTo() != null) {
 			if (SFPlugin.worldBorderPlugin != null) {

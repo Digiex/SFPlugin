@@ -2,17 +2,24 @@ package net.digiex.simplefeatures.questioner;
 
 import java.util.Vector;
 
+import net.digiex.simplefeatures.SFPlugin;
+
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerListener;
 
-public class SFQuestionerPlayerListener extends PlayerListener {
+public class SFQuestionerPlayerListener implements Listener {
 	private final Vector<Question> questions;
+	private final SFPlugin plugin;
 
-	public SFQuestionerPlayerListener(Vector<Question> questions) {
+	public SFQuestionerPlayerListener(Vector<Question> questions,
+			SFPlugin parent) {
 		this.questions = questions;
+		plugin = parent;
+		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
 
-	@Override
+	@EventHandler
 	public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
 		if (!event.isCancelled() && !questions.isEmpty()) {
 			final int playerHash = event.getPlayer().getName().hashCode();
