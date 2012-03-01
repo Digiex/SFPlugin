@@ -114,7 +114,7 @@ public class SFPlayer {
 	}
 
 	public boolean isAdmin() {
-		List<Object> admins = plugin.getConfig().getList("admins");
+		List<?> admins = plugin.getConfig().getList("admins");
 		if (admins != null) {
 			if (admins.contains(player.getName())) {
 				return true;

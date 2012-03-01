@@ -9,10 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.logging.Filter;
 import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
 
 import javax.persistence.PersistenceException;
 
@@ -418,7 +415,6 @@ public class SFPlugin extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
-		setFilter();
 		PluginManager pm = getServer().getPluginManager();
 		questioner = new SFQuestioner();
 		worldBorderPlugin = (WorldBorder) pm.getPlugin("WorldBorder");
@@ -534,7 +530,7 @@ public class SFPlugin extends JavaPlugin {
 	}
 
 	private void setCMDexecutor(String cmd, CommandExecutor exc) {
-		List<Object> disabled = getConfig().getList("commands.disabled");
+		List<?> disabled = getConfig().getList("commands.disabled");
 		if (disabled != null) {
 			if (!disabled.contains(cmd)) {
 				getCommand(cmd).setExecutor(exc);
@@ -544,18 +540,6 @@ public class SFPlugin extends JavaPlugin {
 		} else {
 			getCommand(cmd).setExecutor(exc);
 		}
-	}
-
-	public void setFilter() {
-		Logger.getLogger("Minecraft").setFilter(new Filter() {
-
-			@Override
-			public boolean isLoggable(LogRecord record) {
-				return (record.getMessage() == null)
-						|| (!record.getMessage().contains("overloaded?"))
-						|| (record.getLevel() != Level.WARNING);
-			}
-		});
 	}
 
 	private void setupDatabase() {
