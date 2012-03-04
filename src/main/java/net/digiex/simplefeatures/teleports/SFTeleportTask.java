@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 
+@Deprecated
 public class SFTeleportTask implements Runnable {
 	private final Player who;
 	// wants

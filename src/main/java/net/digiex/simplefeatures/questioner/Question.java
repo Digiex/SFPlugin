@@ -4,6 +4,7 @@ import net.digiex.simplefeatures.SFPlayer;
 
 import org.bukkit.entity.Player;
 
+@Deprecated
 class Question {
 	private String answer = null;
 	private String answer1 = null;

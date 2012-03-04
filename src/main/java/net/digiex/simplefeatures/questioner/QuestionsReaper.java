@@ -3,6 +3,7 @@ package net.digiex.simplefeatures.questioner;
 import java.util.Enumeration;
 import java.util.Vector;
 
+@Deprecated
 public class QuestionsReaper implements Runnable {
 	private final Vector<Question> questions;
 

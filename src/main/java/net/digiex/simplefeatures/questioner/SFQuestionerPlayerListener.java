@@ -8,6 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
+@Deprecated
 public class SFQuestionerPlayerListener implements Listener {
 	private final Vector<Question> questions;
 	private final SFPlugin plugin;

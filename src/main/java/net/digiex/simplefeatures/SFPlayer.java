@@ -337,8 +337,25 @@ public class SFPlayer {
 		teleport(player, null, to, false, null, infoMsg);
 	}
 
+	@Deprecated
 	public void teleport(Player who, Player askSubject, Location where,
-			boolean ask, String question, String infoMsg) {
+			boolean ask, final String question, String infoMsg) {
+		/*
+		 * if (ask) { Prompt prompt = new BooleanPrompt() {
+		 * 
+		 * @Override protected Prompt acceptValidatedInput( ConversationContext
+		 * context, boolean input) {
+		 * 
+		 * System.out.println(input);
+		 * 
+		 * return Prompt.END_OF_CONVERSATION; }
+		 * 
+		 * @Override public String getPromptText(ConversationContext context) {
+		 * // TODO Auto-generated method stub return question; }
+		 * 
+		 * }; Conversation convo = new Conversation(plugin, askSubject, prompt);
+		 * askSubject.beginConversation(convo); }
+		 */
 		int taskId = plugin
 				.getServer()
 				.getScheduler()

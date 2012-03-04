@@ -4,6 +4,7 @@ import java.util.Vector;
 
 import org.bukkit.entity.Player;
 
+@Deprecated
 public class SFQuestioner {
 	public final Vector<Question> questions = new Vector<Question>();
 
