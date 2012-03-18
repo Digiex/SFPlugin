@@ -155,13 +155,13 @@ public class SFPlayer {
 					player.setHealth(inv.getHealth());
 					player.setFoodLevel(inv.getFood());
 				}
-				player.setExp(inv.getExp());
 				player.setExhaustion(inv.getExhaustion());
 				player.setFireTicks(inv.getFireTicks());
-				player.setLevel(inv.getLevel());
 				player.setRemainingAir(inv.getRemainingAir());
 				player.setSaturation(inv.getSaturation());
 				player.setTotalExperience(inv.getTotalExperience());
+				player.setLevel(inv.getLevel());
+				player.setExp(inv.getExp());
 			}
 
 		} catch (NullPointerException ex) {
@@ -199,13 +199,13 @@ public class SFPlayer {
 					.getArmorContents()));
 			inv.setHealth(player.getHealth());
 			inv.setFood(player.getFoodLevel());
-			inv.setExp(player.getExp());
 			inv.setExhaustion(player.getExhaustion());
 			inv.setFireTicks(player.getFireTicks());
-			inv.setLevel(player.getLevel());
 			inv.setRemainingAir(player.getRemainingAir());
 			inv.setSaturation(player.getSaturation());
 			inv.setTotalExperience(player.getTotalExperience());
+			inv.setLevel(player.getLevel());
+			inv.setExp(player.getExp());
 			if (isUpdate) {
 				db.update(inv, invUpdateProps);
 			}
