@@ -1,6 +1,6 @@
 name: SimpleFeatures
 main: net.digiex.simplefeatures.SFPlugin
-version: 1.0.4
+version: 1.0.5
 description: Basic commands and features
 author: jessenic
 website: http://digiex.net/
@@ -141,3 +141,9 @@ commands:
         usage: |
                /<command> <list|remove|add> [pointname]
                Example: /<command> add awesomemountain
+    xp:
+        aliases: [exp, experience]
+        description: View your experience
+        usage: |
+               /<command> [player]
+               Example: /<command>

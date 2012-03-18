@@ -37,6 +37,7 @@ import net.digiex.simplefeatures.commands.CMDtpahere;
 import net.digiex.simplefeatures.commands.CMDtphere;
 import net.digiex.simplefeatures.commands.CMDwho;
 import net.digiex.simplefeatures.commands.CMDworld;
+import net.digiex.simplefeatures.commands.CMDxp;
 import net.digiex.simplefeatures.listeners.BListener;
 import net.digiex.simplefeatures.listeners.ClientModListener;
 import net.digiex.simplefeatures.listeners.EListener;
@@ -512,6 +513,7 @@ public class SFPlugin extends JavaPlugin {
 		setCMDexecutor("admin", new CMDadmin(this));
 		setCMDexecutor("lastseen", new CMDlastseen(this));
 		setCMDexecutor("compasspoint", new CMDcompasspoint(this));
+		setCMDexecutor("xp", new CMDxp(this));
 		setupDatabase();
 		int interval = getConfig().getInt("autosave.interval", 300);
 		log(Level.INFO, ChatColor.AQUA
