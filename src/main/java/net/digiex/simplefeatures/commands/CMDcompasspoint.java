@@ -9,11 +9,17 @@ import net.digiex.simplefeatures.SFPlayer;
 import net.digiex.simplefeatures.SFPlugin;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.World.Environment;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.conversations.BooleanPrompt;
+import org.bukkit.conversations.Conversation;
+import org.bukkit.conversations.ConversationContext;
+import org.bukkit.conversations.Prompt;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 public class CMDcompasspoint implements CommandExecutor {
 	SFPlugin plugin;
@@ -37,9 +43,9 @@ public class CMDcompasspoint implements CommandExecutor {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command,
-			String label, String[] args) {
+			String label, final String[] args) {
 		if (sender instanceof Player) {
-			Player p = (Player) sender;
+			final Player p = (Player) sender;
 			SFPlayer sfp = new SFPlayer(p);
 			if (args.length > 0) {
 				if (args[0].equalsIgnoreCase("list")) {
@@ -138,6 +144,86 @@ public class CMDcompasspoint implements CommandExecutor {
 						}
 						return true;
 					}
+				} else if (args[0].equalsIgnoreCase("warp")) {
+					if (args.length > 1) {
+						com.avaje.ebean.EbeanServer db = plugin.getDatabase();
+						SFCompassPoint point = db
+								.find(SFCompassPoint.class)
+								.where()
+								.ieq("worldName",
+										p.getLocation().getWorld().getName())
+								.ieq("playerName", p.getName())
+								.ieq("pointName", args[1]).findUnique();
+
+						if (point == null) {
+							p.sendMessage(ChatColor.RED
+									+ sfp.translateStringFormat(
+											"compasspoints.notfound", args[1]));
+							return true;
+						} else {
+							final Location pointloc = new Location(
+									p.getServer()
+											.getWorld(point.getWorldName()),
+									point.getX(), point.getY(), point.getZ(),
+									point.getYaw(), point.getPitch());
+							if (p.isOp()) {
+								p.teleport(pointloc);
+								return true;
+							}
+							final Vector player = p.getLocation().toVector();
+							final Vector cp = pointloc.toVector();
+							final double distance = player.distance(cp);
+							final int cost = ((int) distance / 500) + 1;
+							Prompt prompt = new BooleanPrompt() {
+								@Override
+								protected Prompt acceptValidatedInput(
+										ConversationContext context,
+										boolean input) {
+									if (input) {
+										if (p.getLevel() >= cost) {
+											p.teleport(pointloc);
+											p.setLevel(p.getLevel() - cost);
+											context.getForWhom()
+													.sendRawMessage(
+															ChatColor.MAGIC
+																	+ "And the magic carries you to another land!");
+										} else {
+											context.getForWhom()
+													.sendRawMessage(
+															"I'm sorry, but you have only "
+																	+ p.getLevel()
+																	+ " levels and "
+																	+ cost
+																	+ " is needed.");
+										}
+									} else {
+										context.getForWhom()
+												.sendRawMessage(
+														"Alright then, maybe next time!");
+									}
+									return Prompt.END_OF_CONVERSATION;
+								}
+
+								@Override
+								public String getPromptText(
+										ConversationContext context) {
+									// TODO Auto-generated method stub
+									return "Distance to "
+											+ args[1]
+											+ " is "
+											+ (int) distance
+											+ " blocks. Warping will cost "
+											+ cost
+											+ " experience levels. Do you want to continue? yes/no";
+								}
+
+							};
+							Conversation convo = new Conversation(plugin, p,
+									prompt);
+							p.beginConversation(convo);
+						}
+						return true;
+					}
 				}
 			}
 			sender.sendMessage(ChatColor.YELLOW
@@ -145,5 +231,4 @@ public class CMDcompasspoint implements CommandExecutor {
 		}
 		return false;
 	}
-
 }

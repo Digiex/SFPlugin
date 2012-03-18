@@ -139,7 +139,7 @@ commands:
         aliases: [cp]
         description: List/remove/add compass points
         usage: |
-               /<command> <list|remove|add> [pointname]
+               /<command> <list|remove|add|warp> [pointname]
                Example: /<command> add awesomemountain
     xp:
         aliases: [exp, experience]
