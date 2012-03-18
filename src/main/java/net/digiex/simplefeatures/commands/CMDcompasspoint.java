@@ -9,6 +9,7 @@ import net.digiex.simplefeatures.SFPlayer;
 import net.digiex.simplefeatures.SFPlugin;
 
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World.Environment;
 import org.bukkit.command.Command;
@@ -166,7 +167,8 @@ public class CMDcompasspoint implements CommandExecutor {
 											.getWorld(point.getWorldName()),
 									point.getX(), point.getY(), point.getZ(),
 									point.getYaw(), point.getPitch());
-							if (p.isOp()) {
+							if (p.isOp()
+									|| p.getGameMode() == GameMode.CREATIVE) {
 								p.teleport(pointloc);
 								return true;
 							}
