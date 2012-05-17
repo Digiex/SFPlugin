@@ -317,6 +317,9 @@ public class SFPlugin extends JavaPlugin {
 				if (!c.isSet(ks + "type")) {
 					c.set(ks + "type", w.getWorldType().toString());
 				}
+				if (!c.isSet(ks + "structures")) {
+					c.set(ks + "structures", w.canGenerateStructures());
+				}
 			}
 			if (!c.isSet(ks + "itemdrops")) {
 				c.set(ks + "itemdrops", true);
@@ -470,6 +473,8 @@ public class SFPlugin extends JavaPlugin {
 						if (seed != 0) {
 							wc.seed(seed);
 						}
+						wc.generateStructures(getConfig().getBoolean(
+								"worlds." + worldKey + ".structures", true));
 						World newworld = getServer().createWorld(wc);
 
 						// Increment the world count
