@@ -53,6 +53,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.WorldCreator;
+import org.bukkit.WorldType;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -313,6 +314,9 @@ public class SFPlugin extends JavaPlugin {
 				if (!c.isSet(ks + "animals")) {
 					c.set(ks + "animals", w.getAllowAnimals());
 				}
+				if (!c.isSet(ks + "type")) {
+					c.set(ks + "type", w.getWorldType().toString());
+				}
 			}
 			if (!c.isSet(ks + "itemdrops")) {
 				c.set(ks + "itemdrops", true);
@@ -445,6 +449,8 @@ public class SFPlugin extends JavaPlugin {
 						// getEnvFromString(environment));
 						WorldCreator wc = new WorldCreator(worldKey);
 						wc.environment(getEnvFromString(environment));
+						wc.type(WorldType.getByName(getConfig().getString(
+								"worlds." + worldKey + ".type", "NORMAL")));
 						long seed = getConfig().getLong(
 								"worlds." + worldKey + ".seed", 0);
 						if (seed != 0) {
@@ -464,7 +470,9 @@ public class SFPlugin extends JavaPlugin {
 										false));
 						SFWorlds.add(newworld.getUID());
 						log(Level.INFO, "World " + newworld.getName()
-								+ " loaded, environment "
+								+ " loaded, type "
+								+ newworld.getWorldType().toString()
+								+ ", environment "
 								+ newworld.getEnvironment().toString()
 								+ ", pvp: " + newworld.getPVP() + ", Animals:"
 								+ newworld.getAllowAnimals() + ", Monsters: "
