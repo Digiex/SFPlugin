@@ -412,6 +412,20 @@ public class SFPlugin extends JavaPlugin {
 		return Environment.NORMAL;
 	}
 
+	public WorldType getWorldTypeFromString(String type) {
+		WorldType type1 = WorldType.getByName(type);
+		if (type1 != null) {
+			return type1;
+		}
+		if (type.equalsIgnoreCase("flat")) {
+			return WorldType.FLAT;
+		}
+		if (type.equalsIgnoreCase("VERSION_1_1")) {
+			return WorldType.VERSION_1_1;
+		}
+		return WorldType.NORMAL;
+	}
+
 	@Override
 	public void onDisable() {
 		log(Level.INFO, "Plugin disabled.");
@@ -449,7 +463,7 @@ public class SFPlugin extends JavaPlugin {
 						// getEnvFromString(environment));
 						WorldCreator wc = new WorldCreator(worldKey);
 						wc.environment(getEnvFromString(environment));
-						wc.type(WorldType.getByName(getConfig().getString(
+						wc.type(getWorldTypeFromString(getConfig().getString(
 								"worlds." + worldKey + ".type", "NORMAL")));
 						long seed = getConfig().getLong(
 								"worlds." + worldKey + ".seed", 0);
