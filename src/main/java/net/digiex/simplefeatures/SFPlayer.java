@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
-import net.digiex.simplefeatures.teleports.SFTeleportTask;
-
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -124,7 +122,8 @@ public class SFPlayer {
 	}
 
 	public boolean isTeleporting() {
-		return SFTeleportTask.teleporters.containsKey(player.getName());
+		// return SFTeleportTask.teleporters.containsKey(player.getName());
+		return false;
 	}
 
 	public boolean loadInventory() {
@@ -356,14 +355,19 @@ public class SFPlayer {
 		 * }; Conversation convo = new Conversation(plugin, askSubject, prompt);
 		 * askSubject.beginConversation(convo); }
 		 */
-		int taskId = plugin
-				.getServer()
-				.getScheduler()
-				.scheduleAsyncDelayedTask(
-						plugin,
-						new SFTeleportTask(who, player, askSubject, where, ask,
-								question, infoMsg));
-		SFTeleportTask.teleporters.put(player.getName(), taskId);
+		/*
+		 * int taskId = plugin .getServer() .getScheduler()
+		 * .scheduleAsyncDelayedTask( plugin, new SFTeleportTask(who, player,
+		 * askSubject, where, ask, question, infoMsg));
+		 * SFTeleportTask.teleporters.put(player.getName(), taskId);
+		 */
+		if (!ask) {
+			who.sendMessage(infoMsg);
+			who.teleport(where);
+		} else {
+			who.sendMessage("Sorry, cannot teleport you. Please nag jessenic to fix this!");
+
+		}
 	}
 
 	public String translateString(String node) {

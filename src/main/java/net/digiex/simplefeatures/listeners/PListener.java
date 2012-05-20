@@ -8,7 +8,6 @@ import net.digiex.simplefeatures.SFCompassPoint;
 import net.digiex.simplefeatures.SFMail;
 import net.digiex.simplefeatures.SFPlayer;
 import net.digiex.simplefeatures.SFPlugin;
-import net.digiex.simplefeatures.teleports.SFTeleportTask;
 
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -34,7 +33,6 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.scheduler.BukkitScheduler;
-import org.bukkit.scheduler.BukkitWorker;
 
 import com.wimbli.WorldBorder.BorderData;
 
@@ -52,15 +50,17 @@ public class PListener implements Listener {
 		@Override
 		public void run() {
 			SFPlayer sfp = new SFPlayer(player);
-			String answer = SFPlugin.questioner.ask(player, ChatColor.YELLOW
-					+ sfp.translateString("sethome.bedquestion"), "set",
-					"cancel");
-			if (answer == "set") {
-				sfp.setHome(homeLoc);
-			} else {
-				player.sendMessage(ChatColor.GRAY
-						+ sfp.translateString("sethome.bedcancelled"));
-			}
+			/*
+			 * String answer = SFPlugin.questioner.ask(player, ChatColor.YELLOW
+			 * + sfp.translateString("sethome.bedquestion"), "set", "cancel");
+			 * if (answer == "set") {
+			 */
+			sfp.setHome(homeLoc);
+			player.sendMessage("Home set to this bed!");
+			/*
+			 * } else { player.sendMessage(ChatColor.GRAY +
+			 * sfp.translateString("sethome.bedcancelled")); }
+			 */
 			homeTasks.remove(player.getName());
 		}
 	}
@@ -208,28 +208,19 @@ public class PListener implements Listener {
 		if (!e.getPlayer().isWhitelisted()) {
 			e.setLeaveMessage(null);
 		}
-		try {
-			for (BukkitWorker worker : plugin.getServer().getScheduler()
-					.getActiveWorkers()) {
-				if (worker.getOwner() instanceof SFPlugin) {
-					if (SFTeleportTask.teleporters.get(e.getPlayer().getName()) != null) {
-						if (SFTeleportTask.teleporters.get(
-								e.getPlayer().getName()).equals(
-								worker.getTaskId())) {
-
-							plugin.getServer().getScheduler()
-									.cancelTask(worker.getTaskId());
-
-						}
-					}
-				}
-			}
-		} catch (Exception ex) {
-			SFPlugin.log(Level.INFO, "Tried to cancel a teleport of "
-					+ e.getPlayer().getName()
-					+ " but it had been cancelled before (" + ex.getMessage()
-					+ ")");
-		}
+		/*
+		 * try { for (BukkitWorker worker : plugin.getServer().getScheduler()
+		 * .getActiveWorkers()) { if (worker.getOwner() instanceof SFPlugin) {
+		 * if (SFTeleportTask.teleporters.get(e.getPlayer().getName()) != null)
+		 * { if (SFTeleportTask.teleporters.get(
+		 * e.getPlayer().getName()).equals( worker.getTaskId())) {
+		 * 
+		 * plugin.getServer().getScheduler() .cancelTask(worker.getTaskId());
+		 * 
+		 * } } } } } catch (Exception ex) { SFPlugin.log(Level.INFO,
+		 * "Tried to cancel a teleport of " + e.getPlayer().getName() +
+		 * " but it had been cancelled before (" + ex.getMessage() + ")"); }
+		 */
 		if (plugin.permissionAttachements.containsKey(e.getPlayer().getName())) {
 			e.getPlayer().removeAttachment(
 					plugin.permissionAttachements.get(e.getPlayer().getName()));
@@ -287,28 +278,19 @@ public class PListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPlayerQuit(PlayerQuitEvent e) {
-		try {
-			for (BukkitWorker worker : plugin.getServer().getScheduler()
-					.getActiveWorkers()) {
-				if (worker.getOwner() instanceof SFPlugin) {
-					if (SFTeleportTask.teleporters.get(e.getPlayer().getName()) != null) {
-						if (SFTeleportTask.teleporters.get(
-								e.getPlayer().getName()).equals(
-								worker.getTaskId())) {
-
-							plugin.getServer().getScheduler()
-									.cancelTask(worker.getTaskId());
-
-						}
-					}
-				}
-			}
-		} catch (Exception ex) {
-			SFPlugin.log(Level.INFO, "Tried to cancel a teleport of "
-					+ e.getPlayer().getName()
-					+ " but it had been cancelled before (" + ex.getMessage()
-					+ ")");
-		}
+		/*
+		 * try { for (BukkitWorker worker : plugin.getServer().getScheduler()
+		 * .getActiveWorkers()) { if (worker.getOwner() instanceof SFPlugin) {
+		 * if (SFTeleportTask.teleporters.get(e.getPlayer().getName()) != null)
+		 * { if (SFTeleportTask.teleporters.get(
+		 * e.getPlayer().getName()).equals( worker.getTaskId())) {
+		 * 
+		 * plugin.getServer().getScheduler() .cancelTask(worker.getTaskId());
+		 * 
+		 * } } } } } catch (Exception ex) { SFPlugin.log(Level.INFO,
+		 * "Tried to cancel a teleport of " + e.getPlayer().getName() +
+		 * " but it had been cancelled before (" + ex.getMessage() + ")"); }
+		 */
 		if (plugin.permissionAttachements.containsKey(e.getPlayer().getName())) {
 			e.getPlayer().removeAttachment(
 					plugin.permissionAttachements.get(e.getPlayer().getName()));
