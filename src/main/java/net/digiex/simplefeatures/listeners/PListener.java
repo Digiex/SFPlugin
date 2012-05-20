@@ -50,17 +50,17 @@ public class PListener implements Listener {
 		@Override
 		public void run() {
 			SFPlayer sfp = new SFPlayer(player);
-			/*
-			 * String answer = SFPlugin.questioner.ask(player, ChatColor.YELLOW
-			 * + sfp.translateString("sethome.bedquestion"), "set", "cancel");
-			 * if (answer == "set") {
-			 */
-			sfp.setHome(homeLoc);
-			player.sendMessage("Home set to this bed!");
-			/*
-			 * } else { player.sendMessage(ChatColor.GRAY +
-			 * sfp.translateString("sethome.bedcancelled")); }
-			 */
+
+			String answer = SFPlugin.questioner.ask(player, ChatColor.YELLOW
+					+ sfp.translateString("sethome.bedquestion"), "set",
+					"cancel");
+			if (answer == "set") {
+				sfp.setHome(homeLoc);
+			} else {
+				player.sendMessage(ChatColor.GRAY
+						+ sfp.translateString("sethome.bedcancelled"));
+			}
+
 			homeTasks.remove(player.getName());
 		}
 	}
