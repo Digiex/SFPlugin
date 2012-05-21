@@ -67,7 +67,7 @@ public class CMDrandom implements CommandExecutor {
 								.replace("_", " ");
 					}
 				}
-				sfp.teleport(p, null, hB.getLocation(), false, null,
+				sfp.teleport(hB.getLocation(),
 						"Teleporting you to some random " + where);
 			} catch (Exception ex) {
 				p.sendMessage(ChatColor.AQUA

@@ -53,16 +53,14 @@ public class CMDtpahere implements CommandExecutor {
 					}
 					player.sendMessage(ChatColor.GRAY
 							+ sfp.translateString("teleport.requesting"));
-					sfp.teleport(
-							player,
-							to,
-							player.getLocation(),
-							true,
-							SFPlayer.getSFPlayer(to)
-									.translateStringFormat("teleport.tpahere",
-											player.getDisplayName()), sfp
-									.translateStringFormat("teleport.tpingto",
-											player.getDisplayName()));
+					/*
+					 * sfp.teleport( player, to, player.getLocation(), true,
+					 * SFPlayer.getSFPlayer(to)
+					 * .translateStringFormat("teleport.tpahere",
+					 * player.getDisplayName()), sfp
+					 * .translateStringFormat("teleport.tpingto",
+					 * player.getDisplayName()));
+					 */
 
 					return true;
 				}

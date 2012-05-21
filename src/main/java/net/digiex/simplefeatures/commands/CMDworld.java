@@ -120,11 +120,7 @@ public class CMDworld implements CommandExecutor {
 						}
 					}
 					sfp.teleport(
-							player,
-							null,
 							loc,
-							false,
-							null,
 							sfp.translateStringFormat("world.tpingto",
 									world.getName()));
 					return true;

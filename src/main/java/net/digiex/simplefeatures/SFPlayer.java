@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -71,10 +72,20 @@ public class SFPlayer {
 		}
 	}
 
+	private transient SFPlayer teleportRequester;
+
+	private transient boolean teleportRequestHere;
+
+	private transient long teleportRequestTime;
+
+	private long lastTeleportTimestamp;
+	private Teleport teleport;
+
 	private SFPlayer(Player player) {
 		this.player = player;
-		plugin = ((SFPlugin) player.getServer().getPluginManager()
-				.getPlugin("SimpleFeatures"));
+		plugin = ((SFPlugin) Bukkit.getPluginManager().getPlugin(
+				"SimpleFeatures"));
+		teleport = new Teleport(player);
 	}
 
 	public double getClientModVersion() {
@@ -125,8 +136,20 @@ public class SFPlayer {
 		return loc;
 	}
 
+	public long getLastTeleportTimestamp() {
+		return lastTeleportTimestamp;
+	}
+
 	public Player getPlayer() {
 		return player;
+	}
+
+	public Teleport getTeleport() {
+		return teleport;
+	}
+
+	public SFPlayer getTeleportRequest() {
+		return teleportRequester;
 	}
 
 	public Location getTempHomeLocation() {
@@ -150,6 +173,10 @@ public class SFPlayer {
 	public boolean isTeleporting() {
 		// return SFTeleportTask.teleporters.containsKey(player.getName());
 		return false;
+	}
+
+	public boolean isTpRequestHere() {
+		return teleportRequestHere;
 	}
 
 	public boolean loadInventory() {
@@ -195,6 +222,12 @@ public class SFPlayer {
 			// ex.printStackTrace();
 		}
 		return retval;
+	}
+
+	public void requestTeleport(final SFPlayer sfplayer, final boolean here) {
+		teleportRequestTime = System.currentTimeMillis();
+		teleportRequester = sfplayer;
+		teleportRequestHere = here;
 	}
 
 	public boolean saveInventory() {
@@ -320,6 +353,14 @@ public class SFPlayer {
 		}
 	}
 
+	public void setLastTeleportTimestamp(long lastTeleportTimestamp) {
+		this.lastTeleportTimestamp = lastTeleportTimestamp;
+	}
+
+	public void setTeleport(Teleport teleport) {
+		this.teleport = teleport;
+	}
+
 	public void setTempHomeLocation(Location tempHomeLocation) {
 		this.tempHomeLocation = tempHomeLocation;
 	}
@@ -359,44 +400,22 @@ public class SFPlayer {
 	}
 
 	public void teleport(Location to) {
-		teleport(player, null, to, false, null, "Teleporting!");
+		try {
+			getTeleport().teleport(to);
+		} catch (Exception e) {
+			getPlayer().sendMessage(
+					ChatColor.RED + "Could not teleport: " + e.getMessage());
+		}
 	}
 
 	public void teleport(Location to, String infoMsg) {
-		teleport(player, null, to, false, null, infoMsg);
-	}
-
-	@Deprecated
-	public void teleport(Player who, Player askSubject, Location where,
-			boolean ask, final String question, String infoMsg) {
-		/*
-		 * if (ask) { Prompt prompt = new BooleanPrompt() {
-		 * 
-		 * @Override protected Prompt acceptValidatedInput( ConversationContext
-		 * context, boolean input) {
-		 * 
-		 * System.out.println(input);
-		 * 
-		 * return Prompt.END_OF_CONVERSATION; }
-		 * 
-		 * @Override public String getPromptText(ConversationContext context) {
-		 * // TODO Auto-generated method stub return question; }
-		 * 
-		 * }; Conversation convo = new Conversation(plugin, askSubject, prompt);
-		 * askSubject.beginConversation(convo); }
-		 */
-		/*
-		 * int taskId = plugin .getServer() .getScheduler()
-		 * .scheduleAsyncDelayedTask( plugin, new SFTeleportTask(who, player,
-		 * askSubject, where, ask, question, infoMsg));
-		 * SFTeleportTask.teleporters.put(player.getName(), taskId);
-		 */
-		if (!ask) {
-			who.sendMessage(infoMsg);
-			who.teleport(where);
-		} else {
-			who.sendMessage("Sorry, cannot teleport you. Please nag jessenic to fix this!");
-
+		try {
+			getTeleport().teleport(to);
+		} catch (Exception e) {
+			getPlayer().sendMessage(
+					ChatColor.RED + "Could not teleport: " + e.getMessage());
+		} finally {
+			getPlayer().sendMessage(infoMsg);
 		}
 	}
 

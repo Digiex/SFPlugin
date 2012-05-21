@@ -88,9 +88,8 @@ public class CMDspawn implements CommandExecutor {
 					}
 				}
 			}
-			sfp.teleport(player, null, spawnLoc, false, null, sfp
-					.translateStringFormat("spawn.teleport", spawnLoc
-							.getWorld().getName()));
+			sfp.teleport(spawnLoc, sfp.translateStringFormat("spawn.teleport",
+					spawnLoc.getWorld().getName()));
 
 			return true;
 		}

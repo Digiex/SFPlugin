@@ -50,16 +50,13 @@ public class CMDtpa implements CommandExecutor {
 								return true;
 							}
 						}
-					}
-					sfp.teleport(
-							player,
-							to,
-							to.getLocation(),
-							true,
-							SFPlayer.getSFPlayer(to).translateStringFormat(
-									"teleport.tpa", player.getDisplayName()),
-							sfp.translateStringFormat("teleport.tpingto",
-									to.getDisplayName()));
+					}/*
+					 * sfp.teleport( player, to, to.getLocation(), true,
+					 * SFPlayer.getSFPlayer(to).translateStringFormat(
+					 * "teleport.tpa", player.getDisplayName()),
+					 * sfp.translateStringFormat("teleport.tpingto",
+					 * to.getDisplayName()));
+					 */
 
 					return true;
 				}
