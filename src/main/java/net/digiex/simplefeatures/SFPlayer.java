@@ -49,6 +49,8 @@ public class SFPlayer {
 		invUpdateProps.add("total_experience");
 	}
 
+	private Location tempHomeLocation = null;
+
 	public SFPlayer(Player player) {
 		this.player = player;
 		plugin = ((SFPlugin) player.getServer().getPluginManager()
@@ -105,6 +107,10 @@ public class SFPlayer {
 
 	public Player getPlayer() {
 		return player;
+	}
+
+	public Location getTempHomeLocation() {
+		return tempHomeLocation;
 	}
 
 	public boolean hasClientMod() {
@@ -292,6 +298,10 @@ public class SFPlayer {
 		} finally {
 			db.endTransaction();
 		}
+	}
+
+	public void setTempHomeLocation(Location tempHomeLocation) {
+		this.tempHomeLocation = tempHomeLocation;
 	}
 
 	@SuppressWarnings("unchecked")

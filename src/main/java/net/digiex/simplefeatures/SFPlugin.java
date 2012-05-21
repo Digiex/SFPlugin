@@ -42,9 +42,6 @@ import net.digiex.simplefeatures.listeners.BListener;
 import net.digiex.simplefeatures.listeners.ClientModListener;
 import net.digiex.simplefeatures.listeners.EListener;
 import net.digiex.simplefeatures.listeners.PListener;
-import net.digiex.simplefeatures.questioner.QuestionsReaper;
-import net.digiex.simplefeatures.questioner.SFQuestioner;
-import net.digiex.simplefeatures.questioner.SFQuestionerPlayerListener;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -89,12 +86,10 @@ public class SFPlugin extends JavaPlugin {
 
 	}
 
-	public static SFQuestioner questioner;
 	public static String pluginName = "SimpleFeatures";
 	public BListener blockListener;
 	public EListener entityListener;
 	public PListener playerListener;
-	public SFQuestionerPlayerListener questionerPlayerListener;
 	public static WorldBorder worldBorderPlugin;
 
 	public static void broadcastLocalizedFormattedMessage(String node,
@@ -438,7 +433,6 @@ public class SFPlugin extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		PluginManager pm = getServer().getPluginManager();
-		questioner = new SFQuestioner();
 		worldBorderPlugin = (WorldBorder) pm.getPlugin("WorldBorder");
 		// Worlds
 
@@ -508,10 +502,6 @@ public class SFPlugin extends JavaPlugin {
 		playerListener = new PListener(this);
 		blockListener = new BListener(this);
 		entityListener = new EListener(this);
-		questionerPlayerListener = new SFQuestionerPlayerListener(
-				questioner.questions, this);
-		getServer().getScheduler().scheduleSyncRepeatingTask(this,
-				new QuestionsReaper(questioner.questions), 15000, 15000);
 
 		saveConfig();
 		createDefaultConfig();

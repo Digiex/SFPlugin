@@ -4,6 +4,7 @@ import net.digiex.simplefeatures.SFPlayer;
 import net.digiex.simplefeatures.SFPlugin;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -24,7 +25,21 @@ public class CMDsethome implements CommandExecutor {
 		if (sender instanceof Player) {
 			Player player = (Player) sender;
 			SFPlayer sfp = new SFPlayer(player);
-			if (!player.hasPermission(new Permission("sf.sethome",
+			if (sfp.getTempHomeLocation() != null) {
+				Location newHomeLoc = sfp.getTempHomeLocation();
+				if (newHomeLoc.toVector().distance(
+						player.getLocation().toVector()) > 15) {
+					player.sendMessage(ChatColor.RED
+							+ "You are too far away from your bed. Setting home cancelled.");
+					sfp.setTempHomeLocation(null);
+				} else {
+					sfp.setHome(newHomeLoc);
+					player.sendMessage(ChatColor.YELLOW
+							+ "Home set to your bed");
+					sfp.setTempHomeLocation(null);
+					return true;
+				}
+			} else if (!player.hasPermission(new Permission("sf.sethome",
 					PermissionDefault.OP))) {
 				player.sendMessage(ChatColor.RED
 						+ sfp.translateString("sethome.usebed"));

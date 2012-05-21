@@ -38,38 +38,9 @@ import com.wimbli.WorldBorder.BorderData;
 
 public class PListener implements Listener {
 
-	private class AskSetHomeTask implements Runnable {
-		private final Player player;
-		private final Location homeLoc;
-
-		public AskSetHomeTask(Player player, Location homeLoc) {
-			this.player = player;
-			this.homeLoc = homeLoc;
-		}
-
-		@Override
-		public void run() {
-			SFPlayer sfp = new SFPlayer(player);
-
-			String answer = SFPlugin.questioner.ask(player, ChatColor.YELLOW
-					+ sfp.translateString("sethome.bedquestion"), "set",
-					"cancel");
-			if (answer == "set") {
-				sfp.setHome(homeLoc);
-			} else {
-				player.sendMessage(ChatColor.GRAY
-						+ sfp.translateString("sethome.bedcancelled"));
-			}
-
-			homeTasks.remove(player.getName());
-		}
-	}
-
 	SFPlugin plugin;
 
 	public BukkitScheduler tasks;
-
-	public static HashMap<String, Integer> homeTasks = new HashMap<String, Integer>();
 
 	private final HashMap<String, Integer> activeCompassPoints = new HashMap<String, Integer>();
 
@@ -165,17 +136,11 @@ public class PListener implements Listener {
 						|| player.getWorld().getName().contains("_the_end")) {
 					return;
 				}
-				if (homeTasks.containsKey(player.getName())) {
-					plugin.getServer().getScheduler()
-							.cancelTask(homeTasks.get(player.getName()));
-				}
-				int taskId = plugin
-						.getServer()
-						.getScheduler()
-						.scheduleAsyncDelayedTask(
-								plugin,
-								new AskSetHomeTask(player, player.getLocation()));
-				homeTasks.put(player.getName(), taskId);
+				player.sendMessage(ChatColor.YELLOW
+						+ "Type /sethome if you want to set your home to this bed.");
+				(new SFPlayer(player))
+						.setTempHomeLocation(player.getLocation());
+
 			}
 		}
 	}
