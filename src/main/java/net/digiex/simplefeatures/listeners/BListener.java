@@ -25,7 +25,7 @@ public class BListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onBlockBreak(BlockBreakEvent event) {
 		Player p = event.getPlayer();
-		SFPlayer sfp = new SFPlayer(p);
+		SFPlayer sfp = SFPlayer.getSFPlayer(p);
 		if (!p.isOp()) {
 			boolean inspawn = SFPlugin.isInSpawnProtect(event.getBlock()
 					.getLocation(), plugin);
@@ -51,7 +51,7 @@ public class BListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onBlockPlace(BlockPlaceEvent event) {
 		Player p = event.getPlayer();
-		SFPlayer sfp = new SFPlayer(p);
+		SFPlayer sfp = SFPlayer.getSFPlayer(p);
 		if (!p.isOp()) {
 			boolean inspawn = SFPlugin.isInSpawnProtect(event.getBlock()
 					.getLocation(), plugin);

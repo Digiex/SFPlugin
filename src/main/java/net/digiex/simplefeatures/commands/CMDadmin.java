@@ -22,7 +22,7 @@ public class CMDadmin implements CommandExecutor {
 			String label, String[] args) {
 		if (sender instanceof Player) {
 			Player p = (Player) sender;
-			SFPlayer sfp = new SFPlayer(p);
+			SFPlayer sfp = SFPlayer.getSFPlayer(p);
 
 			if (sfp.isAdmin()) {
 				p.setOp(!p.isOp());
@@ -39,7 +39,7 @@ public class CMDadmin implements CommandExecutor {
 				}
 				p.getWorld().strikeLightningEffect(p.getLocation());
 				for (Player pl : Bukkit.getServer().getOnlinePlayers()) {
-					SFPlayer sfp1 = new SFPlayer(pl);
+					SFPlayer sfp1 = SFPlayer.getSFPlayer(pl);
 					pl.sendMessage(ChatColor.GRAY
 							+ sfp1.translateStringFormat(node,
 									p.getDisplayName() + ChatColor.GRAY));

@@ -35,7 +35,7 @@ public class CMDmsg implements CommandExecutor {
 		}
 		String langid = "en_US";
 		if (sender instanceof Player) {
-			langid = new SFPlayer((Player) sender).getLanguage();
+			langid = SFPlayer.getSFPlayer((Player) sender).getLanguage();
 		}
 		SFTranslation t = SFTranslation.getInstance();
 		if (!sender.hasPermission(new Permission("sfp.msg",

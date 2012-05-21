@@ -30,7 +30,7 @@ public class CMDlisthomes implements CommandExecutor {
 		if (player == null) {
 			return true;
 		}
-		SFPlayer sfp = new SFPlayer(player);
+		SFPlayer sfp = SFPlayer.getSFPlayer(player);
 		List<SFHome> homes = plugin.getDatabase().find(SFHome.class).where()
 				.ieq("playerName", player.getName()).findList();
 		if (homes.isEmpty() && player.getBedSpawnLocation() == null) {

@@ -30,7 +30,7 @@ public class CMDwho implements CommandExecutor {
 			String label, String[] args) {
 		String langid = "en_US";
 		if (sender instanceof Player) {
-			langid = new SFPlayer((Player) sender).getLanguage();
+			langid = SFPlayer.getSFPlayer((Player) sender).getLanguage();
 		}
 		SFTranslation t = SFTranslation.getInstance();
 		if (args.length == 0) {

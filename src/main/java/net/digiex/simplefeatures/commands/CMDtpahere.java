@@ -26,7 +26,7 @@ public class CMDtpahere implements CommandExecutor {
 			Player player = (Player) sender;
 			if (args.length > 0) {
 				Player to = SFPlugin.getPlayer(sender, args[0]);
-				SFPlayer sfp = new SFPlayer(to);
+				SFPlayer sfp = SFPlayer.getSFPlayer(to);
 				if (to != null) {
 					if (sfp.isTeleporting()) {
 						player.sendMessage(ChatColor.GRAY
@@ -58,10 +58,11 @@ public class CMDtpahere implements CommandExecutor {
 							to,
 							player.getLocation(),
 							true,
-							new SFPlayer(to).translateStringFormat(
-									"teleport.tpahere", player.getDisplayName()),
-							sfp.translateStringFormat("teleport.tpingto",
-									player.getDisplayName()));
+							SFPlayer.getSFPlayer(to)
+									.translateStringFormat("teleport.tpahere",
+											player.getDisplayName()), sfp
+									.translateStringFormat("teleport.tpingto",
+											player.getDisplayName()));
 
 					return true;
 				}

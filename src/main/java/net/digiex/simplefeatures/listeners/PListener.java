@@ -54,7 +54,7 @@ public class PListener implements Listener {
 		if (e.isCancelled()) {
 			return;
 		}
-		SFPlayer sfp = new SFPlayer(e.getPlayer());
+		SFPlayer sfp = SFPlayer.getSFPlayer(e.getPlayer());
 		SFPlugin.log(Level.INFO, e.getPlayer().getName()
 				+ "'s gamemode changed to " + e.getNewGameMode().toString());
 		if (!sfp.saveInventory()) {
@@ -86,7 +86,7 @@ public class PListener implements Listener {
 					.findList();
 			if (points.isEmpty()) {
 				event.getPlayer().sendMessage(
-						new SFPlayer(event.getPlayer())
+						SFPlayer.getSFPlayer(event.getPlayer())
 								.translateString("compasspoints.nopoints"));
 				return;
 			} else {
@@ -117,7 +117,7 @@ public class PListener implements Listener {
 										.getPitch()));
 				event.getPlayer().sendMessage(
 						ChatColor.YELLOW
-								+ new SFPlayer(event.getPlayer())
+								+ SFPlayer.getSFPlayer(event.getPlayer())
 										.translateStringFormat(
 												"compasspoints.pointchanged",
 												ChatColor.AQUA
@@ -132,14 +132,14 @@ public class PListener implements Listener {
 			}
 			if (event.getClickedBlock().getType() == Material.BED_BLOCK) {
 				Player player = event.getPlayer();
-				if (player.getWorld().getName().contains("_nether")
-						|| player.getWorld().getName().contains("_the_end")) {
+				if (player.getWorld().getEnvironment() == Environment.NETHER
+						|| player.getWorld().getEnvironment() == Environment.THE_END) {
 					return;
 				}
 				player.sendMessage(ChatColor.YELLOW
 						+ "Type /sethome if you want to set your home to this bed.");
-				(new SFPlayer(player))
-						.setTempHomeLocation(player.getLocation());
+				(SFPlayer.getSFPlayer(player)).setTempHomeLocation(player
+						.getLocation());
 
 			}
 		}
@@ -147,7 +147,7 @@ public class PListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPlayerJoin(PlayerJoinEvent e) {
-		SFPlayer sfp = new SFPlayer(e.getPlayer());
+		SFPlayer sfp = SFPlayer.getSFPlayer(e.getPlayer());
 		PermissionAttachment attachment = e.getPlayer().addAttachment(plugin);
 		plugin.permissionAttachements.put(e.getPlayer().getName(), attachment);
 		sfp.updateNameColour();
@@ -159,7 +159,7 @@ public class PListener implements Listener {
 		if (!msgs.isEmpty()) {
 			e.getPlayer().sendMessage(
 					ChatColor.AQUA
-							+ new SFPlayer(e.getPlayer())
+							+ SFPlayer.getSFPlayer(e.getPlayer())
 									.translateStringFormat(
 											"mail.newmailnotifynum",
 											msgs.size()));
@@ -207,8 +207,11 @@ public class PListener implements Listener {
 						e.getPlayer()
 								.sendMessage(
 										ChatColor.RED
-												+ new SFPlayer(e.getPlayer())
-														.translateString("teleport.outsideofborder"));
+												+ SFPlayer
+														.getSFPlayer(
+																e.getPlayer())
+														.translateString(
+																"teleport.outsideofborder"));
 						e.setCancelled(true);
 						return;
 					}
@@ -268,7 +271,7 @@ public class PListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
-		SFPlayer sfp = new SFPlayer(event.getPlayer());
+		SFPlayer sfp = SFPlayer.getSFPlayer(event.getPlayer());
 		Location homeLoc = sfp.getHomeLoc(event.getPlayer().getWorld());
 		if (homeLoc != null) {
 			event.setRespawnLocation(homeLoc);
@@ -288,8 +291,11 @@ public class PListener implements Listener {
 						e.getPlayer()
 								.sendMessage(
 										ChatColor.RED
-												+ new SFPlayer(e.getPlayer())
-														.translateString("teleport.outsideofborder"));
+												+ SFPlayer
+														.getSFPlayer(
+																e.getPlayer())
+														.translateString(
+																"teleport.outsideofborder"));
 						e.setCancelled(true);
 						return;
 					}
@@ -346,7 +352,7 @@ public class PListener implements Listener {
 			if (player.getHealth() > 0
 					&& !(caller instanceof PlayerRespawnEvent)
 					&& player.getLocation().getY() > 1) {
-				SFPlayer sfp = new SFPlayer(player);
+				SFPlayer sfp = SFPlayer.getSFPlayer(player);
 				sfp.setLastLocation(player.getLocation());
 			}
 			setGameMode(player, to);

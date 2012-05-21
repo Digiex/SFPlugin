@@ -1,6 +1,7 @@
 package net.digiex.simplefeatures;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -15,11 +16,23 @@ import org.bukkit.inventory.ItemStack;
 import org.json.simple.JSONObject;
 
 public class SFPlayer {
+	public static SFPlayer getSFPlayer(Player player) {
+		String name = player.getName();
+		if (sfplayers.containsKey(name)) {
+			return sfplayers.get(name);
+		} else {
+			SFPlayer sfp = new SFPlayer(player);
+			sfplayers.put(name, sfp);
+			return sfp;
+		}
+	}
+
 	Player player;
 	SFPlugin plugin;
 	// Properties the EbeanServer must be told to update. It
 	// doesn't appear to be smart enough to figure these out on its own.
 	private static final Set<String> homeUpdateProps;
+
 	static {
 		homeUpdateProps = new HashSet<String>();
 		homeUpdateProps.add("x");
@@ -50,8 +63,9 @@ public class SFPlayer {
 	}
 
 	private Location tempHomeLocation = null;
+	private static HashMap<String, SFPlayer> sfplayers = new HashMap<String, SFPlayer>();
 
-	public SFPlayer(Player player) {
+	private SFPlayer(Player player) {
 		this.player = player;
 		plugin = ((SFPlugin) player.getServer().getPluginManager()
 				.getPlugin("SimpleFeatures"));

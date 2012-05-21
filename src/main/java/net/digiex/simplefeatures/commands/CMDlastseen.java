@@ -109,7 +109,7 @@ public class CMDlastseen implements CommandExecutor {
 		String langid = "en_US";
 		SFTranslation t = SFTranslation.getInstance();
 		if (sender instanceof Player) {
-			langid = new SFPlayer((Player) sender).getLanguage();
+			langid = SFPlayer.getSFPlayer((Player) sender).getLanguage();
 		}
 
 		if (!sender.hasPermission(new Permission("sfp.lastseen",

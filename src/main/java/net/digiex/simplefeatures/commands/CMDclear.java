@@ -25,7 +25,7 @@ public class CMDclear implements CommandExecutor {
 			String label, String[] args) {
 		SFPlayer sfp = null;
 		if (sender instanceof Player) {
-			sfp = new SFPlayer((Player) sender);
+			sfp = SFPlayer.getSFPlayer((Player) sender);
 		}
 		List<SFMail> msgs;
 		msgs = plugin.getDatabase().find(SFMail.class).where()

@@ -35,7 +35,7 @@ public class CMDrandom implements CommandExecutor {
 		}
 		if (sender instanceof Player) {
 			final Player p = (Player) sender;
-			SFPlayer sfp = new SFPlayer(p);
+			SFPlayer sfp = SFPlayer.getSFPlayer(p);
 			p.sendMessage(ChatColor.YELLOW
 					+ "Calculating the meaning of life...");
 			final Location l = new Location(p.getWorld(),

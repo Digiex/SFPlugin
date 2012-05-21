@@ -76,7 +76,7 @@ public class SFPlugin extends JavaPlugin {
 				String label, String[] args) {
 			String langid = "en_US";
 			if (sender instanceof Player) {
-				langid = new SFPlayer((Player) sender).getLanguage();
+				langid = SFPlayer.getSFPlayer((Player) sender).getLanguage();
 			}
 			sender.sendMessage(ChatColor.RED
 					+ SFTranslation.getInstance().translateKey(
@@ -95,14 +95,14 @@ public class SFPlugin extends JavaPlugin {
 	public static void broadcastLocalizedFormattedMessage(String node,
 			Object... args) {
 		for (Player p : Bukkit.getServer().getOnlinePlayers()) {
-			SFPlayer sfp = new SFPlayer(p);
+			SFPlayer sfp = SFPlayer.getSFPlayer(p);
 			p.sendMessage(sfp.translateStringFormat(node, args));
 		}
 	}
 
 	public static void broadcastLocalizedMessage(String node) {
 		for (Player p : Bukkit.getServer().getOnlinePlayers()) {
-			SFPlayer sfp = new SFPlayer(p);
+			SFPlayer sfp = SFPlayer.getSFPlayer(p);
 			p.sendMessage(sfp.translateString(node));
 		}
 	}
@@ -111,7 +111,7 @@ public class SFPlugin extends JavaPlugin {
 			String name, SFPlugin plugin) {
 		String langid = "en_US";
 		if (sender instanceof Player) {
-			langid = new SFPlayer((Player) sender).getLanguage();
+			langid = SFPlayer.getSFPlayer((Player) sender).getLanguage();
 		}
 		if (name != null) {
 			List<OfflinePlayer> players = matchOfflinePlayer(name, plugin);
@@ -135,7 +135,7 @@ public class SFPlugin extends JavaPlugin {
 	public static Player getPlayer(CommandSender sender, String name) {
 		String langid = "en_US";
 		if (sender instanceof Player) {
-			langid = new SFPlayer((Player) sender).getLanguage();
+			langid = SFPlayer.getSFPlayer((Player) sender).getLanguage();
 		}
 		if (name != null) {
 			List<Player> players = sender.getServer().matchPlayer(name);

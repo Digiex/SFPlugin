@@ -47,7 +47,7 @@ public class CMDcompasspoint implements CommandExecutor {
 			String label, final String[] args) {
 		if (sender instanceof Player) {
 			final Player p = (Player) sender;
-			SFPlayer sfp = new SFPlayer(p);
+			SFPlayer sfp = SFPlayer.getSFPlayer(p);
 			if (args.length > 0) {
 				if (args[0].equalsIgnoreCase("list")) {
 					List<SFCompassPoint> points = plugin.getDatabase()

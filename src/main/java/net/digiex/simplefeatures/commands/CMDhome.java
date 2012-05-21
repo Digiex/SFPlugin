@@ -34,7 +34,7 @@ public class CMDhome implements CommandExecutor {
 		if (args.length > 0) {
 			homeworld = plugin.getServer().getWorld(args[0]);
 		}
-		SFPlayer sfp = new SFPlayer(player);
+		SFPlayer sfp = SFPlayer.getSFPlayer(player);
 		if (sfp.isTeleporting()) {
 			player.sendMessage(ChatColor.GRAY
 					+ sfp.translateString("teleport.inprogress"));

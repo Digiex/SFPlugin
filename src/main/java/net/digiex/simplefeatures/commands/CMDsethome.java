@@ -24,7 +24,7 @@ public class CMDsethome implements CommandExecutor {
 			String label, String[] args) {
 		if (sender instanceof Player) {
 			Player player = (Player) sender;
-			SFPlayer sfp = new SFPlayer(player);
+			SFPlayer sfp = SFPlayer.getSFPlayer(player);
 			if (sfp.getTempHomeLocation() != null) {
 				Location newHomeLoc = sfp.getTempHomeLocation();
 				if (newHomeLoc.toVector().distance(
@@ -32,6 +32,7 @@ public class CMDsethome implements CommandExecutor {
 					player.sendMessage(ChatColor.RED
 							+ "You are too far away from your bed. Setting home cancelled.");
 					sfp.setTempHomeLocation(null);
+					return true;
 				} else {
 					sfp.setHome(newHomeLoc);
 					player.sendMessage(ChatColor.YELLOW

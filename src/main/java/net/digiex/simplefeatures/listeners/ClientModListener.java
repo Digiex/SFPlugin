@@ -26,7 +26,7 @@ public class ClientModListener implements PluginMessageListener {
 	@Override
 	public void onPluginMessageReceived(String channel, Player player,
 			byte[] message) {
-		SFPlayer sfp = new SFPlayer(player);
+		SFPlayer sfp = SFPlayer.getSFPlayer(player);
 		if (channel.equalsIgnoreCase("simplefeatures")) {
 			JSONObject json = (JSONObject) JSONValue.parse(new String(message));
 			String id = ((String) json.get("id"));
@@ -63,8 +63,8 @@ public class ClientModListener implements PluginMessageListener {
 					Player p = plugin.getServer().getPlayer(target.getName());
 					if (p != null) {
 						p.sendMessage(ChatColor.AQUA
-								+ new SFPlayer(p)
-										.translateString("mail.newmailnotify"));
+								+ SFPlayer.getSFPlayer(p).translateString(
+										"mail.newmailnotify"));
 					}
 					return;
 				}

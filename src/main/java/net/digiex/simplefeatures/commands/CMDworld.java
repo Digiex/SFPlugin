@@ -62,7 +62,7 @@ public class CMDworld implements CommandExecutor {
 			String label, String[] args) {
 		if (sender instanceof Player) {
 			Player player = (Player) sender;
-			SFPlayer sfp = new SFPlayer(player);
+			SFPlayer sfp = SFPlayer.getSFPlayer(player);
 			if (sfp.isTeleporting()) {
 				player.sendMessage(ChatColor.GRAY
 						+ sfp.translateString("teleport.inprogress"));

@@ -26,7 +26,7 @@ public class CMDabort implements CommandExecutor {
 			String[] strings) {
 
 		if (cs instanceof Player) {
-			SFPlayer sfp = new SFPlayer((Player) cs);
+			SFPlayer sfp = SFPlayer.getSFPlayer((Player) cs);
 			boolean found = false;
 			/*
 			 * for (BukkitWorker worker : parent.getServer().getScheduler()

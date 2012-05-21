@@ -31,7 +31,7 @@ public class CMDread implements CommandExecutor {
 		SFTranslation t = SFTranslation.getInstance();
 		SFPlayer sfp = null;
 		if (sender instanceof Player) {
-			sfp = new SFPlayer((Player) sender);
+			sfp = SFPlayer.getSFPlayer((Player) sender);
 			langid = sfp.getLanguage();
 		}
 		int page = 1;

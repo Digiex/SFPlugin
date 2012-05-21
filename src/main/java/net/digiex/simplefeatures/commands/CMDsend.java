@@ -31,7 +31,7 @@ public class CMDsend implements CommandExecutor {
 
 		String langid = "en_US";
 		if (sender instanceof Player) {
-			langid = new SFPlayer((Player) sender).getLanguage();
+			langid = SFPlayer.getSFPlayer((Player) sender).getLanguage();
 		}
 		SFTranslation t = SFTranslation.getInstance();
 		if (!sender.hasPermission(new Permission("sfp.msg",
@@ -57,7 +57,8 @@ public class CMDsend implements CommandExecutor {
 			Player p = parent.getServer().getPlayer(target.getName());
 			if (p != null) {
 				p.sendMessage(ChatColor.AQUA
-						+ new SFPlayer(p).translateString("mail.newmailnotify"));
+						+ SFPlayer.getSFPlayer(p).translateString(
+								"mail.newmailnotify"));
 			}
 			return true;
 		}
