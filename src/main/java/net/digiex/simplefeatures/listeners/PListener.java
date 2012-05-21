@@ -194,6 +194,7 @@ public class PListener implements Listener {
 		if (SFPlugin.clientAddons.containsKey((e.getPlayer().getName()))) {
 			SFPlugin.clientAddons.remove(e.getPlayer().getName());
 		}
+		SFPlayer.removeSFPlayerObject(e.getPlayer());
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
@@ -267,6 +268,7 @@ public class PListener implements Listener {
 		if (SFPlugin.clientAddons.containsKey((e.getPlayer().getName()))) {
 			SFPlugin.clientAddons.remove(e.getPlayer().getName());
 		}
+		SFPlayer.removeSFPlayerObject(e.getPlayer());
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)

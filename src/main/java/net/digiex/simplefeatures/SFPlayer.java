@@ -65,6 +65,12 @@ public class SFPlayer {
 	private Location tempHomeLocation = null;
 	private static HashMap<String, SFPlayer> sfplayers = new HashMap<String, SFPlayer>();
 
+	public static void removeSFPlayerObject(Player player) {
+		if (sfplayers.containsKey(player.getName())) {
+			sfplayers.remove(player.getName());
+		}
+	}
+
 	private SFPlayer(Player player) {
 		this.player = player;
 		plugin = ((SFPlugin) player.getServer().getPluginManager()
