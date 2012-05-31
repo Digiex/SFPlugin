@@ -2,8 +2,10 @@ package net.digiex.simplefeatures.listeners;
 
 import net.digiex.simplefeatures.SFPlugin;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -31,57 +33,60 @@ public class EListener implements Listener {
 			return;
 		}
 		Entity ent = e.getEntity();
-		if (e.getCause() == DamageCause.VOID) {
-			if (ent.getLocation().getBlock().getBiome() == Biome.SKY) {
-				Location l = ent.getLocation();
-				String mainWorld = l.getWorld().getName()
-						.replace("_the_end", "");
-				l.setWorld(plugin.getServer().getWorld(mainWorld));
-				l.setY(200);
-				if (SFPlugin.worldBorderPlugin != null) {
-					if (SFPlugin.worldBorderPlugin.GetWorldBorder(mainWorld) != null) {
-						if (!SFPlugin.worldBorderPlugin.GetWorldBorder(
-								mainWorld).insideBorder(l)) {
-							return;
+		if (plugin.getConfig().getBoolean("features.voidtp", true)) {
+			if (e.getCause() == DamageCause.VOID) {
+				if (ent.getLocation().getBlock().getBiome() == Biome.SKY) {
+					Location l = ent.getLocation();
+					World mainWorld = Bukkit.getWorld("0");
+					l.setWorld(mainWorld);
+					l.setY(200);
+					if (SFPlugin.worldBorderPlugin != null) {
+						if (SFPlugin.worldBorderPlugin.GetWorldBorder(mainWorld
+								.getName()) != null) {
+							if (!SFPlugin.worldBorderPlugin.GetWorldBorder(
+									mainWorld.getName()).insideBorder(l)) {
+								return;
+							}
 						}
 					}
-				}
-				if (l.getWorld() != null) {
-					ent.teleport(l);
-				} else {
-					return;
-				}
-			} else {
-				ent.setFallDistance(0);
-				Location tpLoc = null;
-				int i = 0;
-				while (tpLoc == null) {
-					i++;
-					if (i > 20) {
-						tpLoc = ent.getWorld().getSpawnLocation();
+					if (l.getWorld() != null) {
+						ent.teleport(l);
 					} else {
-						Block hB = ent.getWorld().getHighestBlockAt(
-								ent.getLocation().getBlockX() + i,
-								ent.getLocation().getBlockZ() + i);
+						return;
+					}
+				} else {
+					ent.setFallDistance(0);
+					Location tpLoc = null;
+					int i = 0;
+					while (tpLoc == null) {
+						i++;
+						if (i > 20) {
+							tpLoc = ent.getWorld().getSpawnLocation();
+						} else {
+							Block hB = ent.getWorld().getHighestBlockAt(
+									ent.getLocation().getBlockX() + i,
+									ent.getLocation().getBlockZ() + i);
 
-						if (hB.getY() > 1) {
-							tpLoc = hB.getLocation();
+							if (hB.getY() > 1) {
+								tpLoc = hB.getLocation();
+							}
 						}
 					}
-				}
-				if (SFPlugin.worldBorderPlugin != null) {
-					if (SFPlugin.worldBorderPlugin.GetWorldBorder(tpLoc
-							.getWorld().getName()) != null) {
-						if (!SFPlugin.worldBorderPlugin.GetWorldBorder(
-								tpLoc.getWorld().getName()).insideBorder(tpLoc)) {
-							return;
+					if (SFPlugin.worldBorderPlugin != null) {
+						if (SFPlugin.worldBorderPlugin.GetWorldBorder(tpLoc
+								.getWorld().getName()) != null) {
+							if (!SFPlugin.worldBorderPlugin.GetWorldBorder(
+									tpLoc.getWorld().getName()).insideBorder(
+									tpLoc)) {
+								return;
+							}
 						}
 					}
+					ent.teleport(tpLoc);
 				}
-				ent.teleport(tpLoc);
+				e.setCancelled(true);
+
 			}
-			e.setCancelled(true);
-
 		}
 
 	}

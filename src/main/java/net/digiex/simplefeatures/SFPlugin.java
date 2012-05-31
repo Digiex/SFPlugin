@@ -355,6 +355,18 @@ public class SFPlugin extends JavaPlugin {
 		if (!c.isSet("autosave.interval")) {
 			c.set("autosave.interval", 300);
 		}
+		if (!c.isSet("features.spawnprotect")) {
+			c.set("features.spawnprotect", true);
+		}
+		if (!c.isSet("features.bedrockprotect")) {
+			c.set("features.bedrockprotect", true);
+		}
+		if (!c.isSet("features.worldborderintegration")) {
+			c.set("features.worldborderintegration", true);
+		}
+		if (!c.isSet("features.voidtp")) {
+			c.set("features.voidtp", true);
+		}
 		saveConfig();
 		if (permsConfig == null) {
 			permsConfig = new YamlConfiguration();
@@ -418,6 +430,9 @@ public class SFPlugin extends JavaPlugin {
 		if (type.equalsIgnoreCase("flat")) {
 			return WorldType.FLAT;
 		}
+		if (type.equalsIgnoreCase("superflat")) {
+			return WorldType.FLAT;
+		}
 		if (type.equalsIgnoreCase("VERSION_1_1")) {
 			return WorldType.VERSION_1_1;
 		}
@@ -433,7 +448,9 @@ public class SFPlugin extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		PluginManager pm = getServer().getPluginManager();
-		worldBorderPlugin = (WorldBorder) pm.getPlugin("WorldBorder");
+		if (getConfig().getBoolean("features.worldborderintegration", true)) {
+			worldBorderPlugin = (WorldBorder) pm.getPlugin("WorldBorder");
+		}
 		// Worlds
 
 		// Basic Counter to count how many Worlds we are loading.
@@ -500,7 +517,10 @@ public class SFPlugin extends JavaPlugin {
 		// Simple Output to the Console to show how many Worlds were loaded.
 		log(Level.INFO, count + " world(s) loaded.");
 		playerListener = new PListener(this);
-		blockListener = new BListener(this);
+		if (getConfig().getBoolean("features.bedrockprotect", true)
+				|| getConfig().getBoolean("features.spawnprotect", true)) {
+			blockListener = new BListener(this);
+		}
 		entityListener = new EListener(this);
 
 		saveConfig();
