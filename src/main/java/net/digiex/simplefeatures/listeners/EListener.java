@@ -1,5 +1,7 @@
 package net.digiex.simplefeatures.listeners;
 
+import java.util.List;
+
 import net.digiex.simplefeatures.SFPlugin;
 
 import org.bukkit.Bukkit;
@@ -115,12 +117,21 @@ public class EListener implements Listener {
 		if (e.isCancelled()) {
 			return;
 		}
-		if (plugin.getConfig()
+		if (!plugin.getConfig()
 				.getBoolean(
 						"worlds." + e.getLocation().getWorld().getName()
 								+ ".itemdrops", true)) {
+			e.setCancelled(true);
 			return;
 		}
-		e.setCancelled(true);
+		List<Integer> disallowedItemsList = plugin.getConfig().getIntegerList(
+				"advanced.disalloweditems");
+		if (disallowedItemsList != null) {
+			if (disallowedItemsList.contains(e.getEntity().getItemStack()
+					.getTypeId())) {
+				e.setCancelled(true);
+				return;
+			}
+		}
 	}
 }

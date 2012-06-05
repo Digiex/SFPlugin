@@ -42,6 +42,7 @@ import net.digiex.simplefeatures.commands.CMDxp;
 import net.digiex.simplefeatures.listeners.BListener;
 import net.digiex.simplefeatures.listeners.ClientModListener;
 import net.digiex.simplefeatures.listeners.EListener;
+import net.digiex.simplefeatures.listeners.InventoryListener;
 import net.digiex.simplefeatures.listeners.PListener;
 
 import org.bukkit.Bukkit;
@@ -288,6 +289,7 @@ public class SFPlugin extends JavaPlugin {
 	public static HashMap<String, String> playerLangs = new HashMap<String, String>();
 
 	YamlConfiguration permsConfig;
+	private InventoryListener inventoryListener;
 
 	private void createDefaultConfig() {
 		// Worlds
@@ -523,6 +525,9 @@ public class SFPlugin extends JavaPlugin {
 			blockListener = new BListener(this);
 		}
 		entityListener = new EListener(this);
+		if (getConfig().getIntegerList("advanced.disalloweditems") != null) {
+			inventoryListener = new InventoryListener(this);
+		}
 
 		saveConfig();
 		createDefaultConfig();
