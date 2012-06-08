@@ -3,13 +3,13 @@ package net.digiex.simplefeatures.listeners;
 import java.util.List;
 
 import net.digiex.simplefeatures.SFPlugin;
+import net.digiex.simplefeatures.Util;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -59,21 +59,12 @@ public class EListener implements Listener {
 				} else {
 					ent.setFallDistance(0);
 					Location tpLoc = null;
-					int i = 0;
-					while (tpLoc == null) {
-						i++;
-						if (i > 20) {
-							tpLoc = ent.getWorld().getSpawnLocation();
-						} else {
-							Block hB = ent.getWorld().getHighestBlockAt(
-									ent.getLocation().getBlockX() + i,
-									ent.getLocation().getBlockZ() + i);
-
-							if (hB.getY() > 1) {
-								tpLoc = hB.getLocation();
-							}
-						}
+					try {
+						tpLoc = Util.getSafeDestination(ent.getLocation());
+					} catch (Exception e1) {
+						tpLoc = ent.getWorld().getSpawnLocation();
 					}
+
 					if (SFPlugin.worldBorderPlugin != null) {
 						if (SFPlugin.worldBorderPlugin.GetWorldBorder(tpLoc
 								.getWorld().getName()) != null) {
