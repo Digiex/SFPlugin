@@ -8,6 +8,7 @@ import net.digiex.simplefeatures.SFCompassPoint;
 import net.digiex.simplefeatures.SFMail;
 import net.digiex.simplefeatures.SFPlayer;
 import net.digiex.simplefeatures.SFPlugin;
+import net.digiex.simplefeatures.Util;
 
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -204,19 +205,6 @@ public class PListener implements Listener {
 		if (!e.getPlayer().isWhitelisted()) {
 			e.setLeaveMessage(null);
 		}
-		/*
-		 * try { for (BukkitWorker worker : plugin.getServer().getScheduler()
-		 * .getActiveWorkers()) { if (worker.getOwner() instanceof SFPlugin) {
-		 * if (SFTeleportTask.teleporters.get(e.getPlayer().getName()) != null)
-		 * { if (SFTeleportTask.teleporters.get(
-		 * e.getPlayer().getName()).equals( worker.getTaskId())) {
-		 * 
-		 * plugin.getServer().getScheduler() .cancelTask(worker.getTaskId());
-		 * 
-		 * } } } } } catch (Exception ex) { SFPlugin.log(Level.INFO,
-		 * "Tried to cancel a teleport of " + e.getPlayer().getName() +
-		 * " but it had been cancelled before (" + ex.getMessage() + ")"); }
-		 */
 		if (plugin.permissionAttachements.containsKey(e.getPlayer().getName())) {
 			e.getPlayer().removeAttachment(
 					plugin.permissionAttachements.get(e.getPlayer().getName()));
@@ -281,19 +269,6 @@ public class PListener implements Listener {
 		if (e.getPlayer().isOp()) {
 			e.getPlayer().setOp(false);
 		}
-		/*
-		 * try { for (BukkitWorker worker : plugin.getServer().getScheduler()
-		 * .getActiveWorkers()) { if (worker.getOwner() instanceof SFPlugin) {
-		 * if (SFTeleportTask.teleporters.get(e.getPlayer().getName()) != null)
-		 * { if (SFTeleportTask.teleporters.get(
-		 * e.getPlayer().getName()).equals( worker.getTaskId())) {
-		 * 
-		 * plugin.getServer().getScheduler() .cancelTask(worker.getTaskId());
-		 * 
-		 * } } } } } catch (Exception ex) { SFPlugin.log(Level.INFO,
-		 * "Tried to cancel a teleport of " + e.getPlayer().getName() +
-		 * " but it had been cancelled before (" + ex.getMessage() + ")"); }
-		 */
 		if (plugin.permissionAttachements.containsKey(e.getPlayer().getName())) {
 			e.getPlayer().removeAttachment(
 					plugin.permissionAttachements.get(e.getPlayer().getName()));
@@ -310,7 +285,13 @@ public class PListener implements Listener {
 		SFPlayer sfp = SFPlayer.getSFPlayer(event.getPlayer());
 		Location homeLoc = sfp.getHomeLoc(event.getPlayer().getWorld());
 		if (homeLoc != null) {
-			event.setRespawnLocation(homeLoc);
+			try {
+				event.setRespawnLocation(Util.getSafeDestination(homeLoc));
+			} catch (Exception e) {
+				event.getPlayer().sendMessage(
+						ChatColor.RED + "Could not respawn at home: "
+								+ e.getMessage());
+			}
 		} // Let vanilla handle setting the location if no home
 		Teleported(event.getPlayer().getWorld(), event.getRespawnLocation()
 				.getWorld(), event.getPlayer(), event);
@@ -337,23 +318,6 @@ public class PListener implements Listener {
 					}
 				}
 			}
-			// I need to disable this, entering bed and vehicles etc are
-			// teleports too.
-			// e.getPlayer().setNoDamageTicks(200);
-
-			// if (e.getPlayer().getVehicle() != null) {
-			// if (e.getFrom().distance(e.getTo()) > 30) {
-			// if (e.getPlayer().getVehicle().eject()) {
-			// e.getPlayer()
-			// .sendMessage(
-			// "Sorry, you cannot take your "
-			// + e.getPlayer().getVehicle()
-			// .getClass()
-			// .getSimpleName()
-			// + " with you.");
-			// }
-			// }
-			// }
 			Teleported(e.getFrom().getWorld(), e.getTo().getWorld(),
 					e.getPlayer(), e);
 			if (e.getFrom().getWorld() != e.getTo().getWorld()) {

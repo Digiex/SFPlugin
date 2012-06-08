@@ -83,7 +83,8 @@ public class Teleport implements Runnable {
 			cooldownTime.add(Calendar.SECOND, (int) cooldown);
 			cooldownTime.add(Calendar.MILLISECOND,
 					(int) ((cooldown * 1000.0) % 1000.0));
-			if (cooldownTime.after(now) && !user.isOp()) {
+			if (cooldownTime.after(now) && !user.isOp()
+					&& user.getGameMode() != GameMode.CREATIVE) {
 				throw new Exception("You need to wait " + cooldown
 						+ " seconds!");
 			}
@@ -187,7 +188,7 @@ public class Teleport implements Runnable {
 	}
 
 	private void teleport(Target target, TeleportCause cause) throws Exception {
-		double delay = 30;
+		double delay = 0;
 		cooldown(true);
 		if (delay <= 0 || user.isOp()
 				|| user.getGameMode() == GameMode.CREATIVE) {
