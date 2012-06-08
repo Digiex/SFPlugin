@@ -148,30 +148,27 @@ public class PListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPlayerJoin(PlayerJoinEvent e) {
 		StringBuilder minimap = new StringBuilder();
-		if (plugin.getConfig().getBoolean("features.cavemapping", false)) {
+		if (plugin.getConfig().getBoolean("minimap.cavemapping", false)) {
 			minimap.append("\2471");
 		}
-		if (plugin.getConfig().getBoolean("features.entitiesradar.player",
-				false)) {
+		if (plugin.getConfig()
+				.getBoolean("minimap.entitiesradar.player", false)) {
 			minimap.append("\2472");
 		}
-		if (plugin.getConfig().getBoolean("features.entitiesradar.animal",
-				false)) {
+		if (plugin.getConfig()
+				.getBoolean("minimap.entitiesradar.animal", false)) {
 			minimap.append("\2473");
 		}
-		if (plugin.getConfig().getBoolean("features.entitiesradar.mob", false)) {
+		if (plugin.getConfig().getBoolean("minimap.entitiesradar.mob", false)) {
 			minimap.append("\2474");
 		}
-		if (plugin.getConfig()
-				.getBoolean("features.entitiesradar.slime", false)) {
+		if (plugin.getConfig().getBoolean("minimap.entitiesradar.slime", false)) {
 			minimap.append("\2475");
 		}
-		if (plugin.getConfig()
-				.getBoolean("features.entitiesradar.squid", false)) {
+		if (plugin.getConfig().getBoolean("minimap.entitiesradar.squid", false)) {
 			minimap.append("\2476");
 		}
-		if (plugin.getConfig()
-				.getBoolean("features.entitiesradar.other", false)) {
+		if (plugin.getConfig().getBoolean("minimap.entitiesradar.other", false)) {
 			minimap.append("\2477");
 		}
 		if (minimap.length() > 0) {

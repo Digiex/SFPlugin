@@ -371,25 +371,25 @@ public class SFPlugin extends JavaPlugin {
 			c.set("features.voidtp", true);
 		}
 		if (!c.isSet("minimap.cavemapping")) {
-			c.set("features.cavemapping", false);
+			c.set("minimap.cavemapping", false);
 		}
 		if (!c.isSet("minimap.entitiesradar.player")) {
-			c.set("features.entitiesradar.player", false);
+			c.set("minimap.entitiesradar.player", false);
 		}
 		if (!c.isSet("minimap.entitiesradar.animal")) {
-			c.set("features.entitiesradar.animal", false);
+			c.set("minimap.entitiesradar.animal", false);
 		}
 		if (!c.isSet("minimap.entitiesradar.mob")) {
-			c.set("features.entitiesradar.mob", false);
+			c.set("minimap.entitiesradar.mob", false);
 		}
 		if (!c.isSet("minimap.entitiesradar.slime")) {
-			c.set("features.entitiesradar.slime", false);
+			c.set("minimap.entitiesradar.slime", false);
 		}
 		if (!c.isSet("minimap.entitiesradar.squid")) {
-			c.set("features.entitiesradar.squid", false);
+			c.set("minimap.entitiesradar.squid", false);
 		}
 		if (!c.isSet("minimap.entitiesradar.other")) {
-			c.set("features.entitiesradar.other", false);
+			c.set("minimap.entitiesradar.other", false);
 		}
 		saveConfig();
 		if (permsConfig == null) {
