@@ -370,6 +370,27 @@ public class SFPlugin extends JavaPlugin {
 		if (!c.isSet("features.voidtp")) {
 			c.set("features.voidtp", true);
 		}
+		if (!c.isSet("minimap.cavemapping")) {
+			c.set("features.cavemapping", false);
+		}
+		if (!c.isSet("minimap.entitiesradar.player")) {
+			c.set("features.entitiesradar.player", false);
+		}
+		if (!c.isSet("minimap.entitiesradar.animal")) {
+			c.set("features.entitiesradar.animal", false);
+		}
+		if (!c.isSet("minimap.entitiesradar.mob")) {
+			c.set("features.entitiesradar.mob", false);
+		}
+		if (!c.isSet("minimap.entitiesradar.slime")) {
+			c.set("features.entitiesradar.slime", false);
+		}
+		if (!c.isSet("minimap.entitiesradar.squid")) {
+			c.set("features.entitiesradar.squid", false);
+		}
+		if (!c.isSet("minimap.entitiesradar.other")) {
+			c.set("features.entitiesradar.other", false);
+		}
 		saveConfig();
 		if (permsConfig == null) {
 			permsConfig = new YamlConfiguration();
