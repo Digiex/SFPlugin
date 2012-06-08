@@ -214,6 +214,7 @@ public class SFPlayer {
 				player.setTotalExperience(inv.getTotalExperience());
 				player.setLevel(inv.getLevel());
 				player.setExp(inv.getExp());
+				removeIllegalItemsFromInventory();
 			}
 
 		} catch (NullPointerException ex) {
@@ -230,7 +231,18 @@ public class SFPlayer {
 		teleportRequestHere = here;
 	}
 
+	public void removeIllegalItemsFromInventory() {
+		List<Integer> disallowedItemsList = plugin.getConfig().getIntegerList(
+				"advanced.disalloweditems");
+		if (disallowedItemsList != null) {
+			for (Integer item : disallowedItemsList) {
+				player.getInventory().remove(item);
+			}
+		}
+	}
+
 	public boolean saveInventory() {
+		removeIllegalItemsFromInventory();
 		com.avaje.ebean.EbeanServer db = plugin.getDatabase();
 		boolean retval = true;
 		if (!(player.getHealth() > 0)) {

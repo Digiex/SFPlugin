@@ -147,6 +147,34 @@ public class PListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPlayerJoin(PlayerJoinEvent e) {
+		StringBuilder minimap = new StringBuilder();
+		if (plugin.getConfig().getBoolean("minimap.cavemapping", false)) {
+			minimap.append("\2471");
+		}
+		if (plugin.getConfig()
+				.getBoolean("minimap.entitiesradar.player", false)) {
+			minimap.append("\2472");
+		}
+		if (plugin.getConfig()
+				.getBoolean("minimap.entitiesradar.animal", false)) {
+			minimap.append("\2473");
+		}
+		if (plugin.getConfig().getBoolean("minimap.entitiesradar.mob", false)) {
+			minimap.append("\2474");
+		}
+		if (plugin.getConfig().getBoolean("minimap.entitiesradar.slime", false)) {
+			minimap.append("\2475");
+		}
+		if (plugin.getConfig().getBoolean("minimap.entitiesradar.squid", false)) {
+			minimap.append("\2476");
+		}
+		if (plugin.getConfig().getBoolean("minimap.entitiesradar.other", false)) {
+			minimap.append("\2477");
+		}
+		if (minimap.length() > 0) {
+			e.getPlayer().sendRawMessage(
+					"\2470\2470" + minimap.toString() + "\247e\247f");
+		}
 		SFPlayer sfp = SFPlayer.getSFPlayer(e.getPlayer());
 		PermissionAttachment attachment = e.getPlayer().addAttachment(plugin);
 		plugin.permissionAttachements.put(e.getPlayer().getName(), attachment);
@@ -170,6 +198,9 @@ public class PListener implements Listener {
 	public void onPlayerKick(PlayerKickEvent e) {
 		System.out
 				.println(e.getPlayer().getName() + " lost connection: kicked");
+		if (e.getPlayer().isOp()) {
+			e.getPlayer().setOp(false);
+		}
 		if (!e.getPlayer().isWhitelisted()) {
 			e.setLeaveMessage(null);
 		}
@@ -247,6 +278,9 @@ public class PListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPlayerQuit(PlayerQuitEvent e) {
+		if (e.getPlayer().isOp()) {
+			e.getPlayer().setOp(false);
+		}
 		/*
 		 * try { for (BukkitWorker worker : plugin.getServer().getScheduler()
 		 * .getActiveWorkers()) { if (worker.getOwner() instanceof SFPlugin) {

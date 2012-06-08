@@ -27,21 +27,25 @@ public class BListener implements Listener {
 		Player p = event.getPlayer();
 		SFPlayer sfp = SFPlayer.getSFPlayer(p);
 		if (!p.isOp()) {
-			boolean inspawn = SFPlugin.isInSpawnProtect(event.getBlock()
-					.getLocation(), plugin);
-			if (inspawn) {
-				event.setCancelled(true);
-				p.sendMessage(ChatColor.RED
-						+ sfp.translateString("general.inspawnprotect"));
+			if (plugin.getConfig().getBoolean("features.spawnprotect", true)) {
+				boolean inspawn = SFPlugin.isInSpawnProtect(event.getBlock()
+						.getLocation(), plugin);
+				if (inspawn) {
+					event.setCancelled(true);
+					p.sendMessage(ChatColor.RED
+							+ sfp.translateString("general.inspawnprotect"));
+				}
 			}
-			if (p.getGameMode().equals(GameMode.CREATIVE)) {
-				if (!event.isCancelled()) {
-					if (event.getBlock().getY() < Double.valueOf(7)
-							&& event.getBlock().getType()
-									.equals(Material.BEDROCK)) {
-						event.setCancelled(true);
-						p.sendMessage(ChatColor.RED
-								+ sfp.translateString("general.bedrockblocked.removal"));
+			if (plugin.getConfig().getBoolean("features.bedrockprotect", true)) {
+				if (p.getGameMode().equals(GameMode.CREATIVE)) {
+					if (!event.isCancelled()) {
+						if (event.getBlock().getY() < Double.valueOf(7)
+								&& event.getBlock().getType()
+										.equals(Material.BEDROCK)) {
+							event.setCancelled(true);
+							p.sendMessage(ChatColor.RED
+									+ sfp.translateString("general.bedrockblocked.removal"));
+						}
 					}
 				}
 			}
@@ -53,21 +57,25 @@ public class BListener implements Listener {
 		Player p = event.getPlayer();
 		SFPlayer sfp = SFPlayer.getSFPlayer(p);
 		if (!p.isOp()) {
-			boolean inspawn = SFPlugin.isInSpawnProtect(event.getBlock()
-					.getLocation(), plugin);
-			if (inspawn) {
-				event.setCancelled(true);
-				p.sendMessage(ChatColor.RED
-						+ sfp.translateString("general.inspawnprotect"));
+			if (plugin.getConfig().getBoolean("features.spawnprotect", true)) {
+				boolean inspawn = SFPlugin.isInSpawnProtect(event.getBlock()
+						.getLocation(), plugin);
+				if (inspawn) {
+					event.setCancelled(true);
+					p.sendMessage(ChatColor.RED
+							+ sfp.translateString("general.inspawnprotect"));
+				}
 			}
-			if (p.getGameMode().equals(GameMode.CREATIVE)) {
-				if (!event.isCancelled()) {
-					if (event.getBlock().getY() < Double.valueOf(7)
-							&& event.getBlock().getType()
-									.equals(Material.BEDROCK)) {
-						event.setCancelled(true);
-						p.sendMessage(ChatColor.RED
-								+ sfp.translateString("general.bedrockblocked.placement"));
+			if (plugin.getConfig().getBoolean("features.bedrockprotect", true)) {
+				if (p.getGameMode().equals(GameMode.CREATIVE)) {
+					if (!event.isCancelled()) {
+						if (event.getBlock().getY() < Double.valueOf(7)
+								&& event.getBlock().getType()
+										.equals(Material.BEDROCK)) {
+							event.setCancelled(true);
+							p.sendMessage(ChatColor.RED
+									+ sfp.translateString("general.bedrockblocked.placement"));
+						}
 					}
 				}
 			}

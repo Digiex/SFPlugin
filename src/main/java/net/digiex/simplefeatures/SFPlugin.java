@@ -30,6 +30,7 @@ import net.digiex.simplefeatures.commands.CMDsend;
 import net.digiex.simplefeatures.commands.CMDsendall;
 import net.digiex.simplefeatures.commands.CMDsethome;
 import net.digiex.simplefeatures.commands.CMDsetspawn;
+import net.digiex.simplefeatures.commands.CMDsf;
 import net.digiex.simplefeatures.commands.CMDspawn;
 import net.digiex.simplefeatures.commands.CMDtp;
 import net.digiex.simplefeatures.commands.CMDtpa;
@@ -41,6 +42,7 @@ import net.digiex.simplefeatures.commands.CMDxp;
 import net.digiex.simplefeatures.listeners.BListener;
 import net.digiex.simplefeatures.listeners.ClientModListener;
 import net.digiex.simplefeatures.listeners.EListener;
+import net.digiex.simplefeatures.listeners.InventoryListener;
 import net.digiex.simplefeatures.listeners.PListener;
 
 import org.bukkit.Bukkit;
@@ -287,6 +289,7 @@ public class SFPlugin extends JavaPlugin {
 	public static HashMap<String, String> playerLangs = new HashMap<String, String>();
 
 	YamlConfiguration permsConfig;
+	private InventoryListener inventoryListener;
 
 	private void createDefaultConfig() {
 		// Worlds
@@ -355,6 +358,39 @@ public class SFPlugin extends JavaPlugin {
 		if (!c.isSet("autosave.interval")) {
 			c.set("autosave.interval", 300);
 		}
+		if (!c.isSet("features.spawnprotect")) {
+			c.set("features.spawnprotect", true);
+		}
+		if (!c.isSet("features.bedrockprotect")) {
+			c.set("features.bedrockprotect", true);
+		}
+		if (!c.isSet("features.worldborderintegration")) {
+			c.set("features.worldborderintegration", true);
+		}
+		if (!c.isSet("features.voidtp")) {
+			c.set("features.voidtp", true);
+		}
+		if (!c.isSet("minimap.cavemapping")) {
+			c.set("minimap.cavemapping", false);
+		}
+		if (!c.isSet("minimap.entitiesradar.player")) {
+			c.set("minimap.entitiesradar.player", false);
+		}
+		if (!c.isSet("minimap.entitiesradar.animal")) {
+			c.set("minimap.entitiesradar.animal", false);
+		}
+		if (!c.isSet("minimap.entitiesradar.mob")) {
+			c.set("minimap.entitiesradar.mob", false);
+		}
+		if (!c.isSet("minimap.entitiesradar.slime")) {
+			c.set("minimap.entitiesradar.slime", false);
+		}
+		if (!c.isSet("minimap.entitiesradar.squid")) {
+			c.set("minimap.entitiesradar.squid", false);
+		}
+		if (!c.isSet("minimap.entitiesradar.other")) {
+			c.set("minimap.entitiesradar.other", false);
+		}
 		saveConfig();
 		if (permsConfig == null) {
 			permsConfig = new YamlConfiguration();
@@ -418,6 +454,9 @@ public class SFPlugin extends JavaPlugin {
 		if (type.equalsIgnoreCase("flat")) {
 			return WorldType.FLAT;
 		}
+		if (type.equalsIgnoreCase("superflat")) {
+			return WorldType.FLAT;
+		}
 		if (type.equalsIgnoreCase("VERSION_1_1")) {
 			return WorldType.VERSION_1_1;
 		}
@@ -433,7 +472,9 @@ public class SFPlugin extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		PluginManager pm = getServer().getPluginManager();
-		worldBorderPlugin = (WorldBorder) pm.getPlugin("WorldBorder");
+		if (getConfig().getBoolean("features.worldborderintegration", true)) {
+			worldBorderPlugin = (WorldBorder) pm.getPlugin("WorldBorder");
+		}
 		// Worlds
 
 		// Basic Counter to count how many Worlds we are loading.
@@ -500,8 +541,14 @@ public class SFPlugin extends JavaPlugin {
 		// Simple Output to the Console to show how many Worlds were loaded.
 		log(Level.INFO, count + " world(s) loaded.");
 		playerListener = new PListener(this);
-		blockListener = new BListener(this);
+		if (getConfig().getBoolean("features.bedrockprotect", true)
+				|| getConfig().getBoolean("features.spawnprotect", true)) {
+			blockListener = new BListener(this);
+		}
 		entityListener = new EListener(this);
+		if (getConfig().getIntegerList("advanced.disalloweditems") != null) {
+			inventoryListener = new InventoryListener(this);
+		}
 
 		saveConfig();
 		createDefaultConfig();
@@ -531,6 +578,7 @@ public class SFPlugin extends JavaPlugin {
 		setCMDexecutor("lastseen", new CMDlastseen(this));
 		setCMDexecutor("compasspoint", new CMDcompasspoint(this));
 		setCMDexecutor("xp", new CMDxp(this));
+		setCMDexecutor("sf", new CMDsf(this));
 		setupDatabase();
 		int interval = getConfig().getInt("autosave.interval", 300);
 		log(Level.INFO, ChatColor.AQUA

@@ -1,6 +1,6 @@
 name: SimpleFeatures
 main: net.digiex.simplefeatures.SFPlugin
-version: 1.0.5
+version: 1.1.6
 description: Basic commands and features
 author: jessenic
 website: http://digiex.net/
@@ -146,4 +146,10 @@ commands:
         description: View your experience
         usage: |
                /<command> [player]
+               Example: /<command>
+    sf:
+        aliases: [sfplugin, simplefeatures, sfp]
+        description: Reloads the SimpleFeatures config
+        usage: |
+               /<command>
                Example: /<command>
